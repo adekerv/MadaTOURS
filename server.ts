@@ -10,11 +10,11 @@ async function startServer() {
   app.use(express.json());
 
   // API Routes
-  app.get('/api/places', (req, res) => {
+  app.get('/api/places', async (req, res) => {
     const { lat, lng, radius } = req.query;
     
     try {
-      const placesData = getPlacesData();
+      const placesData = await getPlacesData();
       
       if (!lat || !lng) {
         return res.json(placesData);

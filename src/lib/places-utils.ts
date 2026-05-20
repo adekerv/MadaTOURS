@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import mysql from 'mysql2/promise';
+import placesJson from '../data/places.json';
 
 export interface Place {
   id: number;
@@ -10,6 +10,10 @@ export interface Place {
   lat: number;
   lng: number;
   distance?: number;
+  rating?: number;
+  hours?: string;
+  tags?: string[];
+  image?: string;
 }
 
 export function deg2rad(deg: number) {
@@ -29,7 +33,26 @@ export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2
   return d;
 }
 
-export function getPlacesData() {
-  const placesPath = path.join(process.cwd(), 'src', 'data', 'places.json');
-  return JSON.parse(fs.readFileSync(placesPath, 'utf8')) as Place[];
+export async function getPlacesData(): Promise<Place[]> {
+  const dbUrl = process.env.DATABASE_URL;
+
+  if (dbUrl) {
+    try {
+      const connection = await mysql.createConnection(dbUrl);
+      const [rows] = await connection.execute('SELECT * FROM places');
+      await connection.end();
+      
+      // Map MySQL results to handle JSON tags if needed
+      return (rows as any[]).map(row => ({
+        ...row,
+        // Ensure tags are an array if stored as string/json in DB
+        tags: typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags
+      })) as Place[];
+    } catch (error) {
+      console.warn('Database connection failed, falling back to JSON:', error);
+    }
+  }
+
+  // Fallback to imported JSON (bundled by esbuild/vite)
+  return placesJson as Place[];
 }

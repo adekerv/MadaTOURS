@@ -107,7 +107,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <p className="text-[10px] font-black uppercase tracking-widest text-orange-500 italic">Scanning...</p>
                   </div>
                 ) : filteredPlaces.length === 0 ? (
-                  <p className="text-center text-slate-300 py-12 md:py-20 italic text-sm">No markers in this sector.</p>
+                  <div className="py-12 md:py-20 text-center space-y-4 px-4">
+                    <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
+                      <Grid size={24} />
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-slate-400 font-medium text-sm">No markers in this sector.</p>
+                      <p className="text-[10px] text-slate-300 uppercase tracking-widest leading-relaxed">Try increasing the search range or moving your location on the map.</p>
+                    </div>
+                  </div>
                 ) : (
                   filteredPlaces.map((place, index) => (
                     <PlaceCard 
