@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  
+  --color-brand-primary: #f97316; /* Orange 500 */
+  --color-brand-secondary: #ea580c; /* Orange 600 */
+  --color-brand-bg: #f0f9ff; /* Sky 50 */
+  --color-brand-accent: #16a34a; /* Green 600 */
+  --color-slate-800: #1e293b;
+  --color-slate-500: #64748b;
+  --color-slate-400: #94a3b8;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-slate-800 font-sans antialiased;
+  }
+}
+
+.leaflet-container {
+  @apply w-full h-full rounded-3xl shadow-2xl overflow-hidden;
+  border: 8px solid white;
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+  }
+}

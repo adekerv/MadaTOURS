@@ -1,0 +1,6 @@
+{
+  "name": "MADATOURS",
+  "description": "Discover Martinique's best restaurants and activities within 5-10km of your location.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
