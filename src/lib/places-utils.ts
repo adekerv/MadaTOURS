@@ -1,4 +1,3 @@
-import mysql from 'mysql2/promise';
 import placesJson from '../data/places.json';
 
 export interface Place {
@@ -34,25 +33,6 @@ export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2
 }
 
 export async function getPlacesData(): Promise<Place[]> {
-  const dbUrl = process.env.DATABASE_URL;
-
-  if (dbUrl) {
-    try {
-      const connection = await mysql.createConnection(dbUrl);
-      const [rows] = await connection.execute('SELECT * FROM places');
-      await connection.end();
-      
-      // Map MySQL results to handle JSON tags if needed
-      return (rows as any[]).map(row => ({
-        ...row,
-        // Ensure tags are an array if stored as string/json in DB
-        tags: typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags
-      })) as Place[];
-    } catch (error) {
-      console.warn('Database connection failed, falling back to JSON:', error);
-    }
-  }
-
-  // Fallback to imported JSON (bundled by esbuild/vite)
+  // Return imported JSON directly (bundled by build tools)
   return placesJson as Place[];
 }

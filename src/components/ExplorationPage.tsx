@@ -8,6 +8,8 @@ import { Header } from './exploration/Header';
 import { Sidebar } from './exploration/Sidebar';
 import { LocationPrompt } from './exploration/LocationPrompt';
 import { SelectedPlaceOverlay } from './exploration/SelectedPlaceOverlay';
+import { calculateDistance } from '../lib/places-utils';
+import placesJson from '../data/places.json';
 
 interface ExplorationPageProps {
   onBack: () => void;
@@ -48,10 +50,19 @@ export const ExplorationPage: React.FC<ExplorationPageProps> = ({
     setLoading(true);
     try {
       const resp = await fetch(`/api/places?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${radius}`);
+      if (!resp.ok) {
+        throw new Error(`API returned status ${resp.status}`);
+      }
       const data = await resp.json();
       setPlaces(data);
     } catch (err) {
-      console.error('Failed to fetch places', err);
+      console.warn('API fetch failed, falling back to local client-side calculation:', err);
+      // Fail-safe client-side calculation fallback
+      const filtered = (placesJson as Place[]).map((place) => {
+        const distance = calculateDistance(userLocation.lat, userLocation.lng, place.lat, place.lng);
+        return { ...place, distance };
+      }).filter((place) => place.distance <= radius);
+      setPlaces(filtered);
     } finally {
       setLoading(false);
     }
