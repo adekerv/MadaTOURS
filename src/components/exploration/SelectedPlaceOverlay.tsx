@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Heart, X, Info } from 'lucide-react';
-import { Place } from '../../types';
+import { Place, User } from '../../types';
+import { getPlaceTheme } from '../../utils/emoji';
 
 interface SelectedPlaceOverlayProps {
   place: Place | null;
@@ -11,6 +12,8 @@ interface SelectedPlaceOverlayProps {
   onToggleFavorite: (place: Place) => void;
   onShowDetails: () => void;
   googleMapsUrl: string;
+  user: User | null;
+  onLoginClick: () => void;
 }
 
 export const SelectedPlaceOverlay: React.FC<SelectedPlaceOverlayProps> = ({ 
@@ -20,11 +23,15 @@ export const SelectedPlaceOverlay: React.FC<SelectedPlaceOverlayProps> = ({
   isFavorite,
   onToggleFavorite,
   onShowDetails,
-  googleMapsUrl
+  googleMapsUrl,
+  user,
+  onLoginClick
 }) => {
+  const theme = place ? getPlaceTheme(place) : null;
+
   return (
     <AnimatePresence>
-      {isVisible && place && (
+      {isVisible && place && theme && (
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -33,8 +40,11 @@ export const SelectedPlaceOverlay: React.FC<SelectedPlaceOverlayProps> = ({
         >
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner border border-orange-200">
-                {place.type === 'restaurant' ? '🍴' : '🏄'}
+              <div 
+                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner border"
+                style={{ backgroundColor: theme.bgColor, borderColor: theme.borderColor }}
+              >
+                {theme.emoji}
               </div>
               <div>
                 <h3 className="text-xl font-black text-slate-800 leading-none">{place.name}</h3>
@@ -43,10 +53,23 @@ export const SelectedPlaceOverlay: React.FC<SelectedPlaceOverlayProps> = ({
             </div>
             <div className="flex gap-2">
               <button 
-                onClick={() => onToggleFavorite(place)}
-                className="w-8 h-8 bg-slate-50 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors"
+                onClick={() => {
+                  if (user) {
+                    onToggleFavorite(place);
+                  } else {
+                    onLoginClick();
+                  }
+                }}
+                title={user ? "Toggle Favorite" : "Log in to save favorites"}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                  user 
+                    ? isFavorite 
+                      ? 'bg-red-500 text-white hover:bg-red-650' 
+                      : 'bg-slate-50 text-red-500 hover:bg-red-50'
+                    : 'bg-slate-50 text-slate-300 hover:text-orange-500 cursor-pointer'
+                }`}
               >
-                <Heart size={18} className={isFavorite ? 'fill-red-500' : ''} />
+                <Heart size={18} className={user && isFavorite ? 'fill-red-500' : ''} />
               </button>
               <button 
                 onClick={onClose}

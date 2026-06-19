@@ -13,6 +13,12 @@ export interface Place {
   image?: string;
 }
 
+export interface User {
+  id: number;
+  email: string;
+  role: 'user' | 'admin';
+}
+
 export interface UserLocation {
   lat: number;
   lng: number;

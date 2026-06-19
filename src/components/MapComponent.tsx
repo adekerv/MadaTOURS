@@ -4,13 +4,23 @@ import L from 'leaflet';
 import { Place, UserLocation } from '../types';
 import { Utensils, Mountain, MapPin } from 'lucide-react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { getPlaceTheme } from '../utils/emoji';
 
 // Fix for default marker icons in React Leaflet
 import 'leaflet/dist/leaflet.css';
 
-const createCustomIcon = (type: 'restaurant' | 'activity' | 'user') => {
-  const color = type === 'user' ? '#2563eb' : '#f97316'; // Blue 600 for user, Orange 500 for places
-  const emoji = type === 'restaurant' ? '🍴' : type === 'activity' ? '🏄' : null;
+const createCustomIcon = (type: 'restaurant' | 'activity' | 'user', tags: string[] = []) => {
+  let color = '#2563eb'; // Default Blue 600
+  let emoji = '';
+  
+  if (type === 'user') {
+    color = '#2563eb'; // Blue 600 for user
+  } else {
+    // Get rich category theme based on tag categorization
+    const theme = getPlaceTheme({ type, tags, name: '' } as Place);
+    color = theme.color;
+    emoji = theme.emoji;
+  }
   
   const markerHtml = type === 'user' ? `
     <div class="relative flex flex-col items-center">
@@ -18,7 +28,7 @@ const createCustomIcon = (type: 'restaurant' | 'activity' | 'user') => {
       <div class="w-8 h-8 bg-blue-600 border-4 border-white rounded-full shadow-2xl z-20"></div>
     </div>
   ` : `
-    <div class="w-8 h-8 bg-orange-500 border-2 border-white rounded-full rounded-bl-none rotate-45 shadow-lg flex items-center justify-center">
+    <div class="w-8 h-8 border-2 border-white rounded-full rounded-bl-none rotate-45 shadow-lg flex items-center justify-center transition-transform hover:scale-110" style="background-color: ${color};">
       <span class="-rotate-45 text-xs">${emoji}</span>
     </div>
   `;
@@ -38,21 +48,29 @@ interface MapComponentProps {
   onPlaceSelect: (place: Place) => void;
   onMapClick?: () => void;
   radius?: number;
+  selectedPlace?: Place | null;
 }
 
 // Component to handle map centering and clicks for manual input
 const MapHandler: React.FC<{ 
   userLocation: UserLocation | null, 
+  selectedPlace: Place | null,
   onLocationSelect: (lat: number, lng: number) => void,
   onMapClick?: () => void
-}> = ({ userLocation, onLocationSelect, onMapClick }) => {
+}> = ({ userLocation, selectedPlace, onLocationSelect, onMapClick }) => {
   const map = useMap();
 
   useEffect(() => {
-    if (userLocation) {
+    if (userLocation && !selectedPlace) {
       map.flyTo([userLocation.lat, userLocation.lng], 13);
     }
   }, [userLocation, map]);
+
+  useEffect(() => {
+    if (selectedPlace) {
+      map.flyTo([selectedPlace.lat, selectedPlace.lng], 15);
+    }
+  }, [selectedPlace, map]);
 
   useMapEvents({
     click(e) {
@@ -70,7 +88,8 @@ export const MapComponent: React.FC<MapComponentProps> = ({
   onLocationSelect,
   onPlaceSelect,
   onMapClick,
-  radius = 10
+  radius = 10,
+  selectedPlace = null
 }) => {
   const martiniqueCenter: [number, number] = [14.6415, -61.0242];
 
@@ -87,7 +106,12 @@ export const MapComponent: React.FC<MapComponentProps> = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
-        <MapHandler userLocation={userLocation} onLocationSelect={onLocationSelect} onMapClick={onMapClick} />
+        <MapHandler 
+          userLocation={userLocation} 
+          selectedPlace={selectedPlace} 
+          onLocationSelect={onLocationSelect} 
+          onMapClick={onMapClick} 
+        />
 
         {userLocation && (
           <>
@@ -119,7 +143,7 @@ export const MapComponent: React.FC<MapComponentProps> = ({
           <Marker
             key={place.id}
             position={[place.lat, place.lng]}
-            icon={createCustomIcon(place.type)}
+            icon={createCustomIcon(place.type, place.tags)}
             eventHandlers={{
               click: () => onPlaceSelect(place),
             }}
