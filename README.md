@@ -1,4 +1,4 @@
-# 📍 MADA-TOURS
+# 📍 MADA-TOURS Boyy
 
 Welcome to **MADA-TOURS**, an interactive location-based web application built specifically for the island of Martinique. This project was developed from scratch during an intensive **4-day Hackathon**. 
 
