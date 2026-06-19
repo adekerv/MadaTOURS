@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Grid, Map as MapIcon, RotateCcw } from 'lucide-react';
-import { Place, UserLocation } from '../../types';
+import { X, Grid, Map as MapIcon, RotateCcw, Plus, Database, ShieldCheck } from 'lucide-react';
+import { Place, UserLocation, User } from '../../types';
 import { PlaceCard } from './PlaceCard';
+import { AddPlacePanel } from './AddPlacePanel';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -19,6 +20,11 @@ interface SidebarProps {
   onShowDetails: (place: Place) => void;
   isFavorite: (id: number) => boolean;
   onResetRadar: () => void;
+  sortBy: 'default' | 'rating' | 'hiking' | 'entertainment';
+  setSortBy: (sortBy: 'default' | 'rating' | 'hiking' | 'entertainment') => void;
+  onRefreshPlaces?: () => void;
+  user: User | null;
+  onAdminClick?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -35,8 +41,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onPlaceSelect,
   onShowDetails,
   isFavorite,
-  onResetRadar
+  onResetRadar,
+  sortBy,
+  setSortBy,
+  onRefreshPlaces,
+  user,
+  onAdminClick
 }) => {
+  const [isAddPanelOpen, setIsAddPanelOpen] = useState(false);
+
   return (
     <AnimatePresence initial={false}>
       {isOpen && (
@@ -47,7 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
           className="absolute md:relative inset-y-0 left-0 w-[85%] md:w-80 bg-white border-r-2 border-orange-50 flex flex-col shadow-2xl z-30 font-sans shrink-0 overflow-hidden"
         >
-          <div className="p-5 md:p-6 space-y-5 md:space-y-6 flex flex-col h-full">
+          <div className="p-5 md:p-6 space-y-5 md:space-y-6 flex flex-col h-full relative">
             <div className="flex items-center justify-between md:hidden">
               <h2 className="text-xl font-black text-slate-800 tracking-tight italic">Filters</h2>
               <button onClick={onClose} className="p-2 bg-slate-100 rounded-full text-slate-500">
@@ -55,9 +68,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </div>
 
-            <section>
-              <h2 className="text-xl md:text-2xl font-black text-slate-800 leading-tight mb-1 italic">Discoveries</h2>
-              <p className="text-[11px] md:text-sm text-slate-500 font-medium tracking-tight">Exploring within {radius}km</p>
+            <section className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl md:text-2xl font-black text-slate-800 leading-tight mb-1 italic">Discoveries</h2>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium tracking-tight">Exploring within {radius}km</p>
+              </div>
+              {user?.role === 'admin' && (
+                <div className="flex gap-2">
+                  <button 
+                    onClick={onAdminClick}
+                    title="Open Database Control Panel"
+                    className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-orange-400 border border-slate-800 hover:border-slate-700 shadow-md hover:shadow-lg transition-all flex items-center justify-center cursor-pointer"
+                  >
+                    <ShieldCheck size={15} />
+                  </button>
+                  <button 
+                    onClick={() => setIsAddPanelOpen(true)}
+                    title="Add Spot (Quick Form)"
+                    className="p-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-center cursor-pointer border-none"
+                  >
+                    <Database size={15} className="mr-1 shadow-sm" />
+                    <Plus size={12} className="stroke-[3]" />
+                  </button>
+                </div>
+              )}
             </section>
 
             {/* Filter Tabs */}
@@ -92,6 +126,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-orange-500"
               />
             </div>
+
+            {/* Special Sort Badge Section */}
+            {sortBy !== 'default' && (
+              <div className="bg-orange-50/80 border border-orange-100/70 p-3 rounded-2xl flex flex-col gap-1.5 text-xs">
+                <span className="font-extrabold text-orange-600 uppercase tracking-tight text-[10px] block">Special Mode Active</span>
+                <div className="flex items-center justify-between text-slate-700">
+                  <span className="font-bold flex items-center gap-1.5">
+                    {sortBy === 'rating' 
+                      ? '⭐ Best Rated Island Restaurants' 
+                      : sortBy === 'hiking' 
+                        ? '🥾 Island Hiking Trails'
+                        : '🎬 Island Entertainment & Fun'}
+                  </span>
+                  <button 
+                    onClick={() => setSortBy('default')}
+                    type="button"
+                    className="font-black text-[9px] uppercase tracking-wider text-orange-600 hover:text-orange-700 underline underline-offset-2 shrink-0 ml-1"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* List of Places */}
             <div className="flex-1 overflow-y-auto space-y-3 md:space-y-4 pr-1 custom-scrollbar">
@@ -143,6 +200,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <RotateCcw size={10} /> Reset Radar
               </button>
             </div>
+
+            <AnimatePresence>
+              {isAddPanelOpen && (
+                <AddPlacePanel 
+                  onClose={() => setIsAddPanelOpen(false)} 
+                  onSuccess={() => {
+                    if (onRefreshPlaces) {
+                      onRefreshPlaces();
+                    }
+                  }} 
+                  currentMapCenter={userLocation}
+                />
+              )}
+            </AnimatePresence>
           </div>
         </motion.aside>
       )}
