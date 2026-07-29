@@ -94,6 +94,21 @@ async function startServer() {
     }
   });
 
+  app.delete('/api/places/:id', async (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: 'ID is required' });
+    }
+
+    try {
+      await query('DELETE FROM places WHERE id = ?', [parseInt(id)]);
+      res.json({ success: true, message: 'Location deleted successfully!' });
+    } catch (err) {
+      console.error('SQL DELETE API Error:', err);
+      res.status(500).json({ error: 'Failed to delete from places table' });
+    }
+  });
+
   /**
    * POST /api/auth/register
    * 

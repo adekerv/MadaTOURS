@@ -36,9 +36,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess })
         body: JSON.stringify({ email, password })
       });
 
-      const data = await res.json();
+      let data: any;
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(text || `HTTP error! Status: ${res.status}`);
+      }
+
       if (!res.ok) {
-        throw new Error(data.error || 'Identity verification failed');
+        throw new Error(data?.error || 'Identity verification failed');
       }
 
       if (isRegister) {
@@ -53,7 +61,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess })
         onClose();
       }
     } catch (err: any) {
-      setError(err.message || 'Verification failed');
+      console.error('Auth request error:', err);
+      // Give a highly readable, human-friendly error message
+      const errorStr = String(err.message || err);
+      if (errorStr.toUpperCase().includes('JSON') || errorStr.toUpperCase().includes('TOKEN <')) {
+        setError('Database connection error or request timed out. Please try again.');
+      } else {
+        setError(errorStr);
+      }
     } finally {
       setLoading(false);
     }
@@ -173,16 +188,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess })
               <Shield size={10} /> Configured Access Profiles
             </div>
             <div className="grid grid-cols-2 gap-2 w-full text-[10px] font-medium text-slate-400">
-              <div 
-                className="bg-slate-50 border border-slate-150 p-2.5 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 select-none"
+              <button 
+                type="button"
+                onClick={() => {
+                  setEmail('admin@madatours.com');
+                  setPassword('admin');
+                }}
+                className="bg-slate-50 border border-slate-150 hover:bg-slate-100 p-2.5 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors"
               >
-                <span className="font-extrabold text-slate-500 uppercase tracking-wider text-[9px]">🔐 Administrator</span>
-              </div>
-              <div
-                className="bg-slate-50 border border-slate-150 p-2.5 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 select-none"
+                <span className="font-extrabold text-slate-700 uppercase tracking-wider text-[9px]">🔐 Administrator</span>
+                <span className="text-[8px] text-slate-500 font-mono">admin@madatours.com / admin</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('user@madatours.com');
+                  setPassword('user');
+                }}
+                className="bg-slate-50 border border-slate-150 hover:bg-slate-100 p-2.5 rounded-xl text-center flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-colors"
               >
-                <span className="font-extrabold text-slate-500 uppercase tracking-wider text-[9px]">👤 Normal Member</span>
-              </div>
+                <span className="font-extrabold text-slate-700 uppercase tracking-wider text-[9px]">👤 Normal Member</span>
+                <span className="text-[8px] text-slate-500 font-mono">user@madatours.com / user</span>
+              </button>
             </div>
           </div>
         </div>
