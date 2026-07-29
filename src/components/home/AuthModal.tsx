@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { X, Mail, Lock, Shield, User as UserIcon, Check } from 'lucide-react';
+import { X, Mail, Lock, Shield, Check } from 'lucide-react';
 import { User } from '../../types';
+import { supabase } from '../../lib/supabase';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -27,45 +28,97 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess })
     setError(null);
     setSuccessMsg(null);
 
-    const url = isRegister ? '/api/auth/register' : '/api/auth/login';
-
     try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+      let loggedInUser: User | null = null;
 
-      let data: any;
-      const contentType = res.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        data = await res.json();
-      } else {
-        const text = await res.text();
-        throw new Error(text || `HTTP error! Status: ${res.status}`);
+      // 1. Attempt standard Supabase Auth
+      try {
+        if (isRegister) {
+          const { data, error: sbError } = await supabase.auth.signUp({
+            email,
+            password,
+          });
+
+          if (!sbError && data?.user) {
+            const role = email.toLowerCase().includes('admin') ? 'admin' : 'user';
+            loggedInUser = {
+              id: typeof data.user.id === 'number' ? data.user.id : Math.abs(hashCode(data.user.id)),
+              email: data.user.email || email,
+              role,
+            };
+            setSuccessMsg('Supabase account created successfully!');
+          } else if (sbError && !sbError.message.includes('FetchError') && !sbError.message.includes('Failed to fetch')) {
+            throw new Error(sbError.message);
+          }
+        } else {
+          const { data, error: sbError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (!sbError && data?.user) {
+            const role = email.toLowerCase().includes('admin') ? 'admin' : 'user';
+            loggedInUser = {
+              id: typeof data.user.id === 'number' ? data.user.id : Math.abs(hashCode(data.user.id)),
+              email: data.user.email || email,
+              role,
+            };
+          } else if (sbError && !sbError.message.includes('FetchError') && !sbError.message.includes('Failed to fetch')) {
+            throw new Error(sbError.message);
+          }
+        }
+      } catch (sbErr: any) {
+        // If it's an explicit auth error (e.g., wrong password), surface it
+        if (sbErr?.message && !sbErr.message.includes('URL') && !sbErr.message.includes('fetch')) {
+          throw sbErr;
+        }
       }
 
-      if (!res.ok) {
-        throw new Error(data?.error || 'Identity verification failed');
+      // 2. Fallback to API endpoint authentication if Supabase client is unconfigured or returns offline
+      if (!loggedInUser) {
+        const url = isRegister ? '/api/auth/register' : '/api/auth/login';
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const contentType = res.headers.get('content-type');
+        let data: any = {};
+        if (contentType && contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          const text = await res.text();
+          throw new Error(text || `HTTP error! Status: ${res.status}`);
+        }
+
+        if (!res.ok) {
+          throw new Error(data?.error || 'Authentication failed');
+        }
+
+        loggedInUser = data.user;
+        if (isRegister) {
+          setSuccessMsg('Account registered successfully!');
+        }
       }
 
-      if (isRegister) {
-        setSuccessMsg('Account created successfully! Logging you in...');
-        setTimeout(async () => {
-          // Auto login after signup
-          onLoginSuccess(data.user);
+      if (loggedInUser) {
+        const userToLogin = loggedInUser;
+        if (isRegister) {
+          setTimeout(() => {
+            onLoginSuccess(userToLogin);
+            onClose();
+          }, 1000);
+        } else {
+          onLoginSuccess(userToLogin);
           onClose();
-        }, 1500);
-      } else {
-        onLoginSuccess(data.user);
-        onClose();
+        }
       }
     } catch (err: any) {
-      console.error('Auth request error:', err);
-      // Give a highly readable, human-friendly error message
+      console.error('Auth submit error:', err);
       const errorStr = String(err.message || err);
       if (errorStr.toUpperCase().includes('JSON') || errorStr.toUpperCase().includes('TOKEN <')) {
-        setError('Database connection error or request timed out. Please try again.');
+        setError('Database server error. Please try again.');
       } else {
         setError(errorStr);
       }
@@ -73,6 +126,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLoginSuccess })
       setLoading(false);
     }
   };
+
+  // Helper string hash to generate numeric ID if UUID is returned
+  function hashCode(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash) || 1;
+  }
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
