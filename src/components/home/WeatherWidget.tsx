@@ -1,161 +1,102 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { Sun, Cloud, CloudRain, CloudLightning, Thermometer, Droplets, Compass } from 'lucide-react';
-
-interface WeatherData {
+import { useEffect, useState } from 'react';
+import { withRequestSignal } from '../../lib/request';
+import { CloudSun, RefreshCw } from 'lucide-react';
+interface Weather {
   temp: number;
-  condition: string;
-  emoji: string;
-  advice: string;
+  humidity: number;
   code: number;
-  humidity?: number;
+  time: string;
 }
-
-export const WeatherWidget: React.FC = () => {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
+export function weatherDescription(code: number) {
+  if (code === 0) return 'Clear';
+  if (code <= 3) return 'Cloudy';
+  if (code === 45 || code === 48) return 'Fog';
+  if (code >= 51 && code <= 57) return 'Drizzle';
+  if (code >= 61 && code <= 67) return 'Rain';
+  if (code >= 71 && code <= 77) return 'Snow';
+  if (code >= 80 && code <= 82) return 'Rain showers';
+  if (code === 85 || code === 86) return 'Snow showers';
+  if (code >= 95) return 'Thunderstorms';
+  return 'Conditions unavailable';
+}
+export function WeatherWidget() {
+  const [weather, setWeather] = useState<Weather | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Fort-de-France, Martinique: Latitude: 14.6035, Longitude: -61.0673
-  const fetchWeather = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(
-        'https://api.open-meteo.com/v1/forecast?latitude=14.6035&longitude=-61.0673&current=temperature_2m,relative_humidity_2m,weather_code'
-      );
-      if (!res.ok) throw new Error('Failed to fetch raw weather');
-      
-      const data = await res.json();
-      const current = data.current;
-      const temp = Math.round(current.temperature_2m);
-      const code = current.weather_code;
-      const humidity = current.relative_humidity_2m;
-      
-      // Map WMO codes
-      let condition = 'Partly Cloudy';
-      let emoji = '⛅';
-      let advice = 'Great weather for visiting a beach or a distillery!';
-      
-      if (code === 0) {
-        condition = 'Sunny';
-        emoji = '☀️';
-        advice = 'Perfect day for checking out a white-sand beach or hiking Pelée volcano!';
-      } else if (code >= 1 && code <= 3) {
-        condition = 'Partly Cloudy';
-        emoji = '⛅';
-        advice = 'Balmy and beautiful! Excellent day for go-karting at Acro\'Kart or exploring.';
-      } else if (code >= 45 && code <= 48) {
-        condition = 'Mist / Fog';
-        emoji = '🌫️';
-        advice = 'Atmospheric vibes. Try exploring a lush green forest path or indoor cafe.';
-      } else if (code >= 51 && code <= 55) {
-        condition = 'Drizzle';
-        emoji = '🌦️';
-        advice = 'Mild passing drizzle. Ideal slot for a classy lunch at Tori Sushi!';
-      } else if (code >= 61 && code <= 65) {
-        condition = 'Tropical Rain';
-        emoji = '🌧️';
-        advice = 'Showers outside. Perfect time to enjoy delicious warm creole dining!';
-      } else if (code >= 80 && code <= 82) {
-        condition = 'Showers';
-        emoji = '🌦️';
-        advice = 'Short passing shower. A wonderful excuse to try bowling or laser tag!';
-      } else if (code >= 95) {
-        condition = 'Thunderstorm';
-        emoji = '⛈️';
-        advice = 'Tropical thunderstorm active. Cosy up inside in classy local spots!';
-      }
-      
-      setWeather({
-        temp,
-        condition,
-        emoji,
-        advice,
-        code,
-        humidity
-      });
-    } catch (err) {
-      console.warn('Weather API failed, fallback to average tropical climate:', err);
-      // Fallback representing pleasant general Martinique standard weather
-      setWeather({
-        temp: 29,
-        condition: 'Tropical Sunshine',
-        emoji: '🌴',
-        advice: 'Beautiful warm sun. Optimal for outdoor adventures and go-kart racing!',
-        code: 1,
-        humidity: 78
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const [revision, setRevision] = useState(0);
   useEffect(() => {
-    fetchWeather();
-  }, []);
-
-  const getWeatherIcon = (code: number) => {
-    if (code === 0) return <Sun className="w-5 h-5 text-amber-500 animate-[pulse_3s_infinite]" />;
-    if (code >= 1 && code <= 3) return <Cloud className="w-5 h-5 text-slate-400" />;
-    if (code >= 45 && code <= 82) return <CloudRain className="w-5 h-5 text-sky-400" />;
-    if (code >= 95) return <CloudLightning className="w-5 h-5 text-purple-400 animate-bounce" />;
-    return <Sun className="w-5 h-5 text-amber-500" />;
-  };
-
+    const controller = new AbortController();
+    setLoading(true);
+    withRequestSignal(
+      (signal) =>
+        fetch(
+          'https://api.open-meteo.com/v1/forecast?latitude=14.6035&longitude=-61.0673&current=temperature_2m,relative_humidity_2m,weather_code&timezone=America%2FMartinique',
+          { signal },
+        ),
+      controller.signal,
+      8000,
+    )
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Weather unavailable');
+        const data = await response.json();
+        const current = data.current;
+        if (
+          !current ||
+          !Number.isFinite(current.temperature_2m) ||
+          !Number.isFinite(current.weather_code) ||
+          !Number.isFinite(current.relative_humidity_2m) ||
+          typeof current.time !== 'string'
+        )
+          throw new Error('Invalid weather');
+        if (!controller.signal.aborted)
+          setWeather({
+            temp: Math.round(current.temperature_2m),
+            code: current.weather_code,
+            humidity: current.relative_humidity_2m,
+            time: current.time,
+          });
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setWeather(null);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [revision]);
   return (
-    <div className="flex justify-center items-center mb-10 w-full px-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-        className="relative bg-white/70 backdrop-blur-md rounded-[2.5rem] border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.03)] px-6 py-4 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 max-w-xl w-full text-left"
-      >
-        {loading ? (
-          <div className="flex items-center gap-3 py-2 w-full justify-center">
-            <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs font-semibold text-slate-400 tracking-wider uppercase">Gathering Tropical Forecast...</span>
-          </div>
-        ) : (
-          weather && (
-            <>
-              {/* Left Temperature capsule */}
-              <div className="flex items-center gap-3.5 bg-orange-500/10 rounded-3xl py-2.5 px-4 py-2 border border-orange-500/20 max-sm:w-full max-sm:justify-center">
-                <div className="p-1 px-1.5 flex items-center justify-center bg-orange-500 text-white rounded-xl shadow-md">
-                  <Thermometer className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-slate-800 leading-none">
-                    {weather.temp}°C
-                  </div>
-                  <div className="text-[10px] font-black uppercase text-orange-600 tracking-wider mt-0.5 leading-none flex items-center gap-1">
-                    <span>{weather.emoji}</span>
-                    <span>{weather.condition}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Recommendation / Detail section */}
-              <div className="flex-1 min-w-0 max-sm:text-center">
-                <p className="text-xs font-black text-slate-800 leading-snug">
-                  ⛅ Martinique Live Weather
-                </p>
-                <p className="text-[11px] text-slate-500 mt-1 font-semibold leading-relaxed line-clamp-2">
-                  {weather.advice} 
-                  {weather.humidity ? ` (Humidity: ${weather.humidity}%)` : ''}
-                </p>
-              </div>
-
-              {/* Minimalist interactive refresh action */}
-              <button 
-                onClick={fetchWeather}
-                title="Refresh Weather Info"
-                className="p-2 rounded-full hover:bg-slate-50 border border-slate-100 text-slate-400 hover:text-slate-600 transition-all text-xs"
-              >
-                <Compass className="w-3.5 h-3.5" />
-              </button>
-            </>
-          )
+    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left">
+      <CloudSun className="shrink-0 text-orange-600" size={26} />
+      <div className="min-w-0 flex-1" aria-live="polite">
+        <p className="text-sm font-semibold text-slate-900">Fort-de-France weather</p>
+        <p className="text-sm text-slate-600">
+          {loading
+            ? 'Checking conditions…'
+            : weather
+              ? `${weather.temp}°C · ${weatherDescription(weather.code)} · ${weather.humidity}% humidity`
+              : 'Weather is unavailable right now.'}
+        </p>
+        {weather && !loading && (
+          <p className="mt-1 text-xs text-slate-500">
+            <a
+              className="underline"
+              href="https://open-meteo.com/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open-Meteo
+            </a>{' '}
+            · {weather.time.slice(11, 16)} Martinique time
+          </p>
         )}
-      </motion.div>
+      </div>
+      <button
+        aria-label="Refresh weather"
+        disabled={loading}
+        onClick={() => setRevision((value) => value + 1)}
+        className="icon-button shrink-0"
+      >
+        <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
+      </button>
     </div>
   );
-};
+}

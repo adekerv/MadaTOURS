@@ -12,15 +12,19 @@ export interface Place {
   tags?: string[];
   image?: string;
 }
-
 export interface User {
   id: number;
   email: string;
   role: 'user' | 'admin';
 }
-
 export interface UserLocation {
   lat: number;
   lng: number;
   manual?: boolean;
+}
+export interface ExploreParams {
+  filter: 'all' | 'restaurant' | 'activity';
+  radius?: number;
+  sortBy?: 'rating' | 'hiking' | 'entertainment';
+  selectedPlaceId?: number;
 }

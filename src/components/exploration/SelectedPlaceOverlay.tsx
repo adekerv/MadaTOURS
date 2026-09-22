@@ -1,10 +1,16 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Heart, X, Info } from 'lucide-react';
-import { Place, User } from '../../types';
-import { getPlaceTheme } from '../../utils/emoji';
-
-interface SelectedPlaceOverlayProps {
+import { Heart, X, ArrowUpRight } from 'lucide-react';
+import type { Place, User } from '../../types';
+export function SelectedPlaceOverlay({
+  place,
+  isVisible,
+  onClose,
+  isFavorite,
+  onToggleFavorite,
+  onShowDetails,
+  googleMapsUrl,
+  user,
+  onLoginClick,
+}: {
   place: Place | null;
   isVisible: boolean;
   onClose: () => void;
@@ -14,94 +20,50 @@ interface SelectedPlaceOverlayProps {
   googleMapsUrl: string;
   user: User | null;
   onLoginClick: () => void;
-}
-
-export const SelectedPlaceOverlay: React.FC<SelectedPlaceOverlayProps> = ({ 
-  place, 
-  isVisible,
-  onClose,
-  isFavorite,
-  onToggleFavorite,
-  onShowDetails,
-  googleMapsUrl,
-  user,
-  onLoginClick
-}) => {
-  const theme = place ? getPlaceTheme(place) : null;
-
+}) {
+  if (!isVisible || !place) return null;
   return (
-    <AnimatePresence>
-      {isVisible && place && theme && (
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 50, opacity: 0 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[90%] md:w-96 bg-white p-6 rounded-[2.5rem] shadow-2xl z-[1000] border-4 border-orange-100"
+    <section
+      aria-label={place.name}
+      className="selected-place-overlay absolute z-[600] rounded-3xl border border-slate-200 bg-white p-4 shadow-xl"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-orange-700">{place.location}</p>
+          <h2 className="mt-1 text-lg font-bold leading-tight">{place.name}</h2>
+        </div>
+        <div className="flex shrink-0">
+          <button
+            aria-label={isFavorite ? 'Remove favorite' : 'Save favorite'}
+            aria-pressed={isFavorite}
+            className="icon-button"
+            onClick={() => (user ? onToggleFavorite(place) : onLoginClick())}
+          >
+            <Heart
+              size={20}
+              className={isFavorite ? 'fill-red-600 text-red-600' : 'text-slate-600'}
+            />
+          </button>
+          <button aria-label="Close selected place" onClick={onClose} className="icon-button">
+            <X size={20} />
+          </button>
+        </div>
+      </div>
+      <p className="my-3 line-clamp-2 text-sm text-slate-600">{place.description}</p>
+      <div className="grid grid-cols-2 gap-2">
+        <button onClick={onShowDetails} className="secondary-button">
+          View details
+        </button>
+        <a
+          href={googleMapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="primary-button flex items-center justify-center gap-1"
         >
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex items-center gap-3">
-              <div 
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner border"
-                style={{ backgroundColor: theme.bgColor, borderColor: theme.borderColor }}
-              >
-                {theme.emoji}
-              </div>
-              <div>
-                <h3 className="text-xl font-black text-slate-800 leading-none">{place.name}</h3>
-                <p className="text-orange-500 text-[10px] font-black uppercase tracking-widest mt-1">{place.location}</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <button 
-                onClick={() => {
-                  if (user) {
-                    onToggleFavorite(place);
-                  } else {
-                    onLoginClick();
-                  }
-                }}
-                title={user ? "Toggle Favorite" : "Log in to save favorites"}
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                  user 
-                    ? isFavorite 
-                      ? 'bg-red-500 text-white hover:bg-red-650' 
-                      : 'bg-slate-50 text-red-500 hover:bg-red-50'
-                    : 'bg-slate-50 text-slate-300 hover:text-orange-500 cursor-pointer'
-                }`}
-              >
-                <Heart size={18} className={user && isFavorite ? 'fill-red-500' : ''} />
-              </button>
-              <button 
-                onClick={onClose}
-                className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-200 transition-colors"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          </div>
-          
-          <p className="text-slate-500 text-sm font-medium leading-normal mb-6 line-clamp-2 italic">
-            &ldquo;{place.description}&rdquo;
-          </p>
-
-          <div className="flex gap-3">
-            <button 
-              onClick={onShowDetails}
-              className="flex-1 bg-slate-800 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-slate-700 transition-all uppercase tracking-widest text-[10px]"
-            >
-              <Info size={16} /> More Info
-            </button>
-            <a 
-              href={googleMapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 bg-orange-500 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-2 shadow-xl shadow-orange-200 hover:bg-orange-600 transition-all uppercase tracking-widest text-[10px]"
-            >
-              Maps ➔
-            </a>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          Directions
+          <ArrowUpRight size={17} />
+        </a>
+      </div>
+    </section>
   );
-};
+}

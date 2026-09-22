@@ -1,122 +1,135 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useId, type KeyboardEvent } from 'react';
 import { Search, X, MapPin } from 'lucide-react';
-import { Place } from '../../types';
-import { getPlaceTheme } from '../../utils/emoji';
-
-interface SearchBarProps {
+import type { Place } from '../../types';
+import { matchesSearch } from '../../lib/places-utils';
+export function SearchBar({
+  places,
+  onSelectPlace,
+}: {
   places: Place[];
   onSelectPlace: (place: Place) => void;
-}
-
-export const SearchBar: React.FC<SearchBarProps> = ({ places, onSelectPlace }) => {
+}) {
   const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Close suggestions clicked outside
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(-1);
+  const ref = useRef<HTMLDivElement>(null);
+  const input = useRef<HTMLInputElement>(null);
+  const id = useId();
+  const filtered = query.trim()
+    ? places.filter((place) => matchesSearch(place, query)).slice(0, 8)
+    : [];
+  const expanded = open && !!query.trim();
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
+    const outside = (event: PointerEvent) => {
+      if (!ref.current?.contains(event.target as Node)) setOpen(false);
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('pointerdown', outside);
+    return () => document.removeEventListener('pointerdown', outside);
   }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
-    setIsOpen(true);
-  };
-
-  const handleClear = () => {
+  useEffect(() => {
+    if (active >= 0)
+      document.getElementById(`${id}-${active}`)?.scrollIntoView({ block: 'nearest' });
+  }, [active, id]);
+  function select(place: Place) {
+    onSelectPlace(place);
+    setOpen(false);
     setQuery('');
-    setIsOpen(false);
-  };
-
-  // Filter logic
-  const filtered = query.trim() === '' 
-    ? [] 
-    : places.filter(place => {
-        const matchesName = place.name.toLowerCase().includes(query.toLowerCase());
-        const matchesLocation = place.location.toLowerCase().includes(query.toLowerCase());
-        const matchesTags = place.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()));
-        const matchesType = place.type.toLowerCase().includes(query.toLowerCase());
-        return matchesName || matchesLocation || matchesTags || matchesType;
-      }).slice(0, 8); // Display top 8 results
-
+    setActive(-1);
+  }
+  function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Escape') {
+      setOpen(false);
+      setActive(-1);
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      setOpen(true);
+      setActive((index) =>
+        Math.max(0, Math.min(filtered.length - 1, index + (event.key === 'ArrowDown' ? 1 : -1))),
+      );
+    }
+    if (event.key === 'Enter' && expanded && filtered[active]) {
+      event.preventDefault();
+      select(filtered[active]);
+    }
+  }
   return (
-    <div ref={containerRef} className="relative w-full max-w-md z-50">
-      {/* Search Input Container */}
-      <div className="relative flex items-center bg-white/95 backdrop-blur-md rounded-full border border-slate-200/80 shadow-md hover:shadow-lg focus-within:shadow-xl focus-within:border-orange-200 transition-all duration-300">
-        <div className="pl-5 pr-2 py-3 text-slate-400">
-          <Search className="w-5 h-5" />
-        </div>
+    <div
+      ref={ref}
+      className="relative w-full text-left"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}
+    >
+      <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 focus-within:border-orange-600">
+        <Search size={19} className="shrink-0 text-slate-500" />
         <input
-          type="text"
+          ref={input}
+          role="combobox"
+          aria-label="Search places"
+          aria-expanded={expanded}
+          aria-controls={`${id}-list`}
+          aria-autocomplete="list"
+          aria-activedescendant={expanded && active >= 0 ? `${id}-${active}` : undefined}
+          autoComplete="off"
           value={query}
-          onChange={handleChange}
-          onFocus={() => setIsOpen(true)}
-          placeholder="Search places, restaurants, or activities..."
-          className="w-full bg-transparent border-none py-3.5 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-0 font-medium"
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setOpen(true);
+            setActive(-1);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={onKeyDown}
+          placeholder="Search places, towns, activities…"
+          className="min-w-0 flex-1 bg-transparent py-3 text-base outline-none"
         />
         {query && (
           <button
-            onClick={handleClear}
-            className="p-1 mr-3 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+            aria-label="Clear search"
+            className="icon-button"
+            onClick={() => {
+              setQuery('');
+              setOpen(false);
+              input.current?.focus();
+            }}
           >
-            <X className="w-4 h-4" />
+            <X size={18} />
           </button>
         )}
       </div>
-
-      {/* Autocomplete Dropdown */}
-      {isOpen && query.trim() !== '' && (
-        <div className="absolute top-[110%] left-0 right-0 bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden divide-y divide-slate-50 animate-in fade-in slide-in-from-top-2 duration-200">
-          {filtered.length > 0 ? (
-            <div className="max-h-[380px] overflow-y-auto py-2 custom-scrollbar">
-              {filtered.map((place) => {
-                const theme = getPlaceTheme(place);
-                return (
-                  <button
-                    key={place.id}
-                    onClick={() => {
-                      onSelectPlace(place);
-                      setIsOpen(false);
-                      setQuery('');
-                    }}
-                    className="w-full px-5 py-3.5 hover:bg-slate-50 transition-colors flex items-center gap-4 text-left group"
-                  >
-                    {/* Themed Emoji Icon */}
-                    <div 
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-inner border transition-transform group-hover:scale-105 duration-200"
-                      style={{ backgroundColor: theme.bgColor, borderColor: theme.borderColor }}
-                    >
-                      {theme.emoji}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="font-bold text-slate-800 group-hover:text-orange-600 transition-colors truncate">
-                        {place.name}
-                      </div>
-                      <div className="text-xs text-slate-400 flex items-center gap-1 mt-0.5 font-medium">
-                        <MapPin className="w-3 h-3 flex-shrink-0" />
-                        <span>{place.location}</span>
-                        <span>•</span>
-                        <span className="capitalize text-slate-500 font-semibold">{place.type}</span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="px-6 py-8 text-center text-slate-400 text-sm font-medium">
-              No matching locations, restaurants, or actions found
-            </div>
+      {expanded && (
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+          <ul
+            id={`${id}-list`}
+            role="listbox"
+            aria-label="Matching places"
+            className="max-h-[min(50dvh,24rem)] overflow-y-auto"
+          >
+            {filtered.map((place, index) => (
+              <li
+                key={place.id}
+                id={`${id}-${index}`}
+                role="option"
+                aria-selected={active === index}
+                onPointerDown={(event) => event.preventDefault()}
+                onClick={() => select(place)}
+                className={`cursor-pointer px-4 py-3 ${active === index ? 'bg-orange-50' : 'hover:bg-slate-50'}`}
+              >
+                <span className="block font-semibold text-slate-900">{place.name}</span>
+                <span className="mt-1 flex items-center gap-1 text-sm text-slate-600">
+                  <MapPin size={12} />
+                  {place.location}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {!filtered.length && (
+            <p role="status" className="p-5 text-sm text-slate-600">
+              No places found. Try a town name or activity.
+            </p>
           )}
         </div>
       )}
     </div>
   );
-};
+}

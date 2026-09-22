@@ -1,62 +1,56 @@
-import React from 'react';
-import { motion } from 'motion/react';
-import { Heart } from 'lucide-react';
-import { Place } from '../../types';
-
-interface PlaceCardProps {
+import { Heart, MapPin } from 'lucide-react';
+import type { Place } from '../../types';
+export function PlaceCard({
+  place,
+  isSelected,
+  isFavorite,
+  onSelect,
+  onShowDetails,
+}: {
   place: Place;
-  index: number;
   isSelected: boolean;
   isFavorite: boolean;
   onSelect: (place: Place) => void;
   onShowDetails: (place: Place) => void;
-}
-
-export const PlaceCard: React.FC<PlaceCardProps> = ({ 
-  place, 
-  index, 
-  isSelected, 
-  isFavorite, 
-  onSelect, 
-  onShowDetails 
-}) => {
+}) {
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      key={place.id}
-      onClick={() => onSelect(place)}
-      className={`bg-white border-2 p-4 rounded-3xl transition-all cursor-pointer group hover:shadow-xl ${
-        isSelected 
-        ? 'border-orange-500 shadow-lg scale-[1.02] bg-orange-50/10' 
-        : 'border-slate-50 hover:border-orange-100'
-      }`}
+    <article
+      className={`rounded-2xl border p-4 ${isSelected ? 'border-orange-600 bg-orange-50' : 'border-slate-200 bg-white'}`}
     >
-      <div className="flex justify-between items-start mb-2">
-        <h3 className={`font-black text-slate-800 text-sm md:text-base group-hover:text-orange-600 transition-colors ${isSelected ? 'text-orange-600' : ''}`}>
-          {place.name}
-        </h3>
-        <div className="flex items-center gap-1">
-          {isFavorite && <Heart size={10} className="text-red-500 fill-red-500" />}
-          <span className="text-[9px] md:text-[10px] font-black bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-md border border-orange-100">
-            {place.distance?.toFixed(1)}km
-          </span>
-        </div>
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="font-bold leading-snug">{place.name}</h3>
+        {isFavorite && (
+          <Heart
+            aria-label="Saved to favorites"
+            size={16}
+            className="shrink-0 fill-red-600 text-red-600"
+          />
+        )}
       </div>
-      <p className="text-[10px] md:text-[11px] text-slate-400 mb-3 line-clamp-1 font-medium italic">
+      <p className="mt-1 text-sm text-slate-600">
+        {place.location}
+        {place.distance !== undefined && ` · ${place.distance.toFixed(1)} km`}
+      </p>
+      <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-600">
         {place.description}
       </p>
-      <button 
-        onClick={(e) => {
-          e.stopPropagation();
-          onShowDetails(place);
-        }}
-        className="w-full bg-slate-800 text-white py-2 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-slate-200 hover:bg-slate-700 transition-all active:scale-95"
-      >
-        Details
-      </button>
-    </motion.div>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          onClick={() => onSelect(place)}
+          aria-label={`Show ${place.name} on map`}
+          className="secondary-button flex justify-center items-center gap-1 text-sm"
+        >
+          <MapPin size={15} />
+          Map
+        </button>
+        <button
+          onClick={() => onShowDetails(place)}
+          aria-label={`Details for ${place.name}`}
+          className="primary-button text-sm"
+        >
+          Details
+        </button>
+      </div>
+    </article>
   );
-};
+}

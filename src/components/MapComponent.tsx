@@ -1,179 +1,136 @@
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents, Circle } from 'react-leaflet';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMap,
+  useMapEvents,
+  Circle,
+  ZoomControl,
+} from 'react-leaflet';
 import L from 'leaflet';
-import { Place, UserLocation } from '../types';
-import { Utensils, Mountain, MapPin } from 'lucide-react';
-import { renderToStaticMarkup } from 'react-dom/server';
+import type { Place, UserLocation } from '../types';
 import { getPlaceTheme } from '../utils/emoji';
-
-// Fix for default marker icons in React Leaflet
-import 'leaflet/dist/leaflet.css';
-
-const createCustomIcon = (type: 'restaurant' | 'activity' | 'user', tags: string[] = []) => {
-  let color = '#2563eb'; // Default Blue 600
-  let emoji = '';
-  
-  if (type === 'user') {
-    color = '#2563eb'; // Blue 600 for user
-  } else {
-    // Get rich category theme based on tag categorization
-    const theme = getPlaceTheme({ type, tags, name: '' } as Place);
-    color = theme.color;
-    emoji = theme.emoji;
-  }
-  
-  const markerHtml = type === 'user' ? `
-    <div class="relative flex flex-col items-center">
-      <div class="absolute inset-0 animate-ping rounded-full bg-blue-400 opacity-20"></div>
-      <div class="w-8 h-8 bg-blue-600 border-4 border-white rounded-full shadow-2xl z-20"></div>
-    </div>
-  ` : `
-    <div class="w-8 h-8 border-2 border-white rounded-full rounded-bl-none rotate-45 shadow-lg flex items-center justify-center transition-transform hover:scale-110" style="background-color: ${color};">
-      <span class="-rotate-45 text-xs">${emoji}</span>
-    </div>
-  `;
-
-  return L.divIcon({
-    html: markerHtml,
-    className: 'custom-vibrant-icon',
-    iconSize: type === 'user' ? [32, 32] : [32, 32],
-    iconAnchor: type === 'user' ? [16, 16] : [16, 32], // Bottom center tip
-  });
-};
-
-interface MapComponentProps {
-  userLocation: UserLocation | null;
+interface Props {
+  userLocation: UserLocation;
   places: Place[];
   onLocationSelect: (lat: number, lng: number) => void;
   onPlaceSelect: (place: Place) => void;
-  onMapClick?: () => void;
-  radius?: number;
-  selectedPlace?: Place | null;
+  onMapClick: () => void;
+  radius: number;
+  selectedPlace: Place | null;
+  manualSelect: boolean;
 }
-
-// Component to handle map centering and clicks for manual input
-const MapHandler: React.FC<{ 
-  userLocation: UserLocation | null, 
-  selectedPlace: Place | null,
-  onLocationSelect: (lat: number, lng: number) => void,
-  onMapClick?: () => void
-}> = ({ userLocation, selectedPlace, onLocationSelect, onMapClick }) => {
+function MapHandler({
+  userLocation,
+  selectedPlace,
+  onLocationSelect,
+  onMapClick,
+  manualSelect,
+  radius,
+}: Omit<Props, 'places' | 'onPlaceSelect'>) {
   const map = useMap();
-
   useEffect(() => {
-    if (userLocation && !selectedPlace) {
-      map.flyTo([userLocation.lat, userLocation.lng], 13);
-    }
-  }, [userLocation, map]);
-
-  useEffect(() => {
-    if (selectedPlace) {
-      map.flyTo([selectedPlace.lat, selectedPlace.lng], 15);
-    }
-  }, [selectedPlace, map]);
-
+    const frameSearch = () => {
+      const container = map.getContainer();
+      if (!container.clientWidth || !container.clientHeight) return;
+      map.invalidateSize({ pan: false });
+      if (selectedPlace)
+        map.setView([selectedPlace.lat, selectedPlace.lng], 14, { animate: false });
+      else
+        map.fitBounds(L.latLng(userLocation.lat, userLocation.lng).toBounds(radius * 2000), {
+          padding: [25, 25],
+          maxZoom: 14,
+          animate: false,
+        });
+    };
+    // A map mounted in the mobile List view has no measurable size yet.
+    // Frame it once visible and again after rotation or a split-view resize.
+    const observer = new ResizeObserver(frameSearch);
+    observer.observe(map.getContainer());
+    frameSearch();
+    return () => observer.disconnect();
+  }, [map, selectedPlace, userLocation, radius]);
   useMapEvents({
-    click(e) {
-      onLocationSelect(e.latlng.lat, e.latlng.lng);
-      onMapClick?.();
+    click(event) {
+      if (manualSelect) onLocationSelect(event.latlng.lat, event.latlng.lng);
+      else onMapClick();
     },
   });
-
   return null;
-};
-
-export const MapComponent: React.FC<MapComponentProps> = ({ 
-  userLocation, 
-  places, 
-  onLocationSelect,
-  onPlaceSelect,
-  onMapClick,
-  radius = 10,
-  selectedPlace = null
-}) => {
-  const martiniqueCenter: [number, number] = [14.6415, -61.0242];
-
+}
+function PlaceMarker({ place, onSelect }: { place: Place; onSelect: (place: Place) => void }) {
+  const icon = useMemo(() => {
+    const theme = getPlaceTheme(place);
+    // Theme values are a fixed internal palette; no catalogue text is inserted into HTML.
+    return L.divIcon({
+      html: `<span class="place-marker" style="background:${theme.color}">${theme.emoji}</span>`,
+      className: 'place-marker-container',
+      iconSize: [44, 44],
+      iconAnchor: [22, 38],
+    });
+  }, [place]);
   return (
-    <div className="h-full w-full relative z-0">
+    <Marker
+      position={[place.lat, place.lng]}
+      icon={icon}
+      title={place.name}
+      alt={place.name}
+      eventHandlers={{ click: () => onSelect(place) }}
+    />
+  );
+}
+export function MapComponent(props: Props) {
+  const [tileError, setTileError] = useState(false);
+  const userIcon = useMemo(
+    () =>
+      L.divIcon({
+        html: '<span class="search-center-marker"></span>',
+        className: '',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      }),
+    [],
+  );
+  return (
+    <div className="relative h-full w-full isolate" aria-label="Map of places in Martinique">
       <MapContainer
-        center={martiniqueCenter}
-        zoom={11}
-        scrollWheelZoom={true}
+        center={[14.6415, -61.0242]}
+        zoom={10}
+        zoomControl={false}
         className="h-full w-full"
+        minZoom={3}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          eventHandlers={{ tileerror: () => setTileError(true) }}
         />
-        
-        <MapHandler 
-          userLocation={userLocation} 
-          selectedPlace={selectedPlace} 
-          onLocationSelect={onLocationSelect} 
-          onMapClick={onMapClick} 
+        <ZoomControl position="topright" />
+        <MapHandler {...props} />
+        <Marker
+          position={[props.userLocation.lat, props.userLocation.lng]}
+          icon={userIcon}
+          title={props.userLocation.manual ? 'Search center' : 'Your location'}
+          alt="Search center"
         />
-
-        {userLocation && (
-          <>
-            <Marker 
-              position={[userLocation.lat, userLocation.lng]} 
-              icon={createCustomIcon('user')}
-            >
-              <Popup>
-                <div className="font-bold">Your Location</div>
-                <div className="text-xs text-gray-500">Tap anywhere to move this</div>
-              </Popup>
-            </Marker>
-            
-            <Circle 
-              center={[userLocation.lat, userLocation.lng]}
-              radius={radius * 1000} // Convert km to meters
-              pathOptions={{
-                color: '#f97316',
-                fillColor: '#f97316',
-                fillOpacity: 0.1,
-                weight: 2,
-                dashArray: '5, 10'
-              }}
-            />
-          </>
-        )}
-
-        {places.map((place) => (
-          <Marker
-            key={place.id}
-            position={[place.lat, place.lng]}
-            icon={createCustomIcon(place.type, place.tags)}
-            eventHandlers={{
-              click: () => onPlaceSelect(place),
-            }}
-          >
-            <Popup>
-              <div className="p-1">
-                <h3 className="font-bold text-lg text-brand-primary">{place.name}</h3>
-                <p className="text-sm italic">{place.location}</p>
-                {place.distance && (
-                  <p className="text-xs font-semibold text-brand-secondary mt-1">
-                    {place.distance.toFixed(1)} km away
-                  </p>
-                )}
-                <button 
-                  onClick={() => onPlaceSelect(place)}
-                  className="mt-2 w-full bg-brand-primary text-white text-xs py-2 rounded-lg font-bold"
-                >
-                  View Details
-                </button>
-              </div>
-            </Popup>
-          </Marker>
+        <Circle
+          center={[props.userLocation.lat, props.userLocation.lng]}
+          radius={props.radius * 1000}
+          pathOptions={{ color: '#ea580c', fillOpacity: 0.06, weight: 2, dashArray: '5, 8' }}
+        />
+        {props.places.map((place) => (
+          <PlaceMarker key={place.id} place={place} onSelect={props.onPlaceSelect} />
         ))}
       </MapContainer>
-      
-      {!userLocation && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-gray-100 animate-pulse">
-          <p className="text-sm font-semibold text-brand-primary">Tap on the map to set your location</p>
-        </div>
+      {tileError && (
+        <p
+          role="status"
+          className="absolute left-3 top-3 z-[500] max-w-[65%] rounded-xl bg-white p-3 text-xs text-slate-700 shadow"
+        >
+          Some map tiles could not load. You can still browse places in the list.
+        </p>
       )}
     </div>
   );
-};
+}
