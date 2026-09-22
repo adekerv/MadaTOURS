@@ -1,0 +1,9 @@
+node_modules
+dist
+ios
+android
+docs/legacy
+package-lock.json
+.data
+playwright-report
+test-results
