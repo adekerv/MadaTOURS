@@ -32,8 +32,8 @@ The generated bundle ID is `com.madatours.app`, a development identifier with ow
 
 ## Release work still required
 
-1. **Production service:** deploy the API and persistent database, run initialization, configure HTTPS/origins, and verify real-device sessions. Add email verification and password recovery before inviting the public.
-2. **Content:** verify venue identities, coordinates, opening status, hours, ratings, and permissions to use photography. Supplied ratings have no review source, and the stock photos are illustrative. Add provenance and last-verified timestamps.
+1. **Production service:** deploy the API and persistent database, run initialization, configure HTTPS/origins, and verify real-device sessions. Configure and verify the supplied email code templates and SMTP before inviting the public.
+2. **Content:** verify venue identities, coordinates, opening status, hours, ratings, and permissions to use photography. Unsupported ratings and stock photos have been removed. Three licensed photos and field-level sources are included; complete the remaining venue verification.
 3. **Privacy and support:** publish a truthful privacy policy and support page with the operator's contact details. Document email, saved-place storage, session retention, location use, and requests to map/photo/weather providers. Complete App Store privacy disclosures and audit the built app's SDK privacy manifests.
 4. **Store assets:** review the development app icon and launch artwork, produce final screenshots for supported devices, choose age/category settings, and write accurate store copy. Original development artwork is included in `native-assets/`; regenerate it with `npm run mobile:assets` after installing Playwright Chromium. Review it as part of your final brand design before submission.
 5. **Distribution:** select the correct developer team and bundle ID, set signing and version/build numbers, configure App Store Connect, then test through TestFlight. The native projects have not been signed or uploaded.
@@ -42,4 +42,4 @@ The generated bundle ID is `com.madatours.app`, a development identifier with ow
 
 ## Useful next mobile features
 
-A trip itinerary with saved day plans, native sharing, locally available saved places, and thoughtfully permissioned reminders would make this useful beyond the browser. Offline map downloads require a provider and license that permit them; do not bulk-download public OpenStreetMap tiles.
+Device-local day plans and offline saved-place text are implemented. Cloud itinerary sync, native sharing, and thoughtfully permissioned reminders are potential next additions. Offline map downloads require a provider and license that permit them; do not bulk-download public OpenStreetMap tiles.

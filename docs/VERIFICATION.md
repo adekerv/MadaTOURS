@@ -1,30 +1,36 @@
-# Verification record
+# Verification record — September 23, 2026
 
-Review environment: macOS on Apple Silicon, Node.js 26.0.0, npm 11.14.1.
+Environment: macOS on Apple Silicon, Node 26.0.0, npm 11.14.1. CI is configured for Node 24.
 
-## Automated coverage
+## Automated checks
 
-- Strict TypeScript and ESLint, including React hook rules.
-- API and utility tests: account creation, password hashing, normalization, denied privilege escalation, authenticated ownership, duplicate saves, actual deletion, foreign-key cascades, session expiry/logout, password-confirmed account deletion, malformed query input, write-origin/CSRF protection, rate limiting, and catalogue/search/distance behavior.
-- PostgreSQL behavior checked with PGlite (an embedded PostgreSQL engine): schema creation, seeding, sequence advancement, unique constraints, deletion cascades, upsert throttling, repeat initialization, and refusal of the legacy schema. This does not test a hosted PostgreSQL network connection, TLS, or pooler.
-- Browser scenarios run in Chromium and WebKit: seven viewport sizes (320×568, 360×640, 390×844, 667×375, 768×1024, 1024×768, 1440×900), home/list/map/detail overflow, keyboard search, browser Back, denied location, failed weather/catalogue requests, registration, saved-list persistence/removal, account deletion, and admin-created place discovery/deletion.
-- Axe checks for serious/critical WCAG A/AA violations on home, exploration, and authentication screens. This is not a complete accessibility certification or a substitute for VoiceOver/TalkBack testing.
-- Production web/server build, dependency audit, native asset generation, and Capacitor project creation/synchronization.
+- ESLint and strict TypeScript pass.
+- Nine API, PostgreSQL security, catalogue, search, planner and translation tests pass. They cover owner-only saved lists, rejected role changes, recovery/logout/deletion, foreign-key cascades and seed reruns.
+- 21 browser scenarios pass, with one explicit WebKit offline skip. The browser suite uses Chromium and WebKit, seven representative viewport sizes, keyboard search, location denial, error states, account/saved-place/admin flows, password recovery and French planner persistence.
+- The production service worker is tested with a complete offline reload and saved-place reading in Chromium. The equivalent WebKit service-worker automation is explicitly skipped; physical Safari offline behavior remains to be checked.
+- Axe scans check serious/critical accessibility violations on home, exploration and authentication, rather than claiming a complete accessibility audit.
+- Production web/server build passes. Capacitor sync passes for both platforms; this does not compile or sign a native application.
+- Production dependency audit reports zero known vulnerabilities.
+- The generated browser files were checked for the configured Supabase keys and database connection string; none were present.
 
-External weather, map tiles, and photos are mocked in the automated browser suite to make behavior repeatable. Manual browser inspection used the real local app and external resources. Test accounts use temporary databases; no real user accounts or remote data were modified.
+API/browser authentication uses a test-only Supabase contract double backed by PGlite, an embedded PostgreSQL engine. Tests do not send emails, alter remote users or prove real Supabase cookie/email behavior. External weather and map tiles are controlled in the browser tests. Photos and a French mobile planner screenshot were visually inspected.
 
-## Results
+## Live configuration checks
 
-The review's API/utility/PostgreSQL suite passed **14 tests**. The browser suite passed **16 scenarios** across the two browser engines. All seven sizes in each layout scenario fit without document overflow; detail dialogs remained within the viewport. No uncaught application errors were detected in those scenarios. Axe reported no serious or critical violations in the scanned screens.
+The Supabase project URL, publishable key and server secret have been checked remotely without printing credentials. Auth accepts the secret; public settings show email signup and email confirmation enabled.
 
-The production build, ESLint/TypeScript, formatting check, native asset generation, Capacitor synchronization for both platforms, and iOS plist validation passed. `npm audit` reported zero known vulnerabilities. A production-server smoke check confirmed frontend/catalogue loading, correct missing-asset/API 404 responses, and rejection of account writes when PostgreSQL is unconfigured. Run the commands in the root README to reproduce the checks.
+The application tables are now initialized. Schema version, public catalogue, draft filtering and guest restrictions pass against the live Supabase project. APP_ORIGIN is the remaining missing setting in the configuration check.
 
-## Not validated here
+`npm run test:live -- --run` passed against the real hosted project: real signup-code verification, password recovery, HttpOnly API cookies, independent login sessions, persisted favorites, duplicate-save handling, cross-user RLS isolation, rejected self-promotion, logout and password-confirmed account deletion. Two temporary accounts were created and removed. Supabase admin-generated OTPs were used without email delivery; actual inbox delivery and configured email templates remain unverified. No existing users or venues were changed.
 
-- A physical iPhone, iPad, or Android device; native compilation or signing.
-- Native HTTP cookie persistence across force-quit/relaunch, native location prompts, on-screen keyboard resizing, and external directions handoff.
-- A real hosted PostgreSQL service or a deployed Vercel routing environment.
-- Accuracy, opening status, hours, ratings, or licensing of all catalogue entries and photographs.
-- Load testing, a third-party security review, or App Store approval.
+The live smoke script is opt-in because it temporarily writes test accounts and saved rows. Supabase may retain normal audit logs and expiring abuse counters from these checks.
 
-The selected developer directory only contains Apple command-line tools. Full Xcode is required to build the iOS target; this review did not install it.
+The Supabase MCP configuration is saved and reports OAuth authentication, but its tools remain unavailable in this conversation. A direct connection returned HTTP 403 with the narrow project/database credential. Live application checks succeeded independently through the official Supabase client.
+
+Vercel connector requests previously returned HTTP 403 for the owner's `ade-kerv-s-projects` scope. No deployment was published from this session, and production Vercel routing has not been exercised. The dashboard URL is known; the public website URL still needs confirmation.
+
+## Remaining release verification
+
+After setting APP_ORIGIN, rerun `npm run setup:check`. Then follow [CLASS-DEMO.md](CLASS-DEMO.md) against the public deployment for real email verification/recovery, session restoration, cross-device persistence and account deletion.
+
+Physical iPhone/iPad/Android testing, native compilation/signing, native cookie persistence, App Store review, load testing, backups/restoration and exhaustive venue verification are not completed. The Java SDK found inside the repository is excluded from formatting/deployment but remains tracked pending separate repository cleanup.

@@ -8,7 +8,7 @@
 - Photographs: suitable openly licensed venue photographs with attribution are authorized.
 - No custom domain is required for the class release.
 
-## Implementation in progress
+## Implementation
 
 1. French/English interface and place descriptions.
 2. Day plans and offline copies of saved places.
@@ -19,8 +19,8 @@
 
 ## External setup still needed
 
-- Supabase project URL and configuration, supplied through environment settings rather than chat secrets.
+- Supabase schema and API credentials are verified. Real authentication, saved-place persistence, RLS isolation and account deletion pass.
 - An email delivery choice for arbitrary classmates' addresses. Supabase's built-in sender only serves authorized team addresses and has a low hourly limit.
 - Vercel connector access to `ade-kerv-s-projects`. The current connection returned HTTP 403 for that scope; this is an authorization mismatch, not evidence of a broken deployment.
 
-No live database has been changed and no new deployment has been published in this phase yet.
+The database is initialized, and two temporary test accounts were created and removed during live verification. Existing users and venues were not changed. No deployment has been published in this phase. APP_ORIGIN, the public Vercel URL, and the email delivery decision remain outstanding. See SUPABASE-SETUP.md for the exact steps.
