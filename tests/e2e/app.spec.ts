@@ -76,7 +76,9 @@ test('search accepts unaccented names, keyboard selection, and browser back navi
   await page.goto('/');
   const input = page.getByRole('combobox', { name: 'Search places' });
   await input.fill('pelee');
-  await expect(page.getByRole('option')).toContainText('Montagne Pelée');
+  await expect(
+    page.getByRole('listbox', { name: 'Matching places' }).getByRole('option'),
+  ).toContainText('Montagne Pelée');
   await input.press('ArrowDown');
   await input.press('Enter');
   await expect(page).toHaveURL(/place=5/);
@@ -188,6 +190,8 @@ test('admin-created places immediately appear in home search and can be deleted'
     page.getByText('Place added. It is now available in search and on the map.'),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Close Manage places' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.getByRole('combobox', { name: 'Search places' }).click();
   await page.getByRole('combobox', { name: 'Search places' }).fill('UI Test Cove');
   await expect(page.getByRole('option', { name: /UI Test Cove/ })).toBeVisible();
   await page.getByRole('button', { name: 'Clear search' }).click();
@@ -236,33 +240,65 @@ test('opening a previously hidden mobile map fits both north and south Martiniqu
   expect(header!.y).toBeGreaterThanOrEqual(0);
 });
 
-test('French preference survives reload and planner edits persist on the device', async ({page})=>{
-  await page.setViewportSize({width:320,height:568});await page.goto('/');
-  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('fr');
-  await expect(page.locator('html')).toHaveAttribute('lang','fr');await page.reload();
-  await expect(page.getByRole('button',{name:'Explorer l’île',exact:true})).toBeVisible();await noOverflow(page);
-  await page.getByRole('button',{name:'Planifier une journée',exact:true}).click();
-  await page.getByRole('button',{name:'Nouvelle journée',exact:true}).click();
-  await page.getByLabel('Nom de la journée', {exact:true}).fill('Journée nature');
-  await page.getByLabel('Ajouter une étape',{exact:true}).selectOption('3');
-  await page.getByLabel('Ajouter une étape',{exact:true}).selectOption('2');
-  await page.getByRole('button',{name:'Monter Habitation Clément',exact:true}).click();
+test('French preference survives reload and planner edits persist on the device', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/');
+  await page.getByRole('combobox', { name: 'Language', exact: true }).selectOption('fr');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Explorer l’île', exact: true })).toBeVisible();
+  await noOverflow(page);
+  await page.getByRole('button', { name: 'Planifier une journée', exact: true }).click();
+  await page.getByRole('button', { name: 'Nouvelle journée', exact: true }).click();
+  await page.getByLabel('Nom de la journée', { exact: true }).fill('Journée nature');
+  await page.getByLabel('Ajouter une étape', { exact: true }).selectOption('3');
+  await page.getByLabel('Ajouter une étape', { exact: true }).selectOption('2');
+  await page.getByRole('button', { name: 'Monter Habitation Clément', exact: true }).click();
   await expect(page.getByRole('listitem').first()).toContainText('1. Habitation Clément');
-  await page.getByLabel('Notes (facultatives)',{exact:true}).fill('Prévoir un pique-nique');
-  await noOverflow(page);const dialog=page.getByRole('dialog');expect(await dialog.evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
-  await page.getByRole('button',{name:'Fermer Vos journées',exact:true}).click();await page.reload();
-  await page.getByRole('button',{name:'Planifier une journée',exact:true}).click();await page.getByRole('button',{name:'Journée nature',exact:true}).click();
-  await expect(page.getByLabel('Notes (facultatives)',{exact:true})).toHaveValue('Prévoir un pique-nique');
-  await expect(page.getByLabel('Ajouter une étape',{exact:true}).locator('option[value="7"]')).toHaveCount(0);
+  await page
+    .getByRole('textbox', { name: 'Notes (facultatives)', exact: true })
+    .fill('Prévoir un pique-nique');
+  await noOverflow(page);
+  const dialog = page.getByRole('dialog');
+  expect(await dialog.evaluate((e) => e.scrollWidth <= e.clientWidth + 1)).toBe(true);
+  await page.getByRole('button', { name: 'Fermer Vos journées', exact: true }).click();
+  await page.reload();
+  await page.getByRole('button', { name: 'Planifier une journée', exact: true }).click();
+  await page.getByRole('button', { name: 'Journée nature', exact: true }).click();
+  await expect(
+    page.getByRole('textbox', { name: 'Notes (facultatives)', exact: true }),
+  ).toHaveValue('Prévoir un pique-nique');
+  await page.screenshot({ path: `test-results/${test.info().project.name}-planner-fr.png` });
+  await expect(
+    page.getByLabel('Ajouter une étape', { exact: true }).locator('option[value="7"]'),
+  ).toHaveCount(0);
 });
 
-test('password recovery accepts only a recovery code and signs in with the new password', async({page})=>{
- const email=`recovery-${Date.now()}@example.test`;
- await page.request.post('/api/auth/register',{headers:{'X-MadaTours-Client':'1'},data:{email,password:'Original password 42'}});
- await page.request.post('/api/auth/verify',{headers:{'X-MadaTours-Client':'1'},data:{email,token:'123456'}});
- await page.request.post('/api/auth/logout',{headers:{'X-MadaTours-Client':'1'}});
- await page.goto('/');await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('button',{name:'Forgot password?',exact:true}).click();
- await page.getByLabel('Email',{exact:true}).fill(email);await page.getByRole('button',{name:'Send recovery code',exact:true}).click();
- await page.getByLabel('Email code',{exact:true}).fill('654321');await page.getByLabel('New password',{exact:true}).fill('Replacement password 42');await page.getByRole('button',{name:'Update password',exact:true}).click();
- await expect(page.getByText('Password updated. Sign in with your new password.')).toBeVisible();await page.getByLabel('Password',{exact:true}).fill('Replacement password 42');await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0);
+test('password recovery accepts only a recovery code and signs in with the new password', async ({
+  page,
+}) => {
+  const email = `recovery-${Date.now()}@example.test`;
+  await page.request.post('/api/auth/register', {
+    headers: { 'X-MadaTours-Client': '1' },
+    data: { email, password: 'Original password 42' },
+  });
+  await page.request.post('/api/auth/verify', {
+    headers: { 'X-MadaTours-Client': '1' },
+    data: { email, token: '123456' },
+  });
+  await page.request.post('/api/auth/logout', { headers: { 'X-MadaTours-Client': '1' } });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await page.getByRole('button', { name: 'Forgot password?', exact: true }).click();
+  await page.getByLabel('Email', { exact: true }).fill(email);
+  await page.getByRole('button', { name: 'Send recovery code', exact: true }).click();
+  await page.getByLabel('Email code', { exact: true }).fill('654321');
+  await page.getByLabel('New password', { exact: true }).fill('Replacement password 42');
+  await page.getByRole('button', { name: 'Update password', exact: true }).click();
+  await expect(page.getByText('Password updated. Sign in with your new password.')).toBeVisible();
+  await page.getByLabel('Password', { exact: true }).fill('Replacement password 42');
+  await page.getByRole('dialog').getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
 });
