@@ -27,7 +27,7 @@ test('search handles accents, case, whitespace, and missing tags', () => {
   assert.ok(matchesSearch({ ...normalizePlace(data[0]), tags: undefined }, 'petibonum'));
 });
 test('hiking filter recognizes Hiking as well as Hike', () => {
-  assert.ok(matchesInterest(normalizePlace(data[6]), 'hiking'));
+  assert.ok(matchesInterest(normalizePlace(data[4]), 'hiking'));
   assert.ok(matchesInterest(normalizePlace(data[12]), 'entertainment'));
   assert.equal(matchesInterest(normalizePlace(data[0]), 'hiking'), false);
 });

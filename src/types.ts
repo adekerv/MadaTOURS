@@ -6,6 +6,16 @@ export interface Place {
   lng: number;
   location: string;
   description: string;
+  descriptionFr?: string;
+  access?: 'unknown' | 'open' | 'restricted';
+  sources?: { url: string; title: string; checkedAt: string; fields: string[] }[];
+  photoCredit?: {
+    author: string;
+    license: string;
+    sourceUrl: string;
+    licenseUrl: string;
+    caption: string;
+  };
   distance?: number;
   rating?: number;
   hours?: string;
@@ -13,7 +23,7 @@ export interface Place {
   image?: string;
 }
 export interface User {
-  id: number;
+  id: string;
   email: string;
   role: 'user' | 'admin';
 }

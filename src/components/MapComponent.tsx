@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/I18nProvider';
 import { useEffect, useMemo, useState } from 'react';
 import {
   MapContainer,
@@ -81,6 +82,7 @@ function PlaceMarker({ place, onSelect }: { place: Place; onSelect: (place: Plac
   );
 }
 export function MapComponent(props: Props) {
+  const { t } = useI18n();
   const [tileError, setTileError] = useState(false);
   const userIcon = useMemo(
     () =>
@@ -93,7 +95,7 @@ export function MapComponent(props: Props) {
     [],
   );
   return (
-    <div className="relative h-full w-full isolate" aria-label="Map of places in Martinique">
+    <div className="relative h-full w-full isolate" aria-label={t('Map of places in Martinique')}>
       <MapContainer
         center={[14.6415, -61.0242]}
         zoom={10}
@@ -111,8 +113,8 @@ export function MapComponent(props: Props) {
         <Marker
           position={[props.userLocation.lat, props.userLocation.lng]}
           icon={userIcon}
-          title={props.userLocation.manual ? 'Search center' : 'Your location'}
-          alt="Search center"
+          title={props.userLocation.manual ? t('Search center') : t('Your location')}
+          alt={t('Search center')}
         />
         <Circle
           center={[props.userLocation.lat, props.userLocation.lng]}
@@ -128,7 +130,7 @@ export function MapComponent(props: Props) {
           role="status"
           className="absolute left-3 top-3 z-[500] max-w-[65%] rounded-xl bg-white p-3 text-xs text-slate-700 shadow"
         >
-          Some map tiles could not load. You can still browse places in the list.
+          {t('Some map tiles could not load. You can still browse places in the list.')}
         </p>
       )}
     </div>

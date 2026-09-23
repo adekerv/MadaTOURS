@@ -3,7 +3,7 @@ import { api } from '../lib/api';
 import { normalizePlace } from '../lib/places-utils';
 import seed from '../data/places.json';
 import type { Place } from '../types';
-const initial = seed.map(normalizePlace);
+const initial = seed.filter((place) => place.published !== false).map(normalizePlace);
 export function usePlaces() {
   const [places, setPlaces] = useState<Place[]>(initial);
   const [catalogueStatus, setCatalogueStatus] = useState<'loading' | 'live' | 'offline'>('loading');

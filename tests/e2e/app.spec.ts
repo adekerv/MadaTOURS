@@ -1,6 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { DatabaseSync } from 'node:sqlite';
 
 test.beforeEach(async ({ page }) => {
   await page.route('https://api.open-meteo.com/**', (route) =>
@@ -139,6 +138,8 @@ test('register, save, restore session, remove, and delete account from the UI', 
   await page.getByLabel('Email', { exact: true }).fill(email);
   await page.getByLabel('Password', { exact: true }).fill('Browser test password 42');
   await page.getByRole('button', { name: 'Create account', exact: true }).click();
+  await page.getByLabel('Email code', { exact: true }).fill('123456');
+  await page.getByRole('button', { name: 'Verify email', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.getByRole('button', { name: 'Explore the island' }).click();
   await page.getByRole('button', { name: 'Details for Jardin de Balata', exact: true }).click();
@@ -167,9 +168,14 @@ test('admin-created places immediately appear in home search and can be deleted'
     headers: { 'X-MadaTours-Client': '1' },
     data: { email, password: 'Admin browser password 42' },
   });
-  const db = new DatabaseSync(process.env.MADATOURS_E2E_DB!);
-  db.prepare("UPDATE users SET role = 'admin' WHERE email = ?").run(email);
-  db.close();
+  await page.request.post('/api/auth/verify', {
+    headers: { 'X-MadaTours-Client': '1' },
+    data: { email, token: '123456' },
+  });
+  await page.request.post('/__test/admin', {
+    headers: { 'X-Test-Token': process.env.MADATOURS_E2E_TOKEN! },
+    data: { email },
+  });
   await page.goto('/');
   await page.getByRole('button', { name: 'Manage places', exact: true }).click();
   await page.getByLabel('Name', { exact: true }).fill('UI Test Cove');
@@ -224,8 +230,39 @@ test('opening a previously hidden mobile map fits both north and south Martiniqu
   await page.goto('/#explore');
   await expect(page.getByRole('heading', { name: 'Discover places' })).toBeVisible();
   await page.getByRole('button', { name: 'Map', exact: true }).click();
-  await expect(page.locator('.leaflet-marker-icon[title="Montagne Pelée Hike"]')).toBeInViewport();
+  await expect(page.locator('.leaflet-marker-icon[title="Montagne Pelée"]')).toBeInViewport();
   await expect(page.locator('.leaflet-marker-icon[title="Plage des Salines"]')).toBeInViewport();
   const header = await page.locator('.explore-header').boundingBox();
   expect(header!.y).toBeGreaterThanOrEqual(0);
+});
+
+test('French preference survives reload and planner edits persist on the device', async ({page})=>{
+  await page.setViewportSize({width:320,height:568});await page.goto('/');
+  await page.getByRole('combobox',{name:'Language',exact:true}).selectOption('fr');
+  await expect(page.locator('html')).toHaveAttribute('lang','fr');await page.reload();
+  await expect(page.getByRole('button',{name:'Explorer l’île',exact:true})).toBeVisible();await noOverflow(page);
+  await page.getByRole('button',{name:'Planifier une journée',exact:true}).click();
+  await page.getByRole('button',{name:'Nouvelle journée',exact:true}).click();
+  await page.getByLabel('Nom de la journée', {exact:true}).fill('Journée nature');
+  await page.getByLabel('Ajouter une étape',{exact:true}).selectOption('3');
+  await page.getByLabel('Ajouter une étape',{exact:true}).selectOption('2');
+  await page.getByRole('button',{name:'Monter Habitation Clément',exact:true}).click();
+  await expect(page.getByRole('listitem').first()).toContainText('1. Habitation Clément');
+  await page.getByLabel('Notes (facultatives)',{exact:true}).fill('Prévoir un pique-nique');
+  await noOverflow(page);const dialog=page.getByRole('dialog');expect(await dialog.evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
+  await page.getByRole('button',{name:'Fermer Vos journées',exact:true}).click();await page.reload();
+  await page.getByRole('button',{name:'Planifier une journée',exact:true}).click();await page.getByRole('button',{name:'Journée nature',exact:true}).click();
+  await expect(page.getByLabel('Notes (facultatives)',{exact:true})).toHaveValue('Prévoir un pique-nique');
+  await expect(page.getByLabel('Ajouter une étape',{exact:true}).locator('option[value="7"]')).toHaveCount(0);
+});
+
+test('password recovery accepts only a recovery code and signs in with the new password', async({page})=>{
+ const email=`recovery-${Date.now()}@example.test`;
+ await page.request.post('/api/auth/register',{headers:{'X-MadaTours-Client':'1'},data:{email,password:'Original password 42'}});
+ await page.request.post('/api/auth/verify',{headers:{'X-MadaTours-Client':'1'},data:{email,token:'123456'}});
+ await page.request.post('/api/auth/logout',{headers:{'X-MadaTours-Client':'1'}});
+ await page.goto('/');await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('button',{name:'Forgot password?',exact:true}).click();
+ await page.getByLabel('Email',{exact:true}).fill(email);await page.getByRole('button',{name:'Send recovery code',exact:true}).click();
+ await page.getByLabel('Email code',{exact:true}).fill('654321');await page.getByLabel('New password',{exact:true}).fill('Replacement password 42');await page.getByRole('button',{name:'Update password',exact:true}).click();
+ await expect(page.getByText('Password updated. Sign in with your new password.')).toBeVisible();await page.getByLabel('Password',{exact:true}).fill('Replacement password 42');await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0);
 });

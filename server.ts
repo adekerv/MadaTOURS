@@ -1,4 +1,5 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
+config({ path: ['.env.local', '.env'] });
 import path from 'node:path';
 import express from 'express';
 import { createApp } from './server/app';

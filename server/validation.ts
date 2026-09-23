@@ -14,6 +14,7 @@ export const placeInput = z.object({
   lng: z.number().min(-180).max(180),
   location: z.string().trim().min(1).max(160),
   description: z.string().trim().min(1).max(3000),
+  description_fr: z.string().trim().max(3000).optional(),
   rating: z.number().min(0).max(5).optional(),
   hours: z.string().trim().max(200).optional(),
   tags: z.array(z.string().trim().min(1).max(40)).max(20).default([]),

@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { useEffect, useState } from 'react';
 import { withRequestSignal } from '../../lib/request';
 import { CloudSun, RefreshCw } from 'lucide-react';
@@ -20,6 +21,7 @@ export function weatherDescription(code: number) {
   return 'Conditions unavailable';
 }
 export function WeatherWidget() {
+  const { t } = useI18n();
   const [weather, setWeather] = useState<Weather | null>(null);
   const [loading, setLoading] = useState(true);
   const [revision, setRevision] = useState(0);
@@ -67,13 +69,17 @@ export function WeatherWidget() {
     <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left">
       <CloudSun className="shrink-0 text-orange-600" size={26} />
       <div className="min-w-0 flex-1" aria-live="polite">
-        <p className="text-sm font-semibold text-slate-900">Fort-de-France weather</p>
+        <p className="text-sm font-semibold text-slate-900">{t('Fort-de-France weather')}</p>
         <p className="text-sm text-slate-600">
           {loading
-            ? 'Checking conditions…'
+            ? t('Checking conditions…')
             : weather
-              ? `${weather.temp}°C · ${weatherDescription(weather.code)} · ${weather.humidity}% humidity`
-              : 'Weather is unavailable right now.'}
+              ? t('{temp}°C · {conditions} · {humidity}% humidity', {
+                  temp: weather.temp,
+                  conditions: t(weatherDescription(weather.code)),
+                  humidity: weather.humidity,
+                })
+              : t('Weather is unavailable right now.')}
         </p>
         {weather && !loading && (
           <p className="mt-1 text-xs text-slate-500">
@@ -85,12 +91,13 @@ export function WeatherWidget() {
             >
               Open-Meteo
             </a>{' '}
-            · {weather.time.slice(11, 16)} Martinique time
+            · {weather.time.slice(11, 16)}
+            {t('Martinique time')}
           </p>
         )}
       </div>
       <button
-        aria-label="Refresh weather"
+        aria-label={t('Refresh weather')}
         disabled={loading}
         onClick={() => setRevision((value) => value + 1)}
         className="icon-button shrink-0"

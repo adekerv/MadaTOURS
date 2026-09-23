@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { useState, useRef, useEffect, useId, type KeyboardEvent } from 'react';
 import { Search, X, MapPin } from 'lucide-react';
 import type { Place } from '../../types';
@@ -9,6 +10,7 @@ export function SearchBar({
   places: Place[];
   onSelectPlace: (place: Place) => void;
 }) {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -66,7 +68,7 @@ export function SearchBar({
         <input
           ref={input}
           role="combobox"
-          aria-label="Search places"
+          aria-label={t('Search places')}
           aria-expanded={expanded}
           aria-controls={`${id}-list`}
           aria-autocomplete="list"
@@ -80,12 +82,12 @@ export function SearchBar({
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
-          placeholder="Search places, towns, activities…"
+          placeholder={t('Search places, towns, activities…')}
           className="min-w-0 flex-1 bg-transparent py-3 text-base outline-none"
         />
         {query && (
           <button
-            aria-label="Clear search"
+            aria-label={t('Clear search')}
             className="icon-button"
             onClick={() => {
               setQuery('');
@@ -102,7 +104,7 @@ export function SearchBar({
           <ul
             id={`${id}-list`}
             role="listbox"
-            aria-label="Matching places"
+            aria-label={t('Matching places')}
             className="max-h-[min(50dvh,24rem)] overflow-y-auto"
           >
             {filtered.map((place, index) => (
@@ -125,7 +127,7 @@ export function SearchBar({
           </ul>
           {!filtered.length && (
             <p role="status" className="p-5 text-sm text-slate-600">
-              No places found. Try a town name or activity.
+              {t('No places found. Try a town name or activity.')}
             </p>
           )}
         </div>

@@ -1,6 +1,8 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 export function Notice({ message, onDismiss }: { message: string; onDismiss: () => void }) {
+  const { t } = useI18n();
   const [container, setContainer] = useState<Element>(document.body);
   useEffect(() => {
     const update = () => {
@@ -19,8 +21,12 @@ export function Notice({ message, onDismiss }: { message: string; onDismiss: () 
   }, []);
   return createPortal(
     <div role="status" className="app-notice">
-      <span>{message}</span>
-      <button onClick={onDismiss} aria-label="Dismiss message" className="icon-button shrink-0">
+      <span>{t(message)}</span>
+      <button
+        onClick={onDismiss}
+        aria-label={t('Dismiss message')}
+        className="icon-button shrink-0"
+      >
         ×
       </button>
     </div>,

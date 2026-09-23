@@ -1,3 +1,4 @@
+import { sourceSchema, photoCreditSchema } from './content';
 import type { Place } from '../types';
 export const deg2rad = (degrees: number) => (degrees * Math.PI) / 180;
 export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -41,10 +42,21 @@ export function normalizePlace(value: unknown): Place {
     lng: Number(p.lng),
     location: p.location,
     description: typeof p.description === 'string' ? p.description : '',
+    descriptionFr:
+      typeof (p.description_fr ?? p.descriptionFr) === 'string'
+        ? String(p.description_fr ?? p.descriptionFr)
+        : undefined,
+    access: p.access === 'restricted' || p.access === 'open' ? p.access : 'unknown',
+    sources: sourceSchema.array().safeParse(p.sources).data ?? [],
+    photoCredit: photoCreditSchema.safeParse(p.photo_credit ?? p.photoCredit).data,
     tags: Array.isArray(tags) ? tags.filter((tag): tag is string => typeof tag === 'string') : [],
     rating: p.rating != null && Number.isFinite(Number(p.rating)) ? Number(p.rating) : undefined,
     hours: typeof p.hours === 'string' ? p.hours : undefined,
-    image: typeof p.image === 'string' && p.image.startsWith('https://') ? p.image : undefined,
+    image:
+      typeof p.image === 'string' &&
+      (p.image.startsWith('https://') || /^\/photos\/[a-zA-Z0-9._-]+$/.test(p.image))
+        ? p.image
+        : undefined,
     distance:
       p.distance != null && Number.isFinite(Number(p.distance)) ? Number(p.distance) : undefined,
   };
@@ -53,12 +65,19 @@ export const normalizeSearch = (value: string) =>
   value
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/œ/g, 'oe')
     .toLowerCase()
+    .replace(/œ/g, 'oe')
     .trim();
 export function matchesSearch(place: Place, query: string) {
   return normalizeSearch(
-    [place.name, place.location, place.type, ...(place.tags ?? [])].join(' '),
+    [
+      place.name,
+      place.location,
+      place.type,
+      place.type === 'activity' ? 'activités' : 'restaurant',
+      place.descriptionFr,
+      ...(place.tags ?? []),
+    ].join(' '),
   ).includes(normalizeSearch(query));
 }
 export function matchesInterest(place: Place, interest: string) {

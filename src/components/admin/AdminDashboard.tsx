@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Trash2, Plus, MapPin } from 'lucide-react';
 import type { Place, User } from '../../types';
@@ -9,6 +10,7 @@ const emptyForm = {
   type: 'activity',
   location: '',
   description: '',
+  description_fr: '',
   lat: '',
   lng: '',
   rating: '',
@@ -25,6 +27,7 @@ export function AdminDashboard({
   onClose: () => void;
   onRefreshPlaces: () => void;
 }) {
+  const { t } = useI18n();
   const [places, setPlaces] = useState<Place[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
@@ -100,27 +103,29 @@ export function AdminDashboard({
     }
   }
   return (
-    <Modal title="Manage places" onClose={onClose} wide>
+    <Modal title={t('Manage places')} onClose={onClose} wide>
       <div className="space-y-7 p-5 sm:p-7">
-        <p className="break-all text-sm text-slate-600">Signed in as {user.email}</p>
+        <p className="break-all text-sm text-slate-600">
+          {t('Signed in as')} {user.email}
+        </p>
         {error && (
           <p role="alert" className="error-message">
-            {error}
+            {t(error)}
           </p>
         )}
         {notice && (
           <p role="status" className="rounded-xl bg-green-50 p-3 text-sm text-green-800">
-            {notice}
+            {t(notice)}
           </p>
         )}
         <section>
           <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
             <Plus size={21} />
-            Add a place
+            {t('Add a place')}
           </h3>
           <form onSubmit={add} className="space-y-4">
             <label className="field-label">
-              Name
+              {t('Name')}
               <input
                 required
                 maxLength={160}
@@ -131,18 +136,18 @@ export function AdminDashboard({
             </label>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="field-label">
-                Category
+                {t('Category')}
                 <select
                   value={form.type}
                   onChange={(event) => update('type', event.target.value)}
                   className="field-input"
                 >
-                  <option value="activity">Activity</option>
-                  <option value="restaurant">Restaurant</option>
+                  <option value="activity">{t('Activity')}</option>
+                  <option value="restaurant">{t('Restaurant')}</option>
                 </select>
               </label>
               <label className="field-label">
-                Town
+                {t('Town')}
                 <input
                   required
                   maxLength={160}
@@ -154,7 +159,7 @@ export function AdminDashboard({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <label className="field-label">
-                Latitude
+                {t('Latitude')}
                 <input
                   required
                   type="number"
@@ -167,7 +172,7 @@ export function AdminDashboard({
                 />
               </label>
               <label className="field-label">
-                Longitude
+                {t('Longitude')}
                 <input
                   required
                   type="number"
@@ -181,7 +186,7 @@ export function AdminDashboard({
               </label>
             </div>
             <label className="field-label">
-              Description
+              {t('Description')}
               <textarea
                 required
                 rows={3}
@@ -191,9 +196,19 @@ export function AdminDashboard({
                 className="field-input"
               />
             </label>
+            <label className="field-label">
+              {t('Description in French (optional)')}
+              <textarea
+                rows={3}
+                maxLength={3000}
+                value={form.description_fr}
+                onChange={(event) => update('description_fr', event.target.value)}
+                className="field-input"
+              />
+            </label>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="field-label">
-                Guide rating (optional)
+                {t('Guide rating (optional)')}
                 <input
                   type="number"
                   min="0"
@@ -205,7 +220,7 @@ export function AdminDashboard({
                 />
               </label>
               <label className="field-label">
-                Opening hours (optional)
+                {t('Opening hours (optional)')}
                 <input
                   maxLength={200}
                   value={form.hours}
@@ -215,16 +230,16 @@ export function AdminDashboard({
               </label>
             </div>
             <label className="field-label">
-              Tags, separated by commas
+              {t('Tags, separated by commas')}
               <input
                 value={form.tags}
                 onChange={(event) => update('tags', event.target.value)}
                 className="field-input"
-                placeholder="Hiking, Nature, Family"
+                placeholder={t('Hiking, Nature, Family')}
               />
             </label>
             <label className="field-label">
-              Image URL (optional)
+              {t('Image URL (optional)')}
               <input
                 type="url"
                 pattern="https://.*"
@@ -236,18 +251,21 @@ export function AdminDashboard({
               />
             </label>
             <button disabled={busy} className="primary-button w-full">
-              {busy ? 'Saving…' : 'Add place'}
+              {busy ? t('Saving…') : t('Add place')}
             </button>
           </form>
         </section>
         <section className="border-t border-slate-200 pt-6">
-          <h3 className="mb-4 text-xl font-bold">Places ({places.length})</h3>
-          {loading && <p role="status">Loading places…</p>}
+          <h3 className="mb-4 text-xl font-bold">
+            {t('Places ({count})', { count: places.length })}
+          </h3>
+          {loading && <p role="status">{t('Loading places…')}</p>}
           {deletePlace && (
             <div role="alert" className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4">
               <p className="text-sm text-red-900">
-                Delete <strong>{deletePlace.name}</strong>? This also removes it from everyone’s
-                saved lists.
+                {t('Delete {name}? This also removes it from everyone’s saved lists.', {
+                  name: deletePlace.name,
+                })}
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <button
@@ -255,14 +273,14 @@ export function AdminDashboard({
                   disabled={busy}
                   className="primary-button bg-red-700"
                 >
-                  Confirm deletion
+                  {t('Confirm deletion')}
                 </button>
                 <button
                   onClick={() => setDeletePlace(null)}
                   disabled={busy}
                   className="secondary-button"
                 >
-                  Cancel
+                  {t('Cancel')}
                 </button>
               </div>
             </div>
@@ -286,7 +304,7 @@ export function AdminDashboard({
                     setDeletePlace(place);
                     setError('');
                   }}
-                  aria-label={`Delete ${place.name}`}
+                  aria-label={t('Delete {name}', { name: place.name })}
                   className="icon-button shrink-0 text-red-700"
                 >
                   <Trash2 size={18} />

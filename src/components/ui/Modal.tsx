@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
@@ -8,6 +9,7 @@ interface Props {
   wide?: boolean;
 }
 export function Modal({ title, onClose, children, wide = false }: Props) {
+  const { t } = useI18n();
   const ref = useRef<HTMLDialogElement>(null);
   const id = useId();
   const closeRef = useRef(onClose);
@@ -53,7 +55,7 @@ export function Modal({ title, onClose, children, wide = false }: Props) {
         <button
           type="button"
           onClick={onClose}
-          aria-label={`Close ${title}`}
+          aria-label={t('Close {title}', { title })}
           className="icon-button shrink-0"
         >
           <X size={20} />

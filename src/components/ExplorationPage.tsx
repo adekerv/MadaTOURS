@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/I18nProvider';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Geolocation } from '@capacitor/geolocation';
@@ -39,6 +40,7 @@ export function ExplorationPage({
   onAdminClick,
   initialParams,
 }: Props) {
+  const { t } = useI18n();
   const initialPlace = places.find((place) => place.id === initialParams.selectedPlaceId);
   const [center, setCenter] = useState<UserLocation>(
     initialPlace ? { lat: initialPlace.lat, lng: initialPlace.lng, manual: true } : islandCenter,
@@ -206,9 +208,9 @@ export function ExplorationPage({
           />
           {manual && (
             <div role="status" className="map-hint">
-              Tap a point on the map to search nearby.
+              {t('Tap a point on the map to search nearby.')}
               <button className="font-semibold underline" onClick={() => setManual(false)}>
-                Cancel
+                {t('Cancel')}
               </button>
             </div>
           )}
@@ -230,14 +232,14 @@ export function ExplorationPage({
           role="status"
           className="flex items-center justify-between gap-3 bg-amber-50 px-4 py-2 text-sm text-amber-900"
         >
-          <span>Connection unavailable. Showing the last loaded guide.</span>
+          <span>{t('Connection unavailable. Showing the last loaded guide.')}</span>
           <button onClick={onRefreshPlaces} className="shrink-0 font-semibold underline">
-            Retry
+            {t('Retry')}
           </button>
         </div>
       )}
       <nav
-        aria-label="Explore views"
+        aria-label={t('Explore views')}
         className="mobile-view-switch grid grid-cols-2 gap-2 border-t border-slate-200 bg-white px-4 pt-2 md:hidden"
       >
         <button
@@ -246,7 +248,7 @@ export function ExplorationPage({
           className={`view-button ${mobileView === 'list' ? 'view-button-active' : ''}`}
         >
           <List size={19} />
-          List
+          {t('List')}
         </button>
         <button
           aria-pressed={mobileView === 'map'}
@@ -254,7 +256,7 @@ export function ExplorationPage({
           className={`view-button ${mobileView === 'map' ? 'view-button-active' : ''}`}
         >
           <MapIcon size={19} />
-          Map
+          {t('Map')}
         </button>
       </nav>
       {locationOpen && (

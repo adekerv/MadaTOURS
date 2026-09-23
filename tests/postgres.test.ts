@@ -1,74 +1,69 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { PGlite } from '@electric-sql/pglite';
-import { initializeDatabase, type Database, type SqlValue } from '../server/db';
-import { hashPassword, rateLimit } from '../server/security';
-
-test('PostgreSQL schema, seed sequence, foreign keys, upserts, and initialization use valid PostgreSQL', async () => {
-  const pg = new PGlite();
-  const db: Database = {
-    dialect: 'postgres',
-    query: async <T>(sql: string, values: SqlValue[] = []) => (await pg.query<T>(sql, values)).rows,
-    exec: async (sql) => {
-      await pg.exec(sql);
-    },
-    close: () => pg.close(),
+import { readFile } from 'node:fs/promises';
+import { testDatabase } from './support/database';
+const alice = '00000000-0000-4000-8000-000000000001',
+  bob = '00000000-0000-4000-8000-000000000002';
+test('Supabase SQL enforces RLS even when requests bypass the application API', async () => {
+  const db = await testDatabase();
+  const asUser = async (id: string, statement: string) => {
+    await db.exec('BEGIN');
+    try {
+      await db.query("SELECT set_config('request.jwt.claim.sub',$1,true)", [id]);
+      await db.exec('SET LOCAL ROLE authenticated');
+      const result = await db.query<Record<string, unknown>>(statement);
+      await db.exec('COMMIT');
+      return result.rows;
+    } catch (e) {
+      await db.exec('ROLLBACK');
+      throw e;
+    }
   };
   try {
-    await initializeDatabase(db);
-    const [user] = await db.query<{ id: number }>(
-      "INSERT INTO users (email,password,role) VALUES ($1,$2,'user') RETURNING id",
-      ['test@example.test', await hashPassword('test password 42')],
-    );
-    const [place] = await db.query<{ id: number }>(
-      "INSERT INTO places (name,type,lat,lng,location,description,tags) VALUES ('A','activity',0,0,'Test','Test','[]') RETURNING id",
-    );
-    assert.ok(place.id > 24);
     await db.query(
-      'INSERT INTO user_favorites (user_id,place_id) VALUES ($1,$2) ON CONFLICT (user_id,place_id) DO NOTHING',
-      [user.id, place.id],
+      'INSERT INTO auth.users(id,email,raw_user_meta_data) VALUES($1,$2,$3),($4,$5,$6)',
+      [alice, 'admin-in-name@example.test', '{"role":"admin"}', bob, 'bob@example.test', '{}'],
     );
-    await db.query(
-      'INSERT INTO user_favorites (user_id,place_id) VALUES ($1,$2) ON CONFLICT (user_id,place_id) DO NOTHING',
-      [user.id, place.id],
+    assert.deepEqual(
+      (await asUser(alice, 'SELECT role FROM public.mt_profiles')).map((r) => r.role),
+      ['user'],
     );
-    assert.equal((await db.query('SELECT * FROM user_favorites')).length, 1);
-    await db.query('DELETE FROM places WHERE id = $1', [place.id]);
-    assert.equal((await db.query('SELECT * FROM user_favorites')).length, 0);
-    await db.query('DELETE FROM places WHERE id = 1');
-    await initializeDatabase(db);
+    await assert.rejects(() => asUser(alice, "UPDATE public.mt_profiles SET role='admin'"));
+    await assert.rejects(() =>
+      asUser(
+        alice,
+        `INSERT INTO public.mt_saved_places(user_id,place_id,kind) VALUES('${bob}',1,'favorites')`,
+      ),
+    );
+    await asUser(
+      alice,
+      `INSERT INTO public.mt_saved_places(user_id,place_id,kind) VALUES('${alice}',1,'favorites')`,
+    );
+    assert.equal((await asUser(bob, 'SELECT * FROM public.mt_saved_places')).length, 0);
+    assert.equal((await asUser(bob, 'DELETE FROM public.mt_saved_places RETURNING *')).length, 0);
+    await assert.rejects(() =>
+      asUser(
+        alice,
+        "INSERT INTO public.mt_places(name,type,lat,lng,location,description) VALUES('No','activity',0,0,'x','x')",
+      ),
+    );
+    await assert.rejects(() =>
+      asUser(alice, "SELECT public.mt_check_rate_limit(repeat('a',64),1)"),
+    );
+    await db.query("UPDATE public.mt_profiles SET role='admin' WHERE id=$1", [alice]);
+    await asUser(alice, 'DELETE FROM public.mt_places WHERE id=1');
+    assert.equal((await asUser(alice, 'SELECT * FROM public.mt_saved_places')).length, 0);
+    await db.exec(await readFile(new URL('../supabase/setup.sql', import.meta.url), 'utf8'));
     assert.equal(
-      (await db.query('SELECT * FROM places WHERE id = 1')).length,
+      (await db.query('SELECT * FROM public.mt_places WHERE id=1')).rows.length,
       0,
-      'Initialization must not resurrect deleted places.',
+      'setup must not resurrect deleted records',
     );
-    await rateLimit(db, 'test', 1);
-    await assert.rejects(() => rateLimit(db, 'test', 1));
-    await db.query('INSERT INTO sessions (token_hash,user_id,expires_at) VALUES ($1,$2,$3)', [
-      'hash',
-      user.id,
-      Date.now() + 1000,
-    ]);
-    await db.query('DELETE FROM users WHERE id = $1', [user.id]);
-    assert.equal((await db.query('SELECT * FROM sessions')).length, 0);
-  } finally {
-    await db.close();
-  }
-});
-
-test('initialization refuses to silently reuse the insecure legacy PostgreSQL schema', async () => {
-  const pg = new PGlite();
-  const db: Database = {
-    dialect: 'postgres',
-    query: async <T>(sql: string, values: SqlValue[] = []) => (await pg.query<T>(sql, values)).rows,
-    exec: async (sql) => {
-      await pg.exec(sql);
-    },
-    close: () => pg.close(),
-  };
-  try {
-    await db.exec('CREATE TABLE users (id INT)');
-    await assert.rejects(() => initializeDatabase(db), /Legacy database/);
+    await db.query('DELETE FROM auth.users WHERE id=$1', [bob]);
+    assert.equal(
+      (await db.query('SELECT * FROM public.mt_profiles WHERE id=$1', [bob])).rows.length,
+      0,
+    );
   } finally {
     await db.close();
   }

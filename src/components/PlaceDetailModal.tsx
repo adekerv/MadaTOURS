@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/I18nProvider';
 import { Heart, Calendar, ExternalLink, Clock, Star, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import type { Place, User } from '../types';
@@ -23,6 +24,7 @@ export function PlaceDetailModal({
   onLoginClick: () => void;
   googleMapsUrl: string;
 }) {
+  const { t, language } = useI18n();
   const [imageError, setImageError] = useState(false);
   return (
     <Modal title={place.name} onClose={onClose} wide>
@@ -42,44 +44,49 @@ export function PlaceDetailModal({
           </div>
         )}
         <span className="absolute bottom-2 right-3 rounded bg-white/90 px-2 py-1 text-xs text-slate-700">
-          Illustrative photo
+          {place.image && !imageError
+            ? (place.photoCredit?.caption ?? t('Illustrative photo'))
+            : t('No venue photo yet')}
         </span>
       </div>
       <div className="space-y-5 p-5 sm:p-7">
         <p className="text-sm font-semibold text-orange-700">
-          {place.type === 'restaurant' ? 'Restaurant' : 'Activity'} · {place.location}
+          {place.type === 'restaurant' ? t('Restaurant') : t('Activity')} · {place.location}
         </p>
-        <p className="leading-relaxed text-slate-700">{place.description}</p>
+        <p className="leading-relaxed text-slate-700">
+          {language === 'fr' && place.descriptionFr ? place.descriptionFr : place.description}
+        </p>
         <dl className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl bg-slate-50 p-4">
             <dt className="flex items-center gap-2 text-sm text-slate-600">
               <Star size={17} />
-              Guide rating
+              {t('Guide rating')}
             </dt>
             <dd className="mt-1 font-semibold">
-              {place.rating !== undefined ? `${place.rating} / 5` : 'Not rated'}
+              {place.rating !== undefined ? `${place.rating} / 5` : t('Not rated')}
             </dd>
           </div>
           <div className="rounded-2xl bg-slate-50 p-4">
             <dt className="flex items-center gap-2 text-sm text-slate-600">
               <Clock size={17} />
-              Listed hours
+              {t('Listed hours')}
             </dt>
-            <dd className="mt-1 font-semibold">{place.hours || 'Check with the venue'}</dd>
+            <dd className="mt-1 font-semibold">{place.hours || t('Check with the venue')}</dd>
           </div>
         </dl>
         <p className="text-xs leading-relaxed text-slate-500">
-          Guide details and ratings are supplied with this catalogue, not live visitor reviews.
-          Confirm opening hours, access, and trail conditions before visiting.
+          {t(
+            'Guide details and ratings are supplied with this catalogue, not live visitor reviews. Confirm opening hours, access, and trail conditions before visiting.',
+          )}
         </p>
         {!!place.tags?.length && (
-          <ul aria-label="Place tags" className="flex flex-wrap gap-2">
+          <ul aria-label={t('Place tags')} className="flex flex-wrap gap-2">
             {[...new Set(place.tags)].map((tag) => (
               <li
-                key={tag}
+                key={t(tag)}
                 className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600"
               >
-                {tag}
+                {t(tag)}
               </li>
             ))}
           </ul>
@@ -91,7 +98,7 @@ export function PlaceDetailModal({
             className="secondary-button flex items-center justify-center gap-2"
           >
             <Heart size={18} className={isFavorite ? 'fill-red-600 text-red-600' : ''} />
-            {isFavorite ? 'Saved to favorites' : 'Save favorite'}
+            {isFavorite ? t('Saved to favorites') : t('Save favorite')}
           </button>
           <button
             onClick={() => (user ? onToggleRevisit(place) : onLoginClick())}
@@ -99,23 +106,79 @@ export function PlaceDetailModal({
             className="secondary-button flex items-center justify-center gap-2"
           >
             <Calendar size={18} />
-            {isRevisit ? 'On your revisit list' : 'Add to revisit list'}
+            {isRevisit ? t('On your revisit list') : t('Add to revisit list')}
           </button>
         </div>
         {!user && (
           <p className="text-center text-sm text-slate-600">
-            Sign in when you want to save a place.
+            {t('Sign in when you want to save a place.')}
           </p>
         )}
-        <a
-          href={googleMapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="primary-button flex w-full items-center justify-center gap-2"
-        >
-          Get directions
-          <ExternalLink size={18} />
-        </a>
+        {place.sources?.length ? (
+          <section className="rounded-2xl bg-slate-50 p-4">
+            <h3 className="font-semibold">{t('Sources and updates')}</h3>
+            <ul className="mt-2 space-y-3">
+              {place.sources.map((source) => (
+                <li key={source.url} className="text-sm">
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-orange-700 underline"
+                  >
+                    {source.title}
+                  </a>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {t('Source checked: {date}', { date: source.checkedAt })} ·{' '}
+                    {source.fields.map((field) => t(field)).join(', ')}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : (
+          <p className="text-sm text-amber-800">{t('Venue details still need verification.')}</p>
+        )}
+        {place.photoCredit && (
+          <p className="text-xs leading-relaxed text-slate-500">
+            {t('Photo')}:{' '}
+            <a
+              href={place.photoCredit.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              {place.photoCredit.author}
+            </a>{' '}
+            ·{' '}
+            <a
+              href={place.photoCredit.licenseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              {place.photoCredit.license}
+            </a>{' '}
+            · {t('Displayed cropped to fit.')}
+          </p>
+        )}
+        {place.access === 'restricted' ? (
+          <p role="note" className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">
+            {t(
+              'Access is restricted. This place cannot be added to a day trip. Consult the source before planning a visit.',
+            )}
+          </p>
+        ) : (
+          <a
+            href={googleMapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="primary-button flex w-full items-center justify-center gap-2"
+          >
+            {t('Get directions')}
+            <ExternalLink size={18} />
+          </a>
+        )}
       </div>
     </Modal>
   );

@@ -1,3 +1,4 @@
+import { useI18n } from './i18n/I18nProvider';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Notice } from './components/ui/Notice';
 import { useNativeBack } from './hooks/useNativeBack';
@@ -7,8 +8,15 @@ import { AccountModal } from './components/home/AccountModal';
 import { usePlaces } from './hooks/usePlaces';
 import { api, ApiError, errorMessage } from './lib/api';
 import type { ExploreParams, Place, User } from './types';
+import { clearOfflinePlaces, readOfflinePlaces, saveOfflinePlaces } from './lib/offline';
 import { normalizePlace } from './lib/places-utils';
 
+const DayPlanner = lazy(() =>
+  import('./components/planner/DayPlanner').then((m) => ({ default: m.DayPlanner })),
+);
+const OfflinePlacesModal = lazy(() =>
+  import('./components/home/OfflinePlacesModal').then((m) => ({ default: m.OfflinePlacesModal })),
+);
 const ExplorationPage = lazy(() =>
   import('./components/ExplorationPage').then((module) => ({ default: module.ExplorationPage })),
 );
@@ -32,12 +40,15 @@ function readRoute(): ExploreParams | null {
   };
 }
 export default function App() {
+  const { t } = useI18n();
   useNativeBack();
   const { places, catalogueStatus, refreshPlaces } = usePlaces();
   const [exploreParams, setExploreParams] = useState(readRoute);
   const [user, setUser] = useState<User | null>(null);
   const [favorites, setFavorites] = useState<Place[]>([]);
   const [revisits, setRevisits] = useState<Place[]>([]);
+  const [plannerOpen, setPlannerOpen] = useState(false);
+  const [offlineOpen, setOfflineOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -88,6 +99,7 @@ export default function App() {
       setCollectionsLoading(false);
       return () => controller.abort();
     }
+    if (readOfflinePlaces()?.ownerId !== user.id) clearOfflinePlaces();
     setCollectionsLoading(true);
     Promise.all([
       api<unknown[]>('/favorites', { signal: controller.signal }),
@@ -97,6 +109,10 @@ export default function App() {
         if (!controller.signal.aborted) {
           setFavorites(favs.map(normalizePlace));
           setRevisits(visits.map(normalizePlace));
+          if (!saveOfflinePlaces(user.id, favs.map(normalizePlace), visits.map(normalizePlace)))
+            setNotice(
+              'Device storage is unavailable. Changes will be lost when you close the app.',
+            );
         }
       })
       .catch((error) => {
@@ -137,6 +153,19 @@ export default function App() {
           ? previous.filter((item) => item.id !== place.id)
           : [...previous.filter((item) => item.id !== place.id), place],
       );
+      const changed = exists
+        ? (collection === 'favorites' ? favorites : revisits).filter((item) => item.id !== place.id)
+        : [
+            ...(collection === 'favorites' ? favorites : revisits).filter(
+              (item) => item.id !== place.id,
+            ),
+            place,
+          ];
+      saveOfflinePlaces(
+        user.id,
+        collection === 'favorites' ? changed : favorites,
+        collection === 'revisits' ? changed : revisits,
+      );
       setNotice(
         exists
           ? `Removed ${place.name} from your ${collection === 'favorites' ? 'favorites' : 'revisit list'}.`
@@ -157,6 +186,7 @@ export default function App() {
     try {
       await api('/auth/logout', { method: 'POST' });
       setUser(null);
+      clearOfflinePlaces();
       setAdminOpen(false);
       setNotice('You have signed out.');
     } catch (error) {
@@ -192,12 +222,12 @@ export default function App() {
           main?.scrollIntoView();
         }}
       >
-        Skip to content
+        {t('Skip to content')}
       </a>
       <Suspense
         fallback={
           <div role="status" className="grid min-h-dvh place-items-center text-slate-600">
-            Opening MadaTours…
+            {t('Opening MadaTours…')}
           </div>
         }
       >
@@ -220,6 +250,8 @@ export default function App() {
         ) : (
           <Homepage
             onStart={startExplore}
+            onPlanDay={() => setPlannerOpen(true)}
+            onOfflineClick={() => setOfflineOpen(true)}
             places={places}
             favorites={favorites}
             revisits={revisits}
@@ -234,6 +266,14 @@ export default function App() {
             onAdminClick={() => setAdminOpen(true)}
           />
         )}
+        {plannerOpen && (
+          <DayPlanner
+            places={places}
+            savedPlaces={[...favorites, ...revisits]}
+            onClose={() => setPlannerOpen(false)}
+          />
+        )}
+        {offlineOpen && <OfflinePlacesModal onClose={() => setOfflineOpen(false)} />}
         {adminOpen && user?.role === 'admin' && (
           <AdminDashboard
             user={user}
@@ -252,7 +292,8 @@ export default function App() {
           onDeleted={() => {
             setUser(null);
             setAccountOpen(false);
-            setNotice('Your account and saved places have been deleted.');
+            clearOfflinePlaces();
+            setNotice(t('Your account and saved places have been deleted.'));
           }}
         />
       )}
@@ -261,7 +302,7 @@ export default function App() {
           onClose={() => setAuthOpen(false)}
           onLoginSuccess={(loggedIn) => {
             setUser(loggedIn);
-            setNotice('You are signed in.');
+            setNotice(t('You are signed in.'));
           }}
         />
       )}

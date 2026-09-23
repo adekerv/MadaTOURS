@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { useState, type FormEvent } from 'react';
 import type { User } from '../../types';
 import { api, errorMessage } from '../../lib/api';
@@ -11,6 +12,7 @@ export function AccountModal({
   onClose: () => void;
   onDeleted: () => void;
 }) {
+  const { t } = useI18n();
   const [confirm, setConfirm] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -29,20 +31,21 @@ export function AccountModal({
     }
   }
   return (
-    <Modal title="Your account" onClose={onClose}>
+    <Modal title={t('Your account')} onClose={onClose}>
       <div className="space-y-5 p-6">
         <p className="break-all text-slate-700">{user.email}</p>
         <p className="text-sm text-slate-600">
-          Your favorites and revisit list are linked to this account.
+          {t('Your favorites and revisit list are linked to this account.')}
         </p>
         {confirm ? (
           <form onSubmit={remove} className="space-y-4">
             <p className="text-sm text-red-700">
-              This permanently deletes your account, saved places, and all active sessions. Enter
-              your password to confirm.
+              {t(
+                'This permanently deletes your account, saved places, and all active sessions. Enter your password to confirm.',
+              )}
             </p>
             <label className="field-label">
-              Password
+              {t('Password')}
               <input
                 type="password"
                 autoComplete="current-password"
@@ -55,23 +58,23 @@ export function AccountModal({
             </label>
             {error && (
               <p role="alert" className="error-message">
-                {error}
+                {t(error)}
               </p>
             )}
             <button disabled={busy} className="primary-button bg-red-700 w-full">
-              {busy ? 'Deleting…' : 'Permanently delete my account'}
+              {busy ? t('Deleting…') : t('Permanently delete my account')}
             </button>
             <button
               type="button"
               className="secondary-button w-full"
               onClick={() => setConfirm(false)}
             >
-              Cancel
+              {t('Cancel')}
             </button>
           </form>
         ) : (
           <button className="secondary-button text-red-700" onClick={() => setConfirm(true)}>
-            Delete account
+            {t('Delete account')}
           </button>
         )}
       </div>

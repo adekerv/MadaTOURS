@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { LocateFixed, MapPin } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 export function LocationPrompt({
@@ -15,16 +16,18 @@ export function LocationPrompt({
   isLoading: boolean;
   error: string;
 }) {
+  const { t } = useI18n();
   return (
-    <Modal title="Choose your search location" onClose={onClose}>
+    <Modal title={t('Choose your search location')} onClose={onClose}>
       <div className="space-y-4 p-5 sm:p-7">
         <p className="text-sm leading-relaxed text-slate-600">
-          Use your location to find places nearby, or explore anywhere in Martinique. Your location
-          is used on this device to calculate distances.
+          {t(
+            'Use your location to find places nearby, or explore anywhere in Martinique. Your location is used on this device to calculate distances.',
+          )}
         </p>
         {error && (
           <p role="alert" className="error-message">
-            {error}
+            {t(error)}
           </p>
         )}
         <button
@@ -33,17 +36,17 @@ export function LocationPrompt({
           className="primary-button flex w-full justify-center items-center gap-2"
         >
           <LocateFixed size={18} />
-          {isLoading ? 'Finding your location…' : 'Use my location'}
+          {isLoading ? t('Finding your location…') : t('Use my location')}
         </button>
         <button
           onClick={onManualSelect}
           className="secondary-button flex w-full justify-center items-center gap-2"
         >
           <MapPin size={18} />
-          Choose on the map
+          {t('Choose on the map')}
         </button>
         <button onClick={onBrowseIsland} className="secondary-button w-full">
-          Browse all Martinique
+          {t('Browse all Martinique')}
         </button>
       </div>
     </Modal>

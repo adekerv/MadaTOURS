@@ -1,31 +1,31 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
-import { ZodError } from 'zod';
-import { getDatabase, type Database } from './db';
+import { z, ZodError } from 'zod';
 import {
-  createSession,
-  digest,
+  requestClient,
+  adminClient,
   HttpError,
-  rateLimit,
-  readToken,
   requireUser,
-  setSessionCookie,
-  hashPassword,
-  verifyPassword,
-} from './security';
+  checkAuthError,
+  checkDataError,
+  limitAttempts,
+  type Clients,
+} from './supabase';
 import { credentials, registration, placeInput, nearbyQuery, positiveId } from './validation';
 import { calculateDistance, normalizePlace } from '../src/lib/places-utils';
 import seedPlaces from '../src/data/places.json';
-import type { Place, User } from '../src/types';
-
-type Account = User & { password: string };
+const emailInput = credentials.pick({ email: true });
+const codeInput = emailInput.extend({
+  token: z
+    .string()
+    .trim()
+    .regex(/^\d{6,10}$/, 'Enter the code from your email.'),
+});
 type Handler = (req: Request, res: Response) => Promise<unknown>;
 const route = (handler: Handler) => (req: Request, res: Response, next: NextFunction) => {
   Promise.resolve(handler(req, res)).catch(next);
 };
-
-export function createApp(database?: Database) {
+export function createApp(clients: Clients = { client: requestClient, admin: adminClient }) {
   const app = express();
-  const db = () => (database ? Promise.resolve(database) : getDatabase());
   app.disable('x-powered-by');
   app.use('/api', (req, res, next) => {
     res.setHeader('Cache-Control', 'no-store');
@@ -34,12 +34,14 @@ export function createApp(database?: Database) {
     const allowed = new Set(
       (process.env.ALLOWED_ORIGINS || '')
         .split(',')
-        .map((value) => value.trim())
+        .map((v) => v.trim())
         .filter(Boolean),
     );
     if (process.env.APP_ORIGIN) allowed.add(process.env.APP_ORIGIN);
-    // Same-origin web requests and explicitly configured native origins are supported.
-    allowed.add(`${req.protocol}://${req.get('host')}`);
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
+      allowed.add(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
+    if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL)
+      allowed.add(`${req.protocol}://${req.get('host')}`);
     if (origin && !allowed.has(origin))
       return res.status(403).json({ error: 'This origin is not allowed.' });
     if (origin) {
@@ -52,48 +54,41 @@ export function createApp(database?: Database) {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-MadaTours-Client');
       return res.status(204).end();
     }
-    // A custom header prevents cross-site form submissions from using session cookies.
-    if (!['GET', 'HEAD'].includes(req.method) && req.get('X-MadaTours-Client') !== '1') {
+    if (!['GET', 'HEAD'].includes(req.method) && req.get('X-MadaTours-Client') !== '1')
       return res.status(403).json({ error: 'Invalid request. Please reload and try again.' });
-    }
     next();
   });
   app.use(express.json({ limit: '32kb' }));
-
   app.get(
     '/api/health',
-    route(async (_req, res) => {
-      const ready = await (
-        await db()
-      ).query("SELECT value FROM madatours_metadata WHERE key = 'catalogue_seeded'");
-      if (!ready.length) throw new HttpError(503, 'The database has not been initialized.');
-      res.json({ status: 'ok' });
+    route(async (req, res) => {
+      const { data, error } = await clients
+        .client(req, res)
+        .from('mt_metadata')
+        .select('value')
+        .eq('key', 'schema_version')
+        .single();
+      checkDataError(error);
+      if (data?.value !== '1') throw new HttpError(503, 'The database has not been initialized.');
+      res.json({ status: 'ok', database: 'supabase' });
     }),
   );
   app.get(
     '/api/places',
     route(async (req, res) => {
-      const hasCoordinates =
-        req.query.lat !== undefined ||
-        req.query.lng !== undefined ||
-        req.query.radius !== undefined;
+      const hasCoordinates = ['lat', 'lng', 'radius'].some((key) => req.query[key] !== undefined);
       const nearby = hasCoordinates ? nearbyQuery.parse(req.query) : null;
-      const readOnly =
-        !database &&
-        !process.env.DATABASE_URL &&
-        !process.env.POSTGRES_URL &&
-        (process.env.NODE_ENV === 'production' || process.env.VERCEL);
-      const raw = readOnly
-        ? seedPlaces
-        : await (await db()).query<Place>('SELECT * FROM places ORDER BY id');
-      let places = raw.map(normalizePlace);
+      const { data, error } = await clients
+        .client(req, res)
+        .from('mt_places')
+        .select('*')
+        .order('id');
+      checkDataError(error);
+      let places = (data ?? []).map(normalizePlace);
       if (nearby)
         places = places
-          .map((place) => ({
-            ...place,
-            distance: calculateDistance(nearby.lat, nearby.lng, place.lat, place.lng),
-          }))
-          .filter((place) => place.distance <= nearby.radius)
+          .map((p) => ({ ...p, distance: calculateDistance(nearby.lat, nearby.lng, p.lat, p.lng) }))
+          .filter((p) => p.distance <= nearby.radius)
           .sort((a, b) => a.distance - b.distance);
       res.json(places);
     }),
@@ -101,89 +96,118 @@ export function createApp(database?: Database) {
   app.post(
     '/api/places',
     route(async (req, res) => {
-      const connection = await db();
-      const user = await requireUser(connection, req);
-      if (user.role !== 'admin') throw new HttpError(403, 'Only administrators can manage places.');
-      const p = placeInput.parse(req.body);
-      const [place] = await connection.query<Place>(
-        `INSERT INTO places (name,type,lat,lng,location,description,rating,hours,tags,image)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
-        [
-          p.name,
-          p.type,
-          p.lat,
-          p.lng,
-          p.location,
-          p.description,
-          p.rating ?? null,
-          p.hours ?? null,
-          JSON.stringify(p.tags),
-          p.image ?? null,
-        ],
-      );
-      res.status(201).json(normalizePlace(place));
+      const client = clients.client(req, res);
+      if ((await requireUser(client)).role !== 'admin')
+        throw new HttpError(403, 'Only administrators can manage places.');
+      const input = placeInput.parse(req.body);
+      const { data, error } = await client.from('mt_places').insert(input).select().single();
+      checkDataError(error);
+      res.status(201).json(normalizePlace(data));
     }),
   );
   app.delete(
     '/api/places/:id',
     route(async (req, res) => {
-      const connection = await db();
-      if ((await requireUser(connection, req)).role !== 'admin')
+      const client = clients.client(req, res);
+      if ((await requireUser(client)).role !== 'admin')
         throw new HttpError(403, 'Only administrators can manage places.');
-      const id = positiveId.parse(req.params.id);
-      const deleted = await connection.query('DELETE FROM places WHERE id = $1 RETURNING id', [id]);
-      if (!deleted.length) throw new HttpError(404, 'This place could not be found.');
+      const { data, error } = await client
+        .from('mt_places')
+        .delete()
+        .eq('id', positiveId.parse(req.params.id))
+        .select('id');
+      checkDataError(error);
+      if (!data?.length) throw new HttpError(404, 'This place could not be found.');
       res.json({ success: true });
     }),
   );
-
-  for (const action of ['register', 'login'] as const) {
-    app.post(
-      `/api/auth/${action}`,
-      route(async (req, res) => {
-        const connection = await db();
-        const input = (action === 'register' ? registration : credentials).parse(req.body);
-        // On Vercel, use its platform-controlled forwarding header; never trust arbitrary forwarded headers locally.
-        const ip = process.env.VERCEL ? req.get('x-vercel-forwarded-for') || req.ip : req.ip;
-        await rateLimit(connection, `auth-ip:${ip}`, 30);
-        await rateLimit(connection, `auth-email:${input.email}`, 10);
-        let account: Account;
-        if (action === 'register') {
-          const password = await hashPassword(input.password);
-          const [created] = await connection.query<Account>(
-            `INSERT INTO users (email,password,role) VALUES ($1,$2,'user') ON CONFLICT (email) DO NOTHING RETURNING *`,
-            [input.email, password],
-          );
-          if (!created)
-            throw new HttpError(409, 'An account with this email already exists. Please sign in.');
-          account = created;
-        } else {
-          const [found] = await connection.query<Account>('SELECT * FROM users WHERE email = $1', [
-            input.email,
-          ]);
-          const dummy = `scrypt:${'0'.repeat(32)}:${'0'.repeat(128)}`;
-          if (!(await verifyPassword(input.password, found?.password || dummy)) || !found)
-            throw new HttpError(401, 'Incorrect email or password.');
-          account = found;
-        }
-        await createSession(connection, req, res, account.id);
-        res
-          .status(action === 'register' ? 201 : 200)
-          .json({ user: { id: account.id, email: account.email, role: account.role } });
-      }),
-    );
-  }
+  app.post(
+    '/api/auth/register',
+    route(async (req, res) => {
+      const input = registration.parse(req.body);
+      await limitAttempts(clients.admin(), req, 'auth', input.email);
+      const client = clients.client(req, res);
+      const { data, error } = await client.auth.signUp(input);
+      checkAuthError(error);
+      res.status(201).json({
+        user: data.session ? await requireUser(client) : null,
+        verificationRequired: !data.session,
+      });
+    }),
+  );
+  app.post(
+    '/api/auth/login',
+    route(async (req, res) => {
+      const input = credentials.parse(req.body);
+      await limitAttempts(clients.admin(), req, 'auth', input.email);
+      const client = clients.client(req, res);
+      const { error } = await client.auth.signInWithPassword(input);
+      checkAuthError(error);
+      res.json({ user: await requireUser(client) });
+    }),
+  );
+  app.post(
+    '/api/auth/verify',
+    route(async (req, res) => {
+      const input = codeInput.parse(req.body);
+      await limitAttempts(clients.admin(), req, 'verify', input.email);
+      const client = clients.client(req, res);
+      const { error } = await client.auth.verifyOtp({ ...input, type: 'email' });
+      checkAuthError(error);
+      res.json({ user: await requireUser(client) });
+    }),
+  );
+  app.post(
+    '/api/auth/resend',
+    route(async (req, res) => {
+      const { email } = emailInput.parse(req.body);
+      await limitAttempts(clients.admin(), req, 'email', email);
+      const { error } = await clients.client(req, res).auth.resend({ email, type: 'signup' });
+      checkAuthError(error);
+      res.json({ success: true });
+    }),
+  );
+  app.post(
+    '/api/auth/forgot-password',
+    route(async (req, res) => {
+      const { email } = emailInput.parse(req.body);
+      await limitAttempts(clients.admin(), req, 'email', email);
+      const { error } = await clients.client(req, res).auth.resetPasswordForEmail(email);
+      checkAuthError(error);
+      res.json({ success: true });
+    }),
+  );
+  app.post(
+    '/api/auth/reset-password',
+    route(async (req, res) => {
+      const input = codeInput.extend({ password: registration.shape.password }).parse(req.body);
+      await limitAttempts(clients.admin(), req, 'verify', input.email);
+      const client = clients.client(req, res);
+      const { error } = await client.auth.verifyOtp({
+        email: input.email,
+        token: input.token,
+        type: 'recovery',
+      });
+      checkAuthError(error);
+      try {
+        const result = await client.auth.updateUser({ password: input.password });
+        checkAuthError(result.error);
+      } finally {
+        // End the recovery session even when a password update fails. Never expose its tokens.
+        const result = await client.auth.signOut({ scope: 'global' });
+        checkAuthError(result.error);
+      }
+      res.json({ success: true });
+    }),
+  );
   app.get(
     '/api/auth/session',
     route(async (req, res) => {
-      if (!readToken(req)) return res.json({ user: null });
+      if (!req.headers.cookie?.includes('madatours-auth')) return res.json({ user: null });
       try {
-        res.json({ user: await requireUser(await db(), req) });
+        res.json({ user: await requireUser(clients.client(req, res)) });
       } catch (error) {
-        if (error instanceof HttpError && error.status === 401) {
-          setSessionCookie(res, '', true);
-          return res.json({ user: null });
-        }
+        if (error instanceof HttpError && error.status === 401) return res.json({ user: null });
         throw error;
       }
     }),
@@ -191,69 +215,78 @@ export function createApp(database?: Database) {
   app.post(
     '/api/auth/logout',
     route(async (req, res) => {
-      if (readToken(req))
-        await (
-          await db()
-        ).query('DELETE FROM sessions WHERE token_hash = $1', [digest(readToken(req))]);
-      setSessionCookie(res, '', true);
+      const { error } = await clients.client(req, res).auth.signOut({ scope: 'local' });
+      checkAuthError(error);
       res.json({ success: true });
     }),
   );
   app.delete(
     '/api/account',
     route(async (req, res) => {
-      const connection = await db();
-      const user = await requireUser(connection, req);
-      await rateLimit(connection, `delete:${user.id}`, 10);
+      const client = clients.client(req, res);
+      const user = await requireUser(client);
       const input = credentials.parse({ email: user.email, password: req.body?.password });
-      const [account] = await connection.query<Account>('SELECT * FROM users WHERE id = $1', [
-        user.id,
-      ]);
-      if (!account || !(await verifyPassword(input.password, account.password)))
+      const admin = clients.admin();
+      await limitAttempts(admin, req, 'delete', user.email);
+      // Password reauthentication prevents a stolen open session from deleting an account.
+      const { data, error } = await client.auth.signInWithPassword(input);
+      checkAuthError(error);
+      if (data.user?.id !== user.id)
         throw new HttpError(401, 'Incorrect password. Your account has not been deleted.');
-      await connection.query('DELETE FROM users WHERE id = $1', [user.id]);
-      setSessionCookie(res, '', true);
+      const deleted = await admin.auth.admin.deleteUser(user.id);
+      checkAuthError(deleted.error);
+      await client.auth.signOut({ scope: 'local' });
       res.json({ success: true });
     }),
   );
   for (const collection of ['favorites', 'revisits'] as const) {
-    const table = `user_${collection}`; // Fixed internal names, never supplied by a request.
     app.get(
       `/api/${collection}`,
       route(async (req, res) => {
-        const connection = await db();
-        const user = await requireUser(connection, req);
-        const places = await connection.query<Place>(
-          `SELECT p.* FROM places p JOIN ${table} c ON c.place_id = p.id WHERE c.user_id = $1 ORDER BY p.name`,
-          [user.id],
-        );
-        res.json(places.map(normalizePlace));
+        const client = clients.client(req, res);
+        const user = await requireUser(client);
+        const { data, error } = await client
+          .from('mt_saved_places')
+          .select('place:mt_places(*)')
+          .eq('user_id', user.id)
+          .eq('kind', collection)
+          .order('created_at');
+        checkDataError(error);
+        res.json((data ?? []).filter((row) => row.place).map((row) => normalizePlace(row.place)));
       }),
     );
     app.post(
       `/api/${collection}`,
       route(async (req, res) => {
-        const connection = await db();
-        const user = await requireUser(connection, req);
+        const client = clients.client(req, res);
+        const user = await requireUser(client);
         const placeId = positiveId.parse(req.body?.placeId);
-        if (!(await connection.query('SELECT id FROM places WHERE id = $1', [placeId])).length)
+        const existing = await client.from('mt_places').select('id').eq('id', placeId).single();
+        if (existing.error?.code === 'PGRST116' || !existing.data)
           throw new HttpError(404, 'This place is no longer available.');
-        await connection.query(
-          `INSERT INTO ${table} (user_id, place_id) VALUES ($1,$2) ON CONFLICT (user_id,place_id) DO NOTHING`,
-          [user.id, placeId],
-        );
+        checkDataError(existing.error);
+        const { error } = await client
+          .from('mt_saved_places')
+          .upsert(
+            { user_id: user.id, place_id: placeId, kind: collection },
+            { onConflict: 'user_id,place_id,kind', ignoreDuplicates: true },
+          );
+        checkDataError(error);
         res.json({ success: true });
       }),
     );
     app.delete(
       `/api/${collection}`,
       route(async (req, res) => {
-        const connection = await db();
-        const user = await requireUser(connection, req);
-        await connection.query(`DELETE FROM ${table} WHERE user_id = $1 AND place_id = $2`, [
-          user.id,
-          positiveId.parse(req.query.placeId),
-        ]);
+        const client = clients.client(req, res);
+        const user = await requireUser(client);
+        const { error } = await client
+          .from('mt_saved_places')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('kind', collection)
+          .eq('place_id', positiveId.parse(req.query.placeId));
+        checkDataError(error);
         res.json({ success: true });
       }),
     );
@@ -276,3 +309,5 @@ export function createApp(database?: Database) {
   });
   return app;
 }
+// Public bundled content is the frontend's explicit offline fallback; failed database writes never fall back locally.
+export const bundledPlaces = seedPlaces;

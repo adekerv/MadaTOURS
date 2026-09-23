@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nProvider';
 import { Heart, X, ArrowUpRight } from 'lucide-react';
 import type { Place, User } from '../../types';
 export function SelectedPlaceOverlay({
@@ -21,6 +22,7 @@ export function SelectedPlaceOverlay({
   user: User | null;
   onLoginClick: () => void;
 }) {
+  const { t, language } = useI18n();
   if (!isVisible || !place) return null;
   return (
     <section
@@ -34,7 +36,7 @@ export function SelectedPlaceOverlay({
         </div>
         <div className="flex shrink-0">
           <button
-            aria-label={isFavorite ? 'Remove favorite' : 'Save favorite'}
+            aria-label={isFavorite ? t('Remove favorite') : t('Save favorite')}
             aria-pressed={isFavorite}
             className="icon-button"
             onClick={() => (user ? onToggleFavorite(place) : onLoginClick())}
@@ -44,25 +46,29 @@ export function SelectedPlaceOverlay({
               className={isFavorite ? 'fill-red-600 text-red-600' : 'text-slate-600'}
             />
           </button>
-          <button aria-label="Close selected place" onClick={onClose} className="icon-button">
+          <button aria-label={t('Close selected place')} onClick={onClose} className="icon-button">
             <X size={20} />
           </button>
         </div>
       </div>
-      <p className="my-3 line-clamp-2 text-sm text-slate-600">{place.description}</p>
+      <p className="my-3 line-clamp-2 text-sm text-slate-600">
+        {language === 'fr' && place.descriptionFr ? place.descriptionFr : place.description}
+      </p>
       <div className="grid grid-cols-2 gap-2">
         <button onClick={onShowDetails} className="secondary-button">
-          View details
+          {t('View details')}
         </button>
-        <a
-          href={googleMapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="primary-button flex items-center justify-center gap-1"
-        >
-          Directions
-          <ArrowUpRight size={17} />
-        </a>
+        {place.access !== 'restricted' && (
+          <a
+            href={googleMapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="primary-button flex items-center justify-center gap-1"
+          >
+            {t('Directions')}
+            <ArrowUpRight size={17} />
+          </a>
+        )}
       </div>
     </section>
   );
