@@ -22,3 +22,5 @@ android/local.properties
 # Ignore JDK binaries
 *.jdk
 oracleJdk-27.jdk/
+oracleJdk-27.jdk/
+*.jdk
