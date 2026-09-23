@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.data/
+*.jdk/
+ios/
+android/
+tests/
+test-results/
+playwright-report/
+native-assets/
+docs/

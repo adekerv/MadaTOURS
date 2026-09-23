@@ -26,7 +26,9 @@
     "db:prepare": "node --import tsx scripts/prepare-database.ts",
     "db:apply": "node --import tsx scripts/apply-database.ts",
     "pretest": "npm run db:prepare",
-    "pretest:e2e": "npm run db:prepare"
+    "pretest:e2e": "npm run db:prepare",
+    "setup:check": "node --import tsx scripts/check-setup.ts",
+    "test:live": "node --import tsx scripts/smoke-supabase.ts"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
