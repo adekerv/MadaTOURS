@@ -147,8 +147,7 @@ export function Homepage({
             {t('Your island, your adventure')}
           </p>
           <h1 className="mx-auto max-w-4xl text-[clamp(2.5rem,7vw,5.6rem)] font-bold leading-[1.05] tracking-tight text-slate-900">
-            {t('A little closer to')}
-            <br />
+            {t('A little closer to')} <br />
             <span className="font-serif italic text-orange-600">Martinique.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-base sm:text-lg leading-relaxed text-slate-600">

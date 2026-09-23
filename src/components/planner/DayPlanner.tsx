@@ -143,6 +143,8 @@ export function DayPlanner({
               {t('Add a stop')}
               <select
                 className="field-input"
+                aria-label={t('Add a stop')}
+                aria-describedby="planner-stop-hint"
                 value=""
                 disabled={trip.stops.length >= 20 || !choices.length}
                 onChange={(e) => {
@@ -159,7 +161,9 @@ export function DayPlanner({
                   </option>
                 ))}
               </select>
-              <span className="text-xs font-normal text-slate-500">{t('Saved places first')}</span>
+              <span id="planner-stop-hint" className="text-xs font-normal text-slate-500">
+                {t('Saved places first')}
+              </span>
             </label>
             {trip.stops.length >= 20 && (
               <p className="text-sm text-slate-600">

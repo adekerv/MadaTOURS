@@ -82,6 +82,7 @@ export function createApp(clients: Clients = { client: requestClient, admin: adm
         .client(req, res)
         .from('mt_places')
         .select('*')
+        .eq('published', true)
         .order('id');
       checkDataError(error);
       let places = (data ?? []).map(normalizePlace);
@@ -262,9 +263,10 @@ export function createApp(clients: Clients = { client: requestClient, admin: adm
         const user = await requireUser(client);
         const placeId = positiveId.parse(req.body?.placeId);
         const existing = await client.from('mt_places').select('id').eq('id', placeId).single();
-        if (existing.error?.code === 'PGRST116' || !existing.data)
+        if (existing.error?.code === 'PGRST116')
           throw new HttpError(404, 'This place is no longer available.');
         checkDataError(existing.error);
+        if (!existing.data) throw new HttpError(404, 'This place is no longer available.');
         const { error } = await client
           .from('mt_saved_places')
           .upsert(

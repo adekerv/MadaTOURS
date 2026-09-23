@@ -76,7 +76,7 @@ export function PlaceDetailModal({
         </dl>
         <p className="text-xs leading-relaxed text-slate-500">
           {t(
-            'Guide details and ratings are supplied with this catalogue, not live visitor reviews. Confirm opening hours, access, and trail conditions before visiting.',
+            'Check the source for current hours and access. Map points are approximate; confirm the entrance with the venue.',
           )}
         </p>
         {!!place.tags?.length && (

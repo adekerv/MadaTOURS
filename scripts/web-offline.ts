@@ -6,12 +6,14 @@ export function offlineShell(): Plugin {
     apply: 'build',
     generateBundle(_options, bundle) {
       const assets = [
-        '/',
-        '/index.html',
-        '/favicon.svg',
-        ...Object.keys(bundle)
-          .filter((name) => !name.endsWith('.map'))
-          .map((name) => `/${name}`),
+        ...new Set([
+          '/',
+          '/index.html',
+          '/favicon.svg',
+          ...Object.keys(bundle)
+            .filter((name) => !name.endsWith('.map'))
+            .map((name) => `/${name}`),
+        ]),
       ];
       const version = createHash('sha256')
         .update(JSON.stringify(assets))

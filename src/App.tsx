@@ -153,23 +153,29 @@ export default function App() {
           ? previous.filter((item) => item.id !== place.id)
           : [...previous.filter((item) => item.id !== place.id), place],
       );
+      const stored = readOfflinePlaces();
+      const snapshot = stored?.ownerId === user.id ? stored : { favorites, revisits };
       const changed = exists
-        ? (collection === 'favorites' ? favorites : revisits).filter((item) => item.id !== place.id)
-        : [
-            ...(collection === 'favorites' ? favorites : revisits).filter(
-              (item) => item.id !== place.id,
-            ),
-            place,
-          ];
-      saveOfflinePlaces(
+        ? snapshot[collection].filter((item) => item.id !== place.id)
+        : [...snapshot[collection].filter((item) => item.id !== place.id), place];
+      const cached = saveOfflinePlaces(
         user.id,
-        collection === 'favorites' ? changed : favorites,
-        collection === 'revisits' ? changed : revisits,
+        collection === 'favorites' ? changed : snapshot.favorites,
+        collection === 'revisits' ? changed : snapshot.revisits,
       );
       setNotice(
-        exists
-          ? `Removed ${place.name} from your ${collection === 'favorites' ? 'favorites' : 'revisit list'}.`
-          : `Saved ${place.name} to your ${collection === 'favorites' ? 'favorites' : 'revisit list'}.`,
+        cached
+          ? t(
+              exists
+                ? collection === 'favorites'
+                  ? 'Removed {name} from your favorites.'
+                  : 'Removed {name} from your revisit list.'
+                : collection === 'favorites'
+                  ? 'Saved {name} to your favorites.'
+                  : 'Saved {name} to your revisit list.',
+              { name: place.name },
+            )
+          : 'Device storage is unavailable. Changes will be lost when you close the app.',
       );
     } catch (error) {
       if (currentUser.current?.id !== user.id) return;

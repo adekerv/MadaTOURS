@@ -91,8 +91,7 @@ export function WeatherWidget() {
             >
               Open-Meteo
             </a>{' '}
-            · {weather.time.slice(11, 16)}
-            {t('Martinique time')}
+            · {weather.time.slice(11, 16)} {t('Martinique time')}
           </p>
         )}
       </div>
