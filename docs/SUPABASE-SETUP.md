@@ -40,7 +40,7 @@ npm run db:apply -- --apply
 
 The command requires certificate-verified TLS. If your local trust setup cannot validate Supabase's certificate, use the SQL Editor; do not disable certificate verification. See [Supabase connection methods](https://supabase.com/docs/guides/database/connecting-to-postgres).
 
-The SQL runs in one transaction, creates namespaced `mt_*` tables, enables row-level security and seeds 24 records (17 public, 7 awaiting verification). Re-running the same setup preserves existing place edits and deletions. It does not migrate old SQLite accounts or arbitrary existing schemas. `DATABASE_URL` is only needed by the setup command, not the running application or Vercel.
+The SQL runs in one transaction, creates namespaced `mt_*` tables, enables row-level security and seeds 364 records (354 public, 10 awaiting verification). Re-running the same setup preserves existing place edits and deletions. For an existing pre-expansion database, use the [catalogue import instructions](CATALOGUE-RESEARCH.md); rerunning setup alone does not add the expansion. It does not migrate old SQLite accounts or arbitrary existing schemas. `DATABASE_URL` is only needed by the setup command, not the running application or Vercel.
 
 ## 3. Configure email authentication
 

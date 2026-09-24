@@ -75,6 +75,7 @@ export function matchesSearch(place: Place, query: string) {
       place.location,
       place.type,
       place.type === 'activity' ? 'activités' : 'restaurant',
+      place.description,
       place.descriptionFr,
       ...(place.tags ?? []),
     ].join(' '),

@@ -10,6 +10,7 @@ import { Sidebar } from './exploration/Sidebar';
 import { LocationPrompt } from './exploration/LocationPrompt';
 import { SelectedPlaceOverlay } from './exploration/SelectedPlaceOverlay';
 import { calculateDistance, mapsUrl, matchesInterest, matchesSearch } from '../lib/places-utils';
+import { catalogueTown, matchesExperience } from '../lib/catalogue';
 import type { ExploreParams, Place, UserLocation, User } from '../types';
 interface Props {
   onBack: () => void;
@@ -60,6 +61,15 @@ export function ExplorationPage({
     initialParams.sortBy ?? 'default',
   );
   const [query, setQuery] = useState('');
+  const [town, setTown] = useState('');
+  const [experience, setExperience] = useState('');
+  const towns = useMemo(
+    () =>
+      [...new Set(places.map((place) => catalogueTown(place.location)))].sort((a, b) =>
+        a.localeCompare(b, 'fr'),
+      ),
+    [places],
+  );
   const [mobileView, setMobileView] = useState<'list' | 'map'>(initialPlace ? 'map' : 'list');
   const locationRequest = useRef(0);
   useEffect(
@@ -88,6 +98,8 @@ export function ExplorationPage({
           (place) =>
             place.distance <= radius &&
             (filter === 'all' || place.type === filter) &&
+            (!town || catalogueTown(place.location) === town) &&
+            matchesExperience(place, experience) &&
             matchesInterest(place, sortBy) &&
             matchesSearch(place, query),
         )
@@ -96,7 +108,7 @@ export function ExplorationPage({
             ? (b.rating ?? -1) - (a.rating ?? -1) || a.distance - b.distance
             : a.distance - b.distance,
         ),
-    [places, center, radius, filter, sortBy, query],
+    [places, center, radius, filter, sortBy, query, town, experience],
   );
   function selectPlace(place: Place) {
     setSelectedId(place.id);
@@ -108,6 +120,8 @@ export function ExplorationPage({
     setCenter(islandCenter);
     setRadius(100);
     setQuery('');
+    setTown('');
+    setExperience('');
     setFilter('all');
     setSortBy('default');
     setSelectedId(null);
@@ -181,6 +195,17 @@ export function ExplorationPage({
               setSelectedId(null);
             }}
             query={query}
+            towns={towns}
+            town={town}
+            setTown={(value) => {
+              setTown(value);
+              setSelectedId(null);
+            }}
+            experience={experience}
+            setExperience={(value) => {
+              setExperience(value);
+              setSelectedId(null);
+            }}
             setQuery={(value) => {
               setQuery(value);
               setSelectedId(null);

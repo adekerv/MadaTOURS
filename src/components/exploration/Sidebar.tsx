@@ -2,6 +2,8 @@ import { useI18n } from '../../i18n/I18nProvider';
 import { Search, RotateCcw, ShieldCheck } from 'lucide-react';
 import type { Place, User } from '../../types';
 import { PlaceCard } from './PlaceCard';
+import { useEffect, useState } from 'react';
+import { experiences } from '../../lib/catalogue';
 interface Props {
   filter: 'all' | 'restaurant' | 'activity';
   setFilter: (filter: 'all' | 'restaurant' | 'activity') => void;
@@ -21,9 +23,16 @@ interface Props {
   user: User | null;
   onAdminClick: () => void;
   manual: boolean;
+  towns: string[];
+  town: string;
+  setTown: (town: string) => void;
+  experience: string;
+  setExperience: (experience: string) => void;
 }
 export function Sidebar(props: Props) {
   const { t } = useI18n();
+  const [visibleCount, setVisibleCount] = useState(30);
+  useEffect(() => setVisibleCount(30), [props.filteredPlaces]);
   const {
     filter,
     setFilter,
@@ -68,6 +77,40 @@ export function Sidebar(props: Props) {
           className="w-full min-w-0 py-3 outline-none"
         />
       </label>
+      <div className="mb-4 grid grid-cols-2 gap-3">
+        <label className="field-label">
+          {t('Town')}
+          <select
+            aria-label={t('Town')}
+            className="field-input"
+            value={props.town}
+            onChange={(event) => props.setTown(event.target.value)}
+          >
+            <option value="">{t('All towns')}</option>
+            {props.towns.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field-label">
+          {t('Experience')}
+          <select
+            aria-label={t('Experience')}
+            className="field-input"
+            value={props.experience}
+            onChange={(event) => props.setExperience(event.target.value)}
+          >
+            <option value="">{t('All experiences')}</option>
+            {experiences.map((item) => (
+              <option key={item.id} value={item.id}>
+                {t(item.label)}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <div aria-label={t('Place category')} className="mb-4 flex gap-1 rounded-xl bg-slate-100 p-1">
         {(['all', 'restaurant', 'activity'] as const).map((value) => (
           <button
@@ -80,39 +123,46 @@ export function Sidebar(props: Props) {
           </button>
         ))}
       </div>
-      <label className="field-label mb-3">
-        <span className="flex justify-between gap-2">
-          <span>{t('Search radius')}</span>
-          <span className="text-orange-700">{radius} km</span>
-        </span>
-        <input
-          aria-label={t('Search radius')}
-          type="range"
-          min="1"
-          max="100"
-          value={radius}
-          onChange={(event) => setRadius(Number(event.target.value))}
-          className="w-full accent-orange-600"
-        />
-      </label>
-      <label className="field-label mb-4">
-        {t('Show')}
-        <select
-          aria-label={t('Sort and interest')}
-          value={sortBy}
-          onChange={(event) => setSortBy(event.target.value as Props['sortBy'])}
-          className="field-input"
-        >
-          <option value="default">{t('Closest to search center')}</option>
-          <option value="rating">{t('Highest guide rating')}</option>
-          <option value="hiking">{t('Hiking and nature trails')}</option>
-          <option value="entertainment">{t('Entertainment')}</option>
-        </select>
-      </label>
-      <p className="mb-4 text-xs leading-relaxed text-slate-500">
-        {t('Distances are straight-line estimates from')}{' '}
-        {manual ? t('your chosen search center') : t('your device location')}.
-      </p>
+      <details className="mb-4 rounded-xl bg-slate-50 p-3">
+        <summary className="cursor-pointer py-1 text-sm font-semibold text-slate-700">
+          {t('Distance and sorting')} · {radius} km
+        </summary>
+        <div className="mt-3">
+          <label className="field-label mb-3">
+            <span className="flex justify-between gap-2">
+              <span>{t('Search radius')}</span>
+              <span className="text-orange-700">{radius} km</span>
+            </span>
+            <input
+              aria-label={t('Search radius')}
+              type="range"
+              min="1"
+              max="100"
+              value={radius}
+              onChange={(event) => setRadius(Number(event.target.value))}
+              className="w-full accent-orange-600"
+            />
+          </label>
+          <label className="field-label mb-4">
+            {t('Show')}
+            <select
+              aria-label={t('Sort and interest')}
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value as Props['sortBy'])}
+              className="field-input"
+            >
+              <option value="default">{t('Closest to search center')}</option>
+              <option value="rating">{t('Highest guide rating')}</option>
+              <option value="hiking">{t('Hiking and nature trails')}</option>
+              <option value="entertainment">{t('Entertainment')}</option>
+            </select>
+          </label>
+          <p className="mb-4 text-xs leading-relaxed text-slate-500">
+            {t('Distances are straight-line estimates from')}{' '}
+            {manual ? t('your chosen search center') : t('your device location')}.
+          </p>
+        </div>
+      </details>
       <p role="status" className="mb-3 text-sm font-semibold text-slate-700">
         {loading
           ? t('Updating places…')
@@ -122,16 +172,18 @@ export function Sidebar(props: Props) {
       </p>
       <div className="space-y-3">
         {filteredPlaces.length ? (
-          filteredPlaces.map((place) => (
-            <PlaceCard
-              key={place.id}
-              place={place}
-              isSelected={selectedPlace?.id === place.id}
-              isFavorite={isFavorite(place.id)}
-              onSelect={onPlaceSelect}
-              onShowDetails={onShowDetails}
-            />
-          ))
+          filteredPlaces
+            .slice(0, visibleCount)
+            .map((place) => (
+              <PlaceCard
+                key={place.id}
+                place={place}
+                isSelected={selectedPlace?.id === place.id}
+                isFavorite={isFavorite(place.id)}
+                onSelect={onPlaceSelect}
+                onShowDetails={onShowDetails}
+              />
+            ))
         ) : (
           <div className="rounded-2xl bg-slate-50 p-5">
             <h3 className="font-semibold">{t('No places in this area')}</h3>
@@ -146,6 +198,16 @@ export function Sidebar(props: Props) {
           </div>
         )}
       </div>
+      {visibleCount < filteredPlaces.length && (
+        <button
+          className="secondary-button mt-4 w-full"
+          onClick={() => setVisibleCount((count) => count + 30)}
+        >
+          {t('Show more places ({remaining} remaining)', {
+            remaining: filteredPlaces.length - visibleCount,
+          })}
+        </button>
+      )}
       <button
         onClick={onResetRadar}
         className="mt-5 flex w-full items-center justify-center gap-2 text-sm font-semibold text-slate-600"

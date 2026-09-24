@@ -4,6 +4,8 @@ A Martinique discovery app for a web-development class, with a responsive React/
 
 Browse as a guest, search in French or English, create a verified account, save favorites and revisit lists across devices, recover a password, and delete an account. Day plans and offline saved-place copies live on the current device. Offline maps and cloud itinerary sync are not included.
 
+The catalogue includes 354 published places across 29 communes, with town and experience filters, bilingual descriptions and dated source links. [Research coverage and import instructions](docs/CATALOGUE-RESEARCH.md).
+
 ## Start here
 
 Use Node 22.13 or later and npm (CI uses Node 24).

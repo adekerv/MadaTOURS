@@ -32,7 +32,7 @@ test('day trips preserve ordering, validate dates, and reject malformed or overs
   assert.equal(tripSummary(trip, places.map(normalizePlace)).minutes, 150);
   assert.ok(tripSummary(trip, places.map(normalizePlace)).distance > 0);
   const url = new URL(legDirections(normalizePlace(places[1]), normalizePlace(places[2])));
-  assert.equal(url.searchParams.get('origin'), '14.671181,-61.092064');
+  assert.equal(url.searchParams.get('origin'), `${places[2].lat},${places[2].lng}`);
 });
 test('French translations preserve all interpolation placeholders', () => {
   for (const [en, fr] of Object.entries(french))

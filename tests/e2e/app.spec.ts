@@ -32,6 +32,47 @@ async function noOverflow(page: Page) {
   ).toBe(true);
 }
 
+test('expanded catalogue paginates, filters by town and experience, and translates on a small phone', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/#explore');
+  const sidebar = page.getByRole('complementary', { name: 'Places and filters' });
+  await expect(sidebar.getByRole('article')).toHaveCount(30);
+  await sidebar.getByText('Distance and sorting', { exact: false }).click();
+  await expect(sidebar.getByRole('slider', { name: 'Search radius' })).toBeVisible();
+  await sidebar.getByText('Distance and sorting', { exact: false }).click();
+  await sidebar.getByRole('button', { name: /Show more places/ }).click();
+  await expect(sidebar.getByRole('article')).toHaveCount(60);
+  await sidebar.getByLabel('Town', { exact: true }).selectOption('Schœlcher');
+  await sidebar.getByLabel('Experience', { exact: true }).selectOption('food');
+  await expect(
+    sidebar.getByRole('button', { name: 'Details for Le Cèdre', exact: true }),
+  ).toBeVisible();
+  await sidebar.getByRole('searchbox', { name: 'Filter places' }).fill('lebanese');
+  await expect(sidebar.getByRole('article')).toHaveCount(1);
+  await sidebar.getByRole('button', { name: 'Details for Le Cèdre', exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText('Lebanese');
+  await expect(
+    page
+      .getByRole('dialog')
+      .getByRole('link', { name: 'Terres du Centre Martinique', exact: true }),
+  ).toHaveAttribute('href', /terresducentremartinique.fr/);
+  await page.keyboard.press('Escape');
+  await sidebar.getByRole('button', { name: 'Reset filters', exact: true }).click();
+  await expect(sidebar.getByRole('article')).toHaveCount(30);
+  await expect(sidebar.getByLabel('Town', { exact: true })).toHaveValue('');
+  await expect(sidebar.getByLabel('Experience', { exact: true })).toHaveValue('');
+  await page.getByRole('combobox', { name: 'Language', exact: true }).selectOption('fr');
+  await page.getByLabel('Expérience', { exact: true }).selectOption('beaches');
+  await page.getByRole('searchbox', { name: 'Filtrer les lieux' }).fill('anse noire');
+  await expect(
+    page.getByRole('button', { name: 'Détails de Anse Noire', exact: true }),
+  ).toBeVisible();
+  await noOverflow(page);
+  await page.screenshot({ path: `test-results/${test.info().project.name}-catalogue-fr.png` });
+});
+
 test('home, list, map, and details fit phone, tablet, landscape, and desktop viewports', async ({
   page,
 }) => {
@@ -53,6 +94,7 @@ test('home, list, map, and details fit phone, tablet, landscape, and desktop vie
     await page.getByRole('button', { name: 'Explore the island', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Discover places' })).toBeVisible();
     await noOverflow(page);
+    await page.getByRole('searchbox', { name: 'Filter places' }).fill('Jardin de Balata');
     await page.getByRole('button', { name: 'Details for Jardin de Balata', exact: true }).click();
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
@@ -77,7 +119,7 @@ test('search accepts unaccented names, keyboard selection, and browser back navi
   const input = page.getByRole('combobox', { name: 'Search places' });
   await input.fill('pelee');
   await expect(
-    page.getByRole('listbox', { name: 'Matching places' }).getByRole('option'),
+    page.getByRole('listbox', { name: 'Matching places' }).getByRole('option').first(),
   ).toContainText('Montagne Pelée');
   await input.press('ArrowDown');
   await input.press('Enter');
@@ -144,6 +186,7 @@ test('register, save, restore session, remove, and delete account from the UI', 
   await page.getByRole('button', { name: 'Verify email', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.getByRole('button', { name: 'Explore the island' }).click();
+  await page.getByRole('searchbox', { name: 'Filter places' }).fill('Jardin de Balata');
   await page.getByRole('button', { name: 'Details for Jardin de Balata', exact: true }).click();
   await page.getByRole('button', { name: 'Save favorite', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Saved to favorites' })).toBeVisible();

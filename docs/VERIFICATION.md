@@ -5,8 +5,8 @@ Environment: macOS on Apple Silicon, Node 26.0.0, npm 11.14.1. CI is configured 
 ## Automated checks
 
 - ESLint and strict TypeScript pass.
-- Ten API, PostgreSQL security, catalogue, search, planner, translation and compiled-runtime tests pass. The compiled-runtime check catches missing JavaScript import extensions that break the Vercel function. The other tests cover owner-only saved lists, rejected role changes, recovery/logout/deletion, foreign-key cascades and seed reruns.
-- 21 browser scenarios pass, with one explicit WebKit offline skip. The browser suite uses Chromium and WebKit, seven representative viewport sizes, keyboard search, location denial, error states, account/saved-place/admin flows, password recovery and French planner persistence.
+- Thirteen API, PostgreSQL security, catalogue, search, planner, translation and compiled-runtime tests pass. The compiled-runtime check catches missing JavaScript import extensions that break the Vercel function. The other tests cover owner-only saved lists, rejected role changes, recovery/logout/deletion, foreign-key cascades and seed reruns.
+- 23 browser scenarios pass, with one explicit WebKit offline skip. The browser suite uses Chromium and WebKit, seven representative viewport sizes, keyboard search, location denial, error states, account/saved-place/admin flows, password recovery and French planner persistence.
 - The production service worker is tested with a complete offline reload and saved-place reading in Chromium. The equivalent WebKit service-worker automation is explicitly skipped; physical Safari offline behavior remains to be checked.
 - Axe scans check serious/critical accessibility violations on home, exploration and authentication, rather than claiming a complete accessibility audit.
 - Production web/server build passes. Capacitor sync passes for both platforms; this does not compile or sign a native application.
@@ -36,3 +36,11 @@ A real Chromium browser at 390 × 844 signed in on the public site, saved Jardin
 Follow [CLASS-DEMO.md](CLASS-DEMO.md) on your own computer and phone before class. Actual inbox delivery, configured verification/recovery email templates and the choice between demo accounts and public signup remain unverified.
 
 Physical iPhone/iPad/Android testing, native compilation/signing, native cookie persistence, App Store review, load testing, backups/restoration and exhaustive venue verification are not completed. The local Java SDK is ignored and has been removed from Git tracking; it is excluded from deployment.
+
+## Expanded catalogue and filters
+
+The September 24 batch adds 337 published entries (65 restaurants and 272 activities), bringing the public catalogue to 354 places across 29 communes. Three more imported records were withheld during final map-point review, leaving 10 drafts including the original seven. A live comparison confirmed all 24 original records were preserved apart from seven intentional map/source corrections. The public API returned HTTP 200 with 354 records. A second import preview reported zero pending additions or corrections.
+
+The importer is validated for duplicate prevention, resuming partial work, preserving deliberately deleted records, and rejecting changed before-values. New content is checked for bilingual descriptions, supported source dates, map bounds, translated tags and experience-filter coverage. Known generic map points and the three withheld records are covered by regression assertions.
+
+Browser checks cover town and experience filters, 30/60-result pagination and reset, English description search, French controls at 320 pixels, and source links in details. Optional distance/sort settings are collapsible to keep more space for results. Full Chromium/WebKit suite: 23 passed and one explicit WebKit service-worker skip. The compact-controls change received an additional targeted layout/accessibility run. Physical devices and current venue operating status are not established by these automated checks.
