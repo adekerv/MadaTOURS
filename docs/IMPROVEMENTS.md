@@ -12,7 +12,7 @@
 
 ## Finish the class release first
 
-Complete the database initialization, email templates/SMTP, public website origin and Vercel environment setup described in [SUPABASE-SETUP.md](SUPABASE-SETUP.md). Verify remote saved-place persistence with two separate devices. Local automated tests cannot prove real email delivery or production deployment.
+The database, production environment and public deployment are configured, and live account/saved-place checks pass. Complete the email templates/SMTP setup in [SUPABASE-SETUP.md](SUPABASE-SETUP.md) if classmates should register themselves; separate confirmed demo accounts are an alternative for class. Rehearse on your own computer and phone. Email inbox delivery remains unverified.
 
 ## Suggested next product work
 

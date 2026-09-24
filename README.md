@@ -52,7 +52,7 @@ npm run test:e2e
 npm run format:check
 ```
 
-Automated tests use an isolated PostgreSQL engine and a Supabase Auth contract double. They do not send email or use your real Supabase credentials. Run `npm run setup:check` separately for read-only cloud checks, then follow the [class demonstration](docs/CLASS-DEMO.md) to verify real authentication and persistence.
+Automated tests use an isolated PostgreSQL engine and a Supabase Auth contract double. They do not send email or use your real Supabase credentials. Run `npm run setup:check` separately for read-only cloud checks. The opt-in `npm run test:live -- --run` verifies real Supabase with temporary accounts that it cleans up; it does not send emails. Then follow the [class demonstration](docs/CLASS-DEMO.md) to verify real authentication and persistence.
 
 ## Release guides
 

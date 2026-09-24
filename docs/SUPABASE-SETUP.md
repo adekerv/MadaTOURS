@@ -2,6 +2,10 @@
 
 The selected setup is Supabase Free for PostgreSQL and accounts, with the existing Vercel `mada-tours` project for the website and API. A custom website domain is unnecessary for the class demonstration. Free-tier limits can change; check [Supabase pricing](https://supabase.com/pricing) and [Vercel Hobby](https://vercel.com/docs/plans/hobby). Supabase Free projects may pause after inactivity, so check the project before your presentation.
 
+## Current project status — September 24, 2026
+
+The database and production environment are already configured. The live site is https://mada-tours.vercel.app, and both its public API and mobile browser sign-in/favorites have passed live checks. You do not need a DATABASE_URL or another database initialization for the current setup. The remaining decision is demo accounts versus email-provider setup for classmates' self-service signup; email templates and actual delivery still need verification. The sections below remain the repeatable setup reference.
+
 ## 1. Local configuration
 
 Your `.env.local` should contain the project URL, publishable key, and server-only secret from Supabase Project Settings → API Keys. These are three distinct values. Do not replace an existing file with the example or paste secrets into chat.
@@ -73,7 +77,7 @@ For an optional live backend smoke test:
 npm run test:live -- --run
 ```
 
-This creates two temporary accounts, generates real Supabase verification/recovery codes without sending emails, checks the application API and direct RLS restrictions, and deletes its test accounts. It does not change existing accounts or venues. Use a configured development project; expect ordinary Supabase audit records and short-lived rate-limit counters. This is separate from the isolated `npm test` suite.
+This creates two temporary accounts, generates real Supabase verification/recovery codes without sending emails, checks the application API and direct RLS restrictions, and deletes its test accounts. It does not change existing accounts or venues. It targets the configured Supabase project; expect ordinary Supabase audit records and short-lived rate-limit counters. To check the deployed API instead of a local API instance, use `npm run test:live -- --run --url https://mada-tours.vercel.app`; the URL must exactly match your HTTPS APP_ORIGIN. This is separate from the isolated `npm test` suite.
 
 Create and verify your own account. If you need catalogue administration:
 

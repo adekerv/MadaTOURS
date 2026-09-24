@@ -9,10 +9,9 @@ import {
   checkDataError,
   limitAttempts,
   type Clients,
-} from './supabase';
-import { credentials, registration, placeInput, nearbyQuery, positiveId } from './validation';
-import { calculateDistance, normalizePlace } from '../src/lib/places-utils';
-import seedPlaces from '../src/data/places.json';
+} from './supabase.js';
+import { credentials, registration, placeInput, nearbyQuery, positiveId } from './validation.js';
+import { calculateDistance, normalizePlace } from '../src/lib/places-utils.js';
 const emailInput = credentials.pick({ email: true });
 const codeInput = emailInput.extend({
   token: z
@@ -311,5 +310,3 @@ export function createApp(clients: Clients = { client: requestClient, admin: adm
   });
   return app;
 }
-// Public bundled content is the frontend's explicit offline fallback; failed database writes never fall back locally.
-export const bundledPlaces = seedPlaces;

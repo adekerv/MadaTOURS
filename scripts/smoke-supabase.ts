@@ -16,9 +16,18 @@ const password = `Mada-${randomBytes(24).toString('base64url')}-42`;
 const replacement = `Mada-${randomBytes(24).toString('base64url')}-43`;
 const email = `madatours-test-${randomUUID()}@example.invalid`;
 const otherEmail = `madatours-test-${randomUUID()}@example.invalid`;
-const server = createApp().listen(0, '127.0.0.1');
-await new Promise<void>((resolve) => server.once('listening', resolve));
-const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api`;
+const remoteIndex = process.argv.indexOf('--url');
+const remoteOrigin = remoteIndex < 0 ? undefined : process.argv[remoteIndex + 1];
+if (
+  remoteIndex >= 0 &&
+  (!remoteOrigin || remoteOrigin !== process.env.APP_ORIGIN || !remoteOrigin.startsWith('https://'))
+)
+  throw new Error('The live test URL must exactly match the configured HTTPS APP_ORIGIN.');
+const server = remoteOrigin ? null : createApp().listen(0, '127.0.0.1');
+if (server) await new Promise<void>((resolve) => server.once('listening', resolve));
+const base = remoteOrigin
+  ? `${remoteOrigin}/api`
+  : `http://127.0.0.1:${(server!.address() as AddressInfo).port}/api`;
 type Jar = Map<string, string>;
 async function request(path: string, jar: Jar, method = 'GET', body?: unknown) {
   const response = await fetch(base + path, {
@@ -26,6 +35,7 @@ async function request(path: string, jar: Jar, method = 'GET', body?: unknown) {
     headers: {
       'X-MadaTours-Client': '1',
       'Content-Type': 'application/json',
+      ...(remoteOrigin ? { Origin: remoteOrigin } : {}),
       Cookie: [...jar].map(([k, v]) => `${k}=${v}`).join('; '),
     },
     body: body ? JSON.stringify(body) : undefined,
@@ -71,7 +81,8 @@ try {
         c.startsWith('madatours-auth') &&
         /HttpOnly/i.test(c) &&
         /Path=\/api/i.test(c) &&
-        /SameSite=Lax/i.test(c),
+        /SameSite=Lax/i.test(c) &&
+        (!remoteOrigin || /Secure/i.test(c)),
     ),
     'HttpOnly API-scoped cookie',
   );
@@ -166,5 +177,5 @@ try {
       process.exitCode = 1;
     } else console.log('Removed temporary test account.');
   }
-  await new Promise<void>((resolve) => server.close(() => resolve()));
+  if (server) await new Promise<void>((resolve) => server.close(() => resolve()));
 }

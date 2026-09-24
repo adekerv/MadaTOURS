@@ -21,6 +21,4 @@ android/app/src/main/assets/capacitor.config.json
 android/local.properties
 # Ignore JDK binaries
 *.jdk
-oracleJdk-27.jdk/
-oracleJdk-27.jdk/
-*.jdk
+.vercel/

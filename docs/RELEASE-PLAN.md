@@ -17,10 +17,16 @@
 5. Repeatable SQL, environment checks, setup instructions, and demonstration script.
 6. Local verification followed by live verification on the existing Vercel project.
 
-## External setup still needed
+## Live release status
 
-- Supabase schema and API credentials are verified. Real authentication, saved-place persistence, RLS isolation and account deletion pass.
-- An email delivery choice for arbitrary classmates' addresses. Supabase's built-in sender only serves authorized team addresses and has a low hourly limit.
-- Vercel connector access to `ade-kerv-s-projects`. The current connection returned HTTP 403 for that scope; this is an authorization mismatch, not evidence of a broken deployment.
+- Public website: https://mada-tours.vercel.app.
+- Supabase schema, server credentials and production Vercel environment are configured and verified.
+- The server import failure is fixed; the corrected deployment is promoted to the public domain.
+- Real verification/recovery codes, saved-place persistence across independent sessions, RLS isolation and account deletion pass through the public API. Tests generated codes without sending email and removed their temporary accounts.
+- A mobile Chromium browser verified login, saving a favorite and session/favorite restoration after refresh.
 
-The database is initialized, and two temporary test accounts were created and removed during live verification. Existing users and venues were not changed. No deployment has been published in this phase. APP_ORIGIN, the public Vercel URL, and the email delivery decision remain outstanding. See SUPABASE-SETUP.md for the exact steps.
+## Owner setup still needed
+
+Choose separate demo accounts for the class or configure an email provider so classmates can register themselves. Supabase's built-in sender only serves authorized team addresses and has a low hourly limit. Actual email templates and inbox delivery remain unverified. See [SUPABASE-SETUP.md](SUPABASE-SETUP.md) for the email settings and [CLASS-DEMO.md](CLASS-DEMO.md) for the presentation walkthrough.
+
+App Store release is a later milestone: physical device checks, native cookie persistence, compilation, signing and store submission are still required.

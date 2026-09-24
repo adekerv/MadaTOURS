@@ -1,4 +1,4 @@
-import { sourceSchema, photoCreditSchema } from './content';
+import { sourceSchema, photoCreditSchema } from './content.js';
 import type { Place } from '../types';
 export const deg2rad = (degrees: number) => (degrees * Math.PI) / 180;
 export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
