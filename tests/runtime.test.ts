@@ -13,6 +13,7 @@ test('compiled Vercel API loads in plain Node without a TypeScript loader or bun
     for (const filename of [
       'api/index.ts',
       'server/app.ts',
+      'server/origins.ts',
       'server/supabase.ts',
       'server/validation.ts',
       'src/lib/places-utils.ts',

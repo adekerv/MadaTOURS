@@ -29,7 +29,8 @@
     "pretest:e2e": "npm run db:prepare",
     "setup:check": "node --import tsx scripts/check-setup.ts",
     "test:live": "node --import tsx scripts/smoke-supabase.ts",
-    "catalogue:import": "node --import tsx scripts/import-catalogue.ts"
+    "catalogue:import": "node --import tsx scripts/import-catalogue.ts",
+    "auth:configure": "node --import tsx scripts/configure-auth-email.ts"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",

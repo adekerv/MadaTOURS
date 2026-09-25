@@ -44,3 +44,9 @@ The September 24 batch adds 337 published entries (65 restaurants and 272 activi
 The importer is validated for duplicate prevention, resuming partial work, preserving deliberately deleted records, and rejecting changed before-values. New content is checked for bilingual descriptions, supported source dates, map bounds, translated tags and experience-filter coverage. Known generic map points and the three withheld records are covered by regression assertions.
 
 Browser checks cover town and experience filters, 30/60-result pagination and reset, English description search, French controls at 320 pixels, and source links in details. Optional distance/sort settings are collapsible to keep more space for results. Full Chromium/WebKit suite: 23 passed and one explicit WebKit service-worker skip. The compact-controls change received an additional targeted layout/accessibility run. Physical devices and current venue operating status are not established by these automated checks.
+
+## Authentication origin repair — September 25, 2026
+
+Reproduced HTTP 403 for this project's generated deployment and branch origins while the canonical origin reached request validation. Origin handling now includes Vercel's exact deployment/branch hostnames and normalizes configured URL whitespace/trailing slashes. The verified team alias is explicitly configured. Regression checks cover login, signup, preflight, native origins, malicious lookalike domains, spoofed Host headers and missing request headers. All 15 backend/security/utility tests pass.
+
+The new `auth:configure` helper can preview, install and read back the hosted confirmation/recovery code templates without changing SMTP credentials or disabling email confirmation. It needs a Supabase management access token; the application's server secret cannot modify hosted Auth settings. Email delivery is a separate verification step.

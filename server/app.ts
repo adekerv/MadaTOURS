@@ -12,6 +12,7 @@ import {
 } from './supabase.js';
 import { credentials, registration, placeInput, nearbyQuery, positiveId } from './validation.js';
 import { calculateDistance, normalizePlace } from '../src/lib/places-utils.js';
+import { configuredOrigins } from './origins.js';
 const emailInput = credentials.pick({ email: true });
 const codeInput = emailInput.extend({
   token: z
@@ -30,15 +31,7 @@ export function createApp(clients: Clients = { client: requestClient, admin: adm
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     const origin = req.headers.origin;
-    const allowed = new Set(
-      (process.env.ALLOWED_ORIGINS || '')
-        .split(',')
-        .map((v) => v.trim())
-        .filter(Boolean),
-    );
-    if (process.env.APP_ORIGIN) allowed.add(process.env.APP_ORIGIN);
-    if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
-      allowed.add(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
+    const allowed = configuredOrigins();
     if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL)
       allowed.add(`${req.protocol}://${req.get('host')}`);
     if (origin && !allowed.has(origin))

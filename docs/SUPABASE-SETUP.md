@@ -87,6 +87,27 @@ npm run admin:grant -- your-confirmed-email@example.com
 
 Reload afterward. Only grant admin to an account you control. Roles come from the database, never from signup form metadata.
 
+## Repair verification emails that contain links instead of codes
+
+The app accepts numeric email codes. Editing the files in `supabase/templates/` alone does not update a hosted Supabase project's email templates.
+
+In Supabase → Authentication → Email Templates, replace **Confirm signup** with `supabase/templates/confirm-signup.html` and **Reset password** with `supabase/templates/reset-password.html`, then save each. Both templates must contain the literal `{{ .Token }}`. Do not replace it with `{{ .ConfirmationURL }}` or `{{ .TokenHash }}`. Request a fresh code afterward; previously delivered emails do not change.
+
+Alternatively, create a personal access token at [Supabase account tokens](https://supabase.com/dashboard/account/tokens), enter it as `SUPABASE_ACCESS_TOKEN` in `.env.local`, and run:
+
+```sh
+npm run auth:configure
+npm run auth:configure -- --apply
+```
+
+The first command previews changes. The second backs up only the affected URL/templates, updates the two email subjects and bodies plus the website URL, and reads the settings back to verify them. It does not disable email confirmation, change SMTP credentials, reset passwords or send emails. Remove the management token from `.env.local` when finished; the app and Vercel do not need it. SMTP delivery still needs a separate real-inbox check.
+
+## Repair “This origin is not allowed”
+
+Use the current public address, `https://mada-tours.vercel.app`. The API accepts `APP_ORIGIN`, explicit comma-separated `ALLOWED_ORIGINS`, and the exact production, deployment and branch domains supplied by Vercel's system variables. Keep system environment variables enabled in Vercel. Additional project aliases/custom domains need explicit entries in `ALLOWED_ORIGINS`; unrelated `*.vercel.app` sites are never trusted automatically. Environment changes require a new deployment. Older immutable deployment URLs retain their old code.
+
+For website builds, keep `VITE_API_URL` empty so login requests use the same origin as the page. Reserve that variable for native builds. A live empty-body POST to `/api/auth/login` with `Origin` and `X-MadaTours-Client: 1` should reach input validation (HTTP 400), not the origin rejection (HTTP 403). Do not probe with a real user's password.
+
 ## 5. Configure the existing Vercel project
 
 Open [mada-tours settings](https://vercel.com/ade-kerv-s-projects/mada-tours/settings/environment-variables). Add these variables for **Production**:
