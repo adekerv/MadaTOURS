@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: mada-tours-laravel
+    runtime: docker
+    plan: free
+    healthCheckPath: /up
+    autoDeployTrigger: off
+    envVars:
+      - key: APP_KEY
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: APP_ORIGIN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: capacitor://localhost,https://localhost

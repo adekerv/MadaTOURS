@@ -11,7 +11,7 @@ import {
   type Clients,
 } from './supabase.js';
 import { credentials, registration, placeInput, nearbyQuery, positiveId } from './validation.js';
-import { calculateDistance, normalizePlace } from '../src/lib/places-utils.js';
+import { calculateDistance, normalizePlace } from '../resources/js/lib/places-utils.js';
 import { configuredOrigins } from './origins.js';
 const emailInput = credentials.pick({ email: true });
 const codeInput = emailInput.extend({

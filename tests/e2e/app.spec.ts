@@ -217,7 +217,7 @@ test('admin-created places immediately appear in home search and can be deleted'
     headers: { 'X-MadaTours-Client': '1' },
     data: { email, token: '123456' },
   });
-  await page.request.post('/__test/admin', {
+  await page.request.post('http://127.0.0.1:3101/__test/admin', {
     headers: { 'X-Test-Token': process.env.MADATOURS_E2E_TOKEN! },
     data: { email },
   });

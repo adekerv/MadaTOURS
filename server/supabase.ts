@@ -2,7 +2,7 @@ import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@s
 import { createClient, type SupabaseClient, type AuthError } from '@supabase/supabase-js';
 import type { Request, Response } from 'express';
 import { createHash } from 'node:crypto';
-import type { User } from '../src/types';
+import type { User } from '../resources/js/types';
 export class HttpError extends Error {
   constructor(
     public status: number,

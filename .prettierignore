@@ -8,3 +8,10 @@ package-lock.json
 playwright-report
 test-results
 *.jdk
+
+vendor
+public/build
+bootstrap/cache
+storage
+composer.lock
+*.blade.php

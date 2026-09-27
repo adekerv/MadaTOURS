@@ -91,6 +91,8 @@ Reload afterward. Only grant admin to an account you control. Roles come from th
 
 The app accepts numeric email codes. Editing the files in `supabase/templates/` alone does not update a hosted Supabase project's email templates.
 
+**Free-plan prerequisite:** Supabase rejected template changes on this project because it still uses the default email sender. Configure a custom SMTP provider first; using custom SMTP does not require upgrading Supabase. Dashboard editing has the same provider restriction. On September 25 the website URL was corrected, but the code templates remain pending SMTP setup.
+
 In Supabase → Authentication → Email Templates, replace **Confirm signup** with `supabase/templates/confirm-signup.html` and **Reset password** with `supabase/templates/reset-password.html`, then save each. Both templates must contain the literal `{{ .Token }}`. Do not replace it with `{{ .ConfirmationURL }}` or `{{ .TokenHash }}`. Request a fresh code afterward; previously delivered emails do not change.
 
 Alternatively, create a personal access token at [Supabase account tokens](https://supabase.com/dashboard/account/tokens), enter it as `SUPABASE_ACCESS_TOKEN` in `.env.local`, and run:
@@ -100,7 +102,37 @@ npm run auth:configure
 npm run auth:configure -- --apply
 ```
 
-The first command previews changes. The second backs up only the affected URL/templates, updates the two email subjects and bodies plus the website URL, and reads the settings back to verify them. It does not disable email confirmation, change SMTP credentials, reset passwords or send emails. Remove the management token from `.env.local` when finished; the app and Vercel do not need it. SMTP delivery still needs a separate real-inbox check.
+The first command previews changes. The second backs up only the affected URL/templates, updates the two email subjects and bodies plus the website URL, and reads the settings back to verify them. Without `--smtp`, it does not change SMTP credentials. Neither command disables email confirmation, resets passwords or sends emails. Remove the management token from `.env.local` when finished; the app and Vercel do not need it. SMTP delivery still needs a separate real-inbox check.
+
+### Set up Brevo Free for the class demonstration
+
+1. Create a [Brevo account](https://www.brevo.com/) on the Free plan and complete account verification. Brevo currently advertises up to 300 emails per day; Supabase's own Auth rate limits apply separately.
+2. Open **Settings → Senders, Domains, IPs → Senders → Add a sender**. Set the name to **MadaTours** and use an email address whose inbox you control. Enter the verification code Brevo sends to that inbox in Brevo. Do not invent an address ending in `vercel.app`.
+3. If you own a domain, authenticate it following Brevo's DNS instructions. Without a domain, Brevo documents temporary sender-address replacement for transactional emails sent from free email addresses. This may support the class demonstration, subject to account approval and actual delivery testing; it is not a permanent authenticated-domain setup. If Brevo requires domain authentication or SMTP activation for your account, resolve that before applying the settings below.
+4. Open **Settings → SMTP & API → SMTP**. Copy the **SMTP Login**, then generate an **SMTP key** named `MadaTours`. Use this key, not a Brevo API key or your account password.
+5. Fill these entries in `.env.local` (quote values if they contain `#` or spaces):
+
+```dotenv
+SUPABASE_SMTP_HOST=smtp-relay.brevo.com
+SUPABASE_SMTP_PORT=587
+SUPABASE_SMTP_USER="your SMTP Login from Brevo"
+SUPABASE_SMTP_PASS="your generated SMTP key"
+SUPABASE_SMTP_FROM_EMAIL="the sender address you verified in Brevo"
+SUPABASE_SMTP_SENDER_NAME=MadaTours
+```
+
+Keep the existing `SUPABASE_ACCESS_TOKEN`, `SUPABASE_URL` and `APP_ORIGIN`. Then run:
+
+```sh
+npm run auth:configure -- --smtp
+npm run auth:configure -- --smtp --apply
+```
+
+The preview makes no changes. Apply saves SMTP to Supabase first, reads the non-secret settings back, then applies the numeric-code templates. Credentials are never printed or included in the template backup. If the template step fails after SMTP succeeds, SMTP remains configured; fix the reported issue and rerun `npm run auth:configure -- --apply` without `--smtp`. A successful configuration read-back does not prove SMTP authentication or inbox delivery.
+
+Finally, on `https://mada-tours.vercel.app`, create an account with an inbox you control, check inbox/spam for the numeric code and complete verification. Sign out, sign in, and test password recovery with a fresh code. Check Brevo's transactional logs if a message is rejected. No Vercel redeployment is required for these hosted Supabase settings. Once verified, remove the local management token and SMTP credentials; retain the SMTP key in Brevo, because Supabase needs it to keep sending.
+
+Sources: [Brevo SMTP setup](https://help.brevo.com/hc/en-us/articles/7924908994450-Send-transactional-emails-using-Brevo-SMTP), [verify a sender](https://help.brevo.com/hc/en-us/articles/208836149-Create-a-new-sender-From-name-and-From-email), [temporary sender replacement](https://help.brevo.com/hc/en-us/articles/14925263522578-Comply-with-Gmail-Yahoo-and-Microsoft-s-requirements-for-email-senders), [Free plan](https://www.brevo.com/products/transactional-email/).
 
 ## Repair “This origin is not allowed”
 

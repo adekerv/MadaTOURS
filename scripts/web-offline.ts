@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import type { Plugin } from 'vite';
 export function offlineShell(): Plugin {
@@ -5,18 +6,25 @@ export function offlineShell(): Plugin {
     name: 'madatours-offline-shell',
     apply: 'build',
     generateBundle(_options, bundle) {
+      const entry = Object.values(bundle).find((item) => item.type === 'chunk' && item.isEntry);
+      if (!entry) throw new Error('Missing frontend entry point for offline shell.');
+      const styles = Object.keys(bundle).filter((name) => name.endsWith('.css'));
+      const shell = readFileSync('index.html', 'utf8').replace(
+        '<script type="module" src="/resources/js/main.tsx"></script>',
+        styles.map((name) => `<link rel="stylesheet" href="/build/${name}">`).join('\n') + `<script type="module" src="/build/${entry.fileName}"></script>`,
+      );
+      this.emitFile({ type: 'asset', fileName: 'offline.html', source: shell });
       const assets = [
         ...new Set([
-          '/',
-          '/index.html',
+          '/build/offline.html',
           '/favicon.svg',
           ...Object.keys(bundle)
             .filter((name) => !name.endsWith('.map'))
-            .map((name) => `/${name}`),
+            .map((name) => `/build/${name}`),
         ]),
       ];
       const version = createHash('sha256')
-        .update(JSON.stringify(assets))
+        .update(JSON.stringify(assets) + shell)
         .digest('hex')
         .slice(0, 12);
       this.emitFile({
@@ -34,7 +42,7 @@ self.addEventListener('fetch', event => {
     event.respondWith((async () => {
       const controller = new AbortController(); const timer=setTimeout(()=>controller.abort(),4000);
       try { const response=await fetch(request,{signal:controller.signal}); if(response.ok) return response; throw new Error('Unavailable'); }
-      catch { return (await caches.match('/index.html', { cacheName:CACHE })) || new Response('MadaTours is offline.',{status:503}); }
+      catch { return (await caches.match('/build/offline.html', { cacheName:CACHE })) || new Response('MadaTours is offline.',{status:503}); }
       finally { clearTimeout(timer); }
     })()); return;
   }

@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "isolatedModules": true,
@@ -13,8 +17,24 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "noEmit": true,
-    "types": ["node", "vite/client"]
+    "types": [
+      "node",
+      "vite/client"
+    ]
   },
-  "include": ["src", "server", "api", "scripts", "tests", "*.ts"],
-  "exclude": ["node_modules", "dist", "docs/legacy", "ios", "android"]
+  "include": [
+    "resources/js",
+    "scripts",
+    "tests",
+    "*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "docs/legacy",
+    "ios",
+    "android",
+    "vendor",
+    "public/build"
+  ]
 }

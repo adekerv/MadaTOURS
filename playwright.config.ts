@@ -13,7 +13,7 @@ export default defineConfig({
     serviceWorkers: 'block',
   },
   webServer: {
-    command: 'npm run build:web && node --import tsx tests/support/start-server.ts',
+    command: 'npm run build:web && node --import tsx tests/support/start-laravel.ts',
     env: { MADATOURS_E2E_TOKEN: process.env.MADATOURS_E2E_TOKEN },
     url: 'http://127.0.0.1:3100',
     reuseExistingServer: false,

@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { tripsSchema, tripSchema, moveStop, tripSummary, legDirections } from '../src/lib/trips';
-import { normalizePlace } from '../src/lib/places-utils';
-import { translate } from '../src/i18n/core';
-import { french } from '../src/i18n/fr';
-import places from '../src/data/places.json';
+import { tripsSchema, tripSchema, moveStop, tripSummary, legDirections } from '../resources/js/lib/trips';
+import { normalizePlace } from '../resources/js/lib/places-utils';
+import { translate } from '../resources/js/i18n/core';
+import { french } from '../resources/js/i18n/fr';
+import places from '../database/data/places.json';
 const trip = {
   id: '00000000-0000-4000-8000-000000000001',
   name: 'Saturday',

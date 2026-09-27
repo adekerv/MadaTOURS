@@ -53,7 +53,7 @@ export function testClients(db: PGlite) {
       session = randomUUID();
       sessions.set(session, user.id);
       res?.setHeader('Set-Cookie', `madatours-auth=${session}; Path=/api; HttpOnly; SameSite=Lax`);
-      return { user: { id: user.id, email: user.email }, session: { access_token: 'test-only' } };
+      return { user: { id: user.id, email: user.email }, session: { access_token: session, refresh_token: session, expires_in: 3600 } };
     };
     const success = (data: unknown = {}) => Promise.resolve({ data, error: null });
     const failure = (code: string) =>

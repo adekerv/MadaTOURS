@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="theme-color" content="#fdfcfb" />
+    <meta
+      name="description"
+      content="Discover Martinique at your own pace. Find restaurants, beaches, trails, and activities, and keep your favorite places close."
+    />
+    <title>MadaTours — Discover Martinique</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript
+      >MadaTours needs JavaScript to show its interactive map and saved places. Please enable
+      JavaScript to continue.</noscript
+    >
+    @viteReactRefresh
+    @vite('resources/js/main.tsx')
+  </body>
+</html>

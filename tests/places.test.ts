@@ -5,8 +5,8 @@ import {
   matchesSearch,
   matchesInterest,
   normalizePlace,
-} from '../src/lib/places-utils';
-import data from '../src/data/places.json';
+} from '../resources/js/lib/places-utils';
+import data from '../database/data/places.json';
 
 test('catalogue is valid and uses unique IDs', () => {
   const places = data.map(normalizePlace);

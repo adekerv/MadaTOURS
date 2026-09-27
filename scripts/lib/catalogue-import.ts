@@ -1,8 +1,8 @@
 import { isDeepStrictEqual } from 'node:util';
 import { z } from 'zod';
 import { placeInput } from '../../server/validation';
-import { sourceSchema } from '../../src/lib/content';
-import { normalizeSearch } from '../../src/lib/places-utils';
+import { sourceSchema } from '../../resources/js/lib/content';
+import { normalizeSearch } from '../../resources/js/lib/places-utils';
 
 const point = z.object({
   lat: z.number().min(14.38).max(14.9),

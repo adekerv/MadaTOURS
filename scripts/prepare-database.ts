@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import places from '../src/data/places.json';
+import places from '../database/data/places.json';
 const migration = await readFile(
-  new URL('../supabase/migrations/202609230001_madatours.sql', import.meta.url),
+  new URL('../database/schema/supabase.sql', import.meta.url),
   'utf8',
 );
 const json = JSON.stringify(places).replaceAll("'", "''");

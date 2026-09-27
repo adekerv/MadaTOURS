@@ -1,15 +1,58 @@
 import { config } from 'dotenv';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { z } from 'zod';
 config({ path: ['.env.local', '.env'], quiet: true });
 
 const args = process.argv.slice(2);
 if (args.includes('--help')) {
   console.log(
-    "npm run auth:configure -- [--apply]\nPreview or apply the project's confirmation/recovery code templates and website URL. Requires a Supabase management access token; never use the app secret key here.",
+    "npm run auth:configure -- [--smtp] [--apply]\nPreview or apply the project's confirmation/recovery code templates and website URL. --smtp also configures SMTP from SUPABASE_SMTP_* in .env.local. Requires a Supabase management access token; never use the app secret key here.",
   );
   process.exit(0);
 }
-if (args.some((arg) => arg !== '--apply')) throw new Error('Unknown argument. Use --help.');
+if (args.some((arg) => !['--apply', '--smtp'].includes(arg)))
+  throw new Error('Unknown argument. Use --help.');
+type Settings = Record<string, string | number>;
+let smtp: Settings | undefined;
+if (args.includes('--smtp')) {
+  const parsed = z
+    .object({
+      smtp_host: z
+        .string()
+        .trim()
+        .regex(/^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i),
+      smtp_port: z.coerce.number().int().min(1).max(65535),
+      smtp_user: z
+        .string()
+        .trim()
+        .min(1)
+        .regex(/^[^\r\n]+$/),
+      smtp_pass: z
+        .string()
+        .min(1)
+        .regex(/^[^\r\n]+$/),
+      smtp_admin_email: z.email(),
+      smtp_sender_name: z
+        .string()
+        .trim()
+        .min(1)
+        .max(100)
+        .regex(/^[^\r\n]+$/),
+    })
+    .safeParse({
+      smtp_host: process.env.SUPABASE_SMTP_HOST,
+      smtp_port: process.env.SUPABASE_SMTP_PORT,
+      smtp_user: process.env.SUPABASE_SMTP_USER,
+      smtp_pass: process.env.SUPABASE_SMTP_PASS,
+      smtp_admin_email: process.env.SUPABASE_SMTP_FROM_EMAIL?.trim(),
+      smtp_sender_name: process.env.SUPABASE_SMTP_SENDER_NAME,
+    });
+  if (!parsed.success)
+    throw new Error(
+      `Complete the SUPABASE_SMTP_* fields in .env.local. Invalid settings: ${parsed.error.issues.map((issue) => issue.path.join('.')).join(', ')}. No changes were made.`,
+    );
+  smtp = parsed.data;
+}
 const token = process.env.SUPABASE_ACCESS_TOKEN?.trim();
 if (!token) {
   console.error(
@@ -44,20 +87,51 @@ const desired: Record<string, string> = {
   mailer_templates_recovery_content: recovery,
 };
 const endpoint = `https://api.supabase.com/v1/projects/${match[1]}/config/auth`;
-async function request(method = 'GET', body?: Record<string, string>) {
+async function request(method = 'GET', body?: Settings) {
   const response = await fetch(endpoint, {
     method,
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
     signal: AbortSignal.timeout(20000),
   });
-  if (!response.ok)
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+    if (
+      response.status === 400 &&
+      typeof error?.message === 'string' &&
+      error.message.includes('Email template modification is not available')
+    )
+      throw new Error(
+        'Supabase blocks custom email templates on Free projects using its default sender. Configure a custom SMTP provider, then rerun this command. Your management token is valid; no plan upgrade is required if you use custom SMTP.',
+      );
     throw new Error(
-      `Supabase settings request failed (HTTP ${response.status}). Check the management token's project permissions. No credentials or provider response were logged.`,
+      `Supabase settings request failed (HTTP ${response.status}). ${response.status === 401 || response.status === 403 ? "Check the management token's project permissions." : 'Check the Auth configuration requirements.'} No credentials or provider response were logged.`,
     );
+  }
   return (await response.json()) as Record<string, unknown>;
 }
-const current = await request();
+let current = await request();
+if (smtp) {
+  console.log(
+    'SMTP configuration requested (credentials hidden; sender must already be verified with your provider).',
+  );
+  if (args.includes('--apply')) {
+    await request('PATCH', smtp);
+    current = await request();
+    // The API may mask passwords and serialize the port as a string.
+    if (
+      Object.entries(smtp).some(
+        ([key, value]) => key !== 'smtp_pass' && String(current[key]) !== String(value),
+      )
+    )
+      throw new Error(
+        'SMTP settings verification failed. SMTP may have changed; inspect Supabase settings before retrying. Email templates have not been changed.',
+      );
+    console.log(
+      'SMTP settings saved and read back. Provider credentials and actual email delivery still need a real-inbox test.',
+    );
+  }
+}
 const changes = Object.fromEntries(
   Object.entries(desired).filter(([key, value]) => current[key] !== value),
 );

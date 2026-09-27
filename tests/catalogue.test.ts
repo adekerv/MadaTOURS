@@ -2,10 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import raw from '../supabase/catalogue/2026-09-24.json';
 import { batchSchema, planImport } from '../scripts/lib/catalogue-import';
-import { catalogueTown, experiences, matchesExperience } from '../src/lib/catalogue';
-import { normalizePlace, matchesSearch } from '../src/lib/places-utils';
-import { french } from '../src/i18n/fr';
-import seed from '../src/data/places.json';
+import { catalogueTown, experiences, matchesExperience } from '../resources/js/lib/catalogue';
+import { normalizePlace, matchesSearch } from '../resources/js/lib/places-utils';
+import { french } from '../resources/js/i18n/fr';
+import seed from '../database/data/places.json';
 
 const batch = batchSchema.parse(raw);
 test('reviewed batch is bilingual, source-backed, deduplicated, and covered by experience filters', () => {

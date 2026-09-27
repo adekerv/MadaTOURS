@@ -16,8 +16,8 @@ test('compiled Vercel API loads in plain Node without a TypeScript loader or bun
       'server/origins.ts',
       'server/supabase.ts',
       'server/validation.ts',
-      'src/lib/places-utils.ts',
-      'src/lib/content.ts',
+      'resources/js/lib/places-utils.ts',
+      'resources/js/lib/content.ts',
     ]) {
       const compiled = ts.transpileModule(await readFile(filename, 'utf8'), {
         compilerOptions: {
