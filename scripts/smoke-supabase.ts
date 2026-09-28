@@ -1,11 +1,9 @@
 import { config } from 'dotenv';
 import { randomBytes, randomUUID } from 'node:crypto';
 import assert from 'node:assert/strict';
-import type { AddressInfo } from 'node:net';
 import { createClient } from '@supabase/supabase-js';
-import { createApp } from '../server/app';
-import { adminClient } from '../server/supabase';
-config({ path: ['.env.local', '.env'], quiet: true });
+import { adminClient } from './lib/supabase-admin';
+config({ path: ['.env', '.env.local'], quiet: true });
 if (!process.argv.includes('--run'))
   throw new Error(
     'Use npm run test:live -- --run to create and clean up temporary Supabase test accounts. No emails are sent.',
@@ -17,17 +15,18 @@ const replacement = `Mada-${randomBytes(24).toString('base64url')}-43`;
 const email = `madatours-test-${randomUUID()}@example.invalid`;
 const otherEmail = `madatours-test-${randomUUID()}@example.invalid`;
 const remoteIndex = process.argv.indexOf('--url');
-const remoteOrigin = remoteIndex < 0 ? undefined : process.argv[remoteIndex + 1];
+const remoteOrigin = remoteIndex < 0 ? process.env.APP_URL : process.argv[remoteIndex + 1];
+if (!remoteOrigin || ![process.env.APP_URL, process.env.APP_ORIGIN].includes(remoteOrigin))
+  throw new Error('Start Laravel first, then pass --url matching APP_URL or APP_ORIGIN.');
+const parsedOrigin = new URL(remoteOrigin);
 if (
-  remoteIndex >= 0 &&
-  (!remoteOrigin || remoteOrigin !== process.env.APP_ORIGIN || !remoteOrigin.startsWith('https://'))
+  parsedOrigin.origin !== remoteOrigin ||
+  !(
+    parsedOrigin.protocol === 'https:' || ['127.0.0.1', 'localhost'].includes(parsedOrigin.hostname)
+  )
 )
-  throw new Error('The live test URL must exactly match the configured HTTPS APP_ORIGIN.');
-const server = remoteOrigin ? null : createApp().listen(0, '127.0.0.1');
-if (server) await new Promise<void>((resolve) => server.once('listening', resolve));
-const base = remoteOrigin
-  ? `${remoteOrigin}/api`
-  : `http://127.0.0.1:${(server!.address() as AddressInfo).port}/api`;
+  throw new Error('Use an HTTPS origin or a local Laravel development server.');
+const base = `${remoteOrigin}/api`;
 type Jar = Map<string, string>;
 async function request(path: string, jar: Jar, method = 'GET', body?: unknown) {
   const response = await fetch(base + path, {
@@ -78,11 +77,11 @@ try {
   assert.ok(
     verified.cookies.some(
       (c) =>
-        c.startsWith('madatours-auth') &&
+        c.startsWith('madatours-session') &&
         /HttpOnly/i.test(c) &&
         /Path=\/api/i.test(c) &&
-        /SameSite=Lax/i.test(c) &&
-        (!remoteOrigin || /Secure/i.test(c)),
+        /SameSite=(Lax|None)/i.test(c) &&
+        (parsedOrigin.protocol !== 'https:' || /Secure/i.test(c)),
     ),
     'HttpOnly API-scoped cookie',
   );
@@ -177,5 +176,4 @@ try {
       process.exitCode = 1;
     } else console.log('Removed temporary test account.');
   }
-  if (server) await new Promise<void>((resolve) => server.close(() => resolve()));
 }

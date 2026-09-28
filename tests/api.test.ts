@@ -1,17 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { once } from 'node:events';
-import { createApp } from '../server/app';
-import { testDatabase } from './support/database';
-import { testClients } from './support/clients';
-test('Supabase API: verification, ownership, roles, recovery, logout, validation, and deletion', async () => {
-  const db = await testDatabase();
-  const fixture = testClients(db);
-  const server = createApp(fixture.clients).listen(0, '127.0.0.1');
-  await once(server, 'listening');
-  const address = server.address();
-  if (!address || typeof address === 'string') throw new Error('Missing port');
-  const base = `http://127.0.0.1:${address.port}/api`;
+import { startLaravel } from './support/laravel';
+test('Laravel API: verification, ownership, roles, recovery, logout, validation, and deletion', async () => {
+  const app = await startLaravel();
+  const { fixture } = app;
+  const base = `${app.origin}/api`;
   const jar = { alice: '', bob: '' };
   const call = async (
     path: string,
@@ -30,9 +23,17 @@ test('Supabase API: verification, ownership, roles, recovery, logout, validation
       },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
-    const cookie = res.headers.get('set-cookie');
+    const cookie = res.headers
+      .getSetCookie()
+      .find((value) => value.startsWith('madatours-session='));
     if (cookie) jar[who] = cookie.split(';')[0];
-    return { status: res.status, body: await res.json() };
+    const raw = await res.text();
+    assert.match(
+      res.headers.get('content-type') || '',
+      /application\/json/,
+      `${path}: ${raw.slice(0, 1500)}`,
+    );
+    return { status: res.status, body: JSON.parse(raw) };
   };
   try {
     assert.equal((await call('/health')).status, 200);
@@ -165,8 +166,6 @@ test('Supabase API: verification, ownership, roles, recovery, logout, validation
       401,
     );
   } finally {
-    server.close();
-    await once(server, 'close');
-    await db.close();
+    await app.close();
   }
 });

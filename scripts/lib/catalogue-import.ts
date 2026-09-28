@@ -1,6 +1,6 @@
 import { isDeepStrictEqual } from 'node:util';
 import { z } from 'zod';
-import { placeInput } from '../../server/validation';
+import { placeInput } from './place-input';
 import { sourceSchema } from '../../resources/js/lib/content';
 import { normalizeSearch } from '../../resources/js/lib/places-utils';
 

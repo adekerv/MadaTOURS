@@ -2,9 +2,7 @@
 // The double does not replace live Supabase Auth or email-delivery verification.
 import { randomUUID } from 'node:crypto';
 import type { SupabaseClient, AuthError } from '@supabase/supabase-js';
-import type { Request, Response } from 'express';
 import type { PGlite } from '@electric-sql/pglite';
-import type { Clients } from '../../server/supabase';
 type Account = {
   id: string;
   email: string;
@@ -41,25 +39,24 @@ export function testClients(db: PGlite) {
         throw e;
       }
     });
-  const build = (req?: Request, res?: Response, admin = false): SupabaseClient => {
-    let session =
-      req?.headers.cookie
-        ?.split(';')
-        .map((v) => v.trim())
-        .find((v) => v.startsWith('madatours-auth='))
-        ?.slice(15) ?? '';
+  const build = (token = '', admin = false): SupabaseClient => {
+    let session = token;
     const account = () => accounts.get(sessions.get(session) ?? '');
     const signIn = (user: Account) => {
       session = randomUUID();
       sessions.set(session, user.id);
-      res?.setHeader('Set-Cookie', `madatours-auth=${session}; Path=/api; HttpOnly; SameSite=Lax`);
-      return { user: { id: user.id, email: user.email }, session: { access_token: session, refresh_token: session, expires_in: 3600 } };
+      return {
+        user: { id: user.id, email: user.email },
+        session: { access_token: session, refresh_token: session, expires_in: 3600 },
+      };
     };
     const success = (data: unknown = {}) => Promise.resolve({ data, error: null });
     const failure = (code: string) =>
       Promise.resolve({ data: { user: null, session: null }, error: authError(code) });
     return {
       auth: {
+        refreshSession: () =>
+          account() ? success(signIn(account()!)) : failure('refresh_token_not_found'),
         getUser: () =>
           account()
             ? success({ user: { id: account()!.id, email: account()!.email } })
@@ -117,7 +114,6 @@ export function testClients(db: PGlite) {
           if (scope === 'global')
             for (const [token, userId] of sessions) if (userId === id) sessions.delete(token);
           sessions.delete(session);
-          res?.setHeader('Set-Cookie', 'madatours-auth=; Path=/api; HttpOnly; Max-Age=0');
           return success();
         },
         admin: {
@@ -156,6 +152,8 @@ export function testClients(db: PGlite) {
           body: Row | undefined,
           one = false,
           ordering = '',
+          offset = 0,
+          limit: number | undefined,
           ignore = false;
         const filters: [string, unknown][] = [];
         const id = (value: string) => {
@@ -172,7 +170,12 @@ export function testClients(db: PGlite) {
             return query;
           },
           order: (column: string) => {
-            ordering = id(column);
+            ordering += (ordering ? ',' : '') + id(column);
+            return query;
+          },
+          range: (from: number, to: number) => {
+            offset = from;
+            limit = to - from + 1;
             return query;
           },
           single: () => {
@@ -215,10 +218,12 @@ export function testClients(db: PGlite) {
               } else if (op === 'delete')
                 statement = `DELETE FROM public.${table}${where ? ' WHERE ' + where : ''} RETURNING *`;
               else if (columns === 'place:mt_places(*)')
-                statement = `SELECT to_jsonb(p.*) AS place FROM public.mt_saved_places s JOIN public.mt_places p ON p.id=s.place_id WHERE ${where.split('"user_id"').join('s."user_id"').split('"kind"').join('s."kind"')} ORDER BY s.created_at`;
+                statement = `SELECT to_jsonb(p.*) AS place FROM public.mt_saved_places s JOIN public.mt_places p ON p.id=s.place_id WHERE ${where.split('"user_id"').join('s."user_id"').split('"kind"').join('s."kind"')} ORDER BY s.created_at,s.place_id`;
               else
                 statement = `SELECT ${columns === '*' ? '*' : columns.split(',').map(id).join(',')} FROM public.${table}${where ? ' WHERE ' + where : ''}${ordering ? ' ORDER BY ' + ordering : ''}`;
               try {
+                if (op === 'select' && limit !== undefined)
+                  statement += ` LIMIT ${limit} OFFSET ${offset}`;
                 const rows = await sql<Row>(statement, args, account()?.id, admin);
                 return {
                   data: one ? (rows[0] ?? null) : rows,
@@ -235,9 +240,9 @@ export function testClients(db: PGlite) {
       },
     } as unknown as SupabaseClient;
   };
-  const clients: Clients = {
-    client: (req, res) => build(req, res),
-    admin: () => build(undefined, undefined, true),
+  const clients = {
+    client: (token?: string) => build(token),
+    admin: () => build('', true),
   };
   return {
     clients,
