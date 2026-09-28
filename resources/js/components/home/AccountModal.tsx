@@ -33,6 +33,7 @@ export function AccountModal({
   return (
     <Modal title={t('Your account')} onClose={onClose}>
       <div className="space-y-5 p-6">
+        <p className="break-words text-lg font-semibold text-slate-900">{user.name}</p>
         <p className="break-all text-slate-700">{user.email}</p>
         <p className="text-sm text-slate-600">
           {t('Your favorites and revisit list are linked to this account.')}

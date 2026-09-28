@@ -1,0 +1,22 @@
+{
+  "name": "MadaTours",
+  "category": "Travel",
+  "contactEmail": "adejkervin@protonmail.com",
+  "supportUrl": "https://mada-tours.vercel.app/#contact",
+  "privacyUrl": "https://mada-tours.vercel.app/privacy",
+  "accountDeletionUrl": "https://mada-tours.vercel.app/delete-account",
+  "localizations": {
+    "en-GB": {
+      "subtitle": "Explore & plan Martinique",
+      "shortDescription": "Discover Martinique’s beaches, food and trails. Plan a day at your own pace.",
+      "keywords": "Martinique,travel,beaches,hiking,restaurants,Caribbean,day trip,island,guide,map",
+      "description": "Make room for a little more Martinique. MadaTours brings together beaches, restaurants, trails and cultural stops in a warm, easy-to-use island guide.\n\nExplore freely — no account is needed to discover places or plan a day. Browse by town and experience, search the guide, or choose Places near me to sort by distance after granting location permission. Open a place to see its details, sources and directions.\n\nBuild your own day trip: add stops, arrange their order, choose visit durations and add notes. A route-order suggestion and rough travel allowance help you plan; use the linked directions for road routes and current travel times. Day plans stay on your device.\n\nThe last loaded place catalogue stays available when the connection drops. Maps, weather, directions and account updates need an internet connection. Optional accounts keep your favorites and revisit list across devices; account deletion is available in settings.\n\nSwitch between English and French at any time. Check Fort-de-France weather, revisit recent searches and suggest a place to help improve the guide.\n\nPlace information is curated from tourism sources and may change. Confirm access and opening hours with venues. Illustrative island photos are labeled; source and photo credits are included.\n\nYour island. Your pace."
+    },
+    "fr-FR": {
+      "subtitle": "La Martinique à votre rythme",
+      "shortDescription": "Plages, restaurants, sentiers : explorez la Martinique et planifiez votre journée.",
+      "keywords": "Martinique,voyage,plage,randonnée,restaurant,Caraïbes,journée,île,guide,carte",
+      "description": "Faites une place à la Martinique dans votre journée. MadaTours réunit plages, restaurants, sentiers et étapes culturelles dans un guide de l’île simple et chaleureux.\n\nExplorez librement : aucun compte n’est nécessaire pour découvrir les lieux ou préparer une journée. Filtrez par commune et expérience, recherchez dans le guide ou choisissez les lieux proches après avoir autorisé la localisation. Consultez les détails, les sources et les itinéraires de chaque lieu.\n\nComposez votre journée : ajoutez des étapes, organisez leur ordre, choisissez vos durées de visite et gardez vos notes. Une suggestion d’ordre et une estimation indicative des trajets vous aident à préparer la sortie. Consultez les itinéraires liés pour les routes et durées actuelles. Les journées restent sur votre appareil.\n\nLe dernier catalogue chargé reste disponible lorsque la connexion est coupée. Les cartes, la météo, les itinéraires et la synchronisation du compte nécessitent Internet. Un compte facultatif conserve vos favoris et lieux à revoir sur plusieurs appareils. La suppression du compte est accessible dans les réglages.\n\nPassez du français à l’anglais à tout moment. Consultez la météo de Fort-de-France, retrouvez vos recherches récentes et proposez un lieu pour enrichir le guide.\n\nLes informations proviennent de sources touristiques et peuvent évoluer. Confirmez l’accès et les horaires auprès des établissements. Les photos d’illustration sont signalées ; les sources et crédits photo sont indiqués.\n\nVotre île. Votre rythme."
+    }
+  }
+}

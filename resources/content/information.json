@@ -1,0 +1,218 @@
+{
+  "en": {
+    "about": {
+      "title": "About MadaTours",
+      "intro": "A small island guide for a day that feels like yours.",
+      "sections": [
+        {
+          "title": "Discover at your own pace",
+          "body": "MadaTours helps you explore Martinique’s beaches, gardens, heritage, restaurants and activities. Search the guide, browse the map and arrange a day trip without creating an account. An optional account keeps your favorites and revisit list across devices."
+        },
+        {
+          "title": "Our sources",
+          "body": "Place information is curated from Martinique tourism sources, including Martinique Tourisme and Terres du Centre. Each place shows its source links and research date when available. Hours, access and businesses can change: confirm plans with the venue. Homepage picks are editorial suggestions, not a popularity ranking."
+        },
+        {
+          "title": "Maps, weather and trip estimates",
+          "body": "Maps use OpenStreetMap and Leaflet. Weather for Fort-de-France comes from Open-Meteo. Distances are straight-line estimates. The planner adds a rough driving allowance; it is not a road-routing or traffic service. Route optimization keeps your first stop and suggests the next nearest stop. Open directions to check the actual route."
+        },
+        {
+          "title": "Photos with context",
+          "body": "Venue photographs are labeled through their source credits. Where a venue photo is unavailable, a clearly labeled photograph of the Salines landscape provides island context. It does not depict that venue. Photos are historical and cropped to fit; they do not establish current conditions."
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact & suggest a place",
+      "intro": "Found a beautiful stop, an incorrect location or outdated information? Help improve the guide.",
+      "sections": [
+        {
+          "title": "Contact the project owner",
+          "body": "MadaTours is maintained by Kervin Adé. Email adejkervin@protonmail.com for support, corrections, privacy requests or photo-credit questions. Suggestions are reviewed before publication; sending a suggestion does not automatically add a public listing."
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "Last updated: September 28, 2026. This policy explains how MadaTours uses information when you browse the website or native app.",
+      "sections": [
+        {
+          "title": "Who is responsible",
+          "body": "MadaTours is maintained by Kervin Adé. Contact adejkervin@protonmail.com about access, correction, deletion or other privacy questions."
+        },
+        {
+          "title": "Browsing and location",
+          "body": "You can browse and plan without an account. Location is requested only when you choose Use my location. It is used in memory on your device to calculate nearby places, and is not stored in your MadaTours account or sent to our database. Map tile requests reveal the area being viewed to the map provider. You can deny or revoke location permission and choose a point manually."
+        },
+        {
+          "title": "Optional account",
+          "body": "If you sign up, we use your name, email, password credentials and saved places to provide your account. Supabase manages authentication and stores password hashes. New signup does not verify email ownership. We use an essential session cookie to keep you signed in and may send account-related messages. Phone signup is not currently offered. We do not use your profile name to grant administrator access."
+        },
+        {
+          "title": "Data on your device",
+          "body": "Language preference, recent searches, onboarding dismissal, day trips, a cached public catalogue and optional offline saved-place copies are stored on your device. Day trips and recent searches are not synchronized to our database. You can clear recent searches in search controls, delete individual trips in the planner, remove offline copies from Offline places, or clear MadaTours site/app data in your device settings."
+        },
+        {
+          "title": "Service providers and external links",
+          "body": "Supabase processes account and saved-place data. Our hosting provider handles website requests and technical logs. OpenStreetMap receives map requests and Open-Meteo receives requests for Fort-de-France weather; those services may receive your IP address and device request information. Directions and rating links open Google Maps. Their privacy terms apply when you use them. A place suggestion opens your email app and is sent only when you send it there. Providers may process information outside your country under their applicable safeguards."
+        },
+        {
+          "title": "Purpose, retention and your choices",
+          "body": "Account information supports the service you request; optional location access is based on your permission. Technical security data helps prevent abuse. We do not sell personal data or include advertising or analytics trackers in the app. Your account data remains until you delete the account. Local data remains until cleared or removed with the app. Providers may retain security logs and backups under their retention policies. Contact us for access, correction, deletion, restriction, objection or a copy of your information, and for questions about retention or transfers."
+        },
+        {
+          "title": "Delete your account",
+          "body": "Sign in, open Your account, choose Delete account and confirm with your password. This removes the account profile and cloud favorites/revisit list and revokes refresh sessions. Locally stored trip plans and recent searches can be cleared separately on your device. If you cannot access your account, email adejkervin@protonmail.com from its address to request deletion; ownership will be checked. You may contact the competent data-protection authority, including the CNIL in France, if a concern remains unresolved."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "intro": "Last updated: September 28, 2026. MadaTours is a discovery and planning guide for Martinique.",
+      "sections": [
+        {
+          "title": "Using the guide",
+          "body": "Core discovery and day planning are available without an account. Use accurate information if you create an account, keep your password private and do not impersonate another person, disrupt the service or attempt to access another person’s saved data."
+        },
+        {
+          "title": "Check before you travel",
+          "body": "Listings, coordinates, photos and source dates are provided as a guide. We do not guarantee current opening hours, access, accessibility, prices or availability. Respect restrictions, landowners, local guidance and weather conditions. The planner’s distances and travel allowances are approximate; verify road routes and conditions before departure. MadaTours does not provide bookings or emergency assistance."
+        },
+        {
+          "title": "Credits and contributions",
+          "body": "Photographs and third-party data remain subject to their stated licenses. Keep attribution when reusing licensed material and obtain permission for other content. Only suggest information you are entitled to share. Suggestions are reviewed and may be edited or declined; they are not published automatically. Reviews written on external services follow those services’ terms."
+        },
+        {
+          "title": "Availability and contact",
+          "body": "Some features require connectivity or third-party services. Offline information can be outdated. We may update the guide and these terms as the service changes. Nothing here removes rights you have under applicable law. For support, corrections or a complaint, contact Kervin Adé at adejkervin@protonmail.com."
+        }
+      ]
+    },
+    "delete-account": {
+      "title": "Delete your MadaTours account",
+      "intro": "You can delete your account directly in the app, without contacting support.",
+      "sections": [
+        {
+          "title": "In the app",
+          "body": "Sign in with your email and password. Open Your account using the account icon, choose Delete account, enter your password and confirm Permanently delete my account. Your account profile and cloud favorites/revisit list are removed. Existing refresh sessions are revoked."
+        },
+        {
+          "title": "If you cannot sign in",
+          "body": "Use Forgot password to recover access. If recovery is unavailable or you prefer to request deletion, email adejkervin@protonmail.com with the subject MadaTours account deletion from the account’s email address. We will check ownership before acting. Never send your password by email."
+        },
+        {
+          "title": "Local data and provider records",
+          "body": "Day trips, recent searches and cached public catalogue data are stored separately on your device. Clear them in the app or device settings. Hosting and authentication providers may retain security logs or backups under their retention policies; contact us for details."
+        }
+      ]
+    }
+  },
+  "fr": {
+    "about": {
+      "title": "À propos de MadaTours",
+      "intro": "Un petit guide de l’île pour une journée qui vous ressemble.",
+      "sections": [
+        {
+          "title": "Découvrez à votre rythme",
+          "body": "MadaTours vous aide à explorer les plages, jardins, sites patrimoniaux, restaurants et activités de Martinique. Recherchez un lieu, consultez la carte et préparez une journée sans créer de compte. Un compte facultatif conserve vos favoris et lieux à revisiter sur plusieurs appareils."
+        },
+        {
+          "title": "Nos sources",
+          "body": "Les informations sont sélectionnées à partir de sources touristiques martiniquaises, dont Martinique Tourisme et Terres du Centre. Chaque fiche affiche ses liens sources et sa date de recherche lorsqu’ils sont disponibles. Horaires, accès et établissements peuvent évoluer : confirmez vos projets auprès du lieu. Les suggestions de l’accueil sont éditoriales, pas un classement de popularité."
+        },
+        {
+          "title": "Cartes, météo et estimations",
+          "body": "Les cartes utilisent OpenStreetMap et Leaflet. La météo de Fort-de-France provient d’Open-Meteo. Les distances sont estimées à vol d’oiseau. Le planificateur ajoute une estimation approximative du temps de conduite ; ce n’est pas un service de calcul routier ou de trafic. L’optimisation conserve la première étape puis suggère la plus proche. Ouvrez les itinéraires pour vérifier le trajet réel."
+        },
+        {
+          "title": "Des photos avec leur contexte",
+          "body": "Les photos des lieux sont accompagnées de leurs crédits. Lorsqu’une photo du lieu manque, une photographie clairement signalée du paysage des Salines illustre l’île. Elle ne représente pas l’établissement. Les photos sont anciennes et recadrées ; elles ne prouvent pas les conditions actuelles."
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact et suggestion de lieu",
+      "intro": "Un bel endroit, une localisation incorrecte ou une information dépassée ? Aidez-nous à améliorer le guide.",
+      "sections": [
+        {
+          "title": "Contacter le responsable du projet",
+          "body": "MadaTours est maintenu par Kervin Adé. Écrivez à adejkervin@protonmail.com pour l’assistance, les corrections, les demandes liées aux données personnelles ou les crédits photo. Les suggestions sont examinées avant publication ; leur envoi n’ajoute pas automatiquement une fiche publique."
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "intro": "Dernière mise à jour : 28 septembre 2026. Cette politique explique l’utilisation des informations sur le site et dans l’application native MadaTours.",
+      "sections": [
+        {
+          "title": "Responsable",
+          "body": "MadaTours est maintenu par Kervin Adé. Contactez adejkervin@protonmail.com pour toute demande d’accès, de correction, de suppression ou toute question sur vos données."
+        },
+        {
+          "title": "Navigation et localisation",
+          "body": "Vous pouvez explorer et préparer une journée sans compte. La localisation n’est demandée que lorsque vous choisissez Utiliser ma position. Elle est utilisée en mémoire sur votre appareil pour calculer les lieux proches et n’est ni enregistrée dans votre compte ni envoyée à notre base. Les requêtes de carte révèlent la zone consultée au fournisseur cartographique. Vous pouvez refuser ou retirer l’autorisation et choisir un point manuellement."
+        },
+        {
+          "title": "Compte facultatif",
+          "body": "Lors de l’inscription, votre nom, email, identifiants de connexion et lieux sauvegardés servent au fonctionnement du compte. Supabase gère l’authentification et conserve des empreintes de mots de passe. L’inscription ne vérifie pas la propriété de l’email. Un cookie de session essentiel maintient votre connexion et des messages liés au compte peuvent être envoyés. L’inscription par téléphone n’est pas proposée actuellement. Le nom du profil ne donne aucun droit administrateur."
+        },
+        {
+          "title": "Données sur votre appareil",
+          "body": "La langue, les recherches récentes, le masquage de l’introduction, les journées, le catalogue public en cache et les copies hors ligne facultatives sont conservés sur votre appareil. Les journées et recherches ne sont pas synchronisées dans notre base. Effacez l’historique dans les commandes de recherche, supprimez les journées dans le planificateur, retirez les copies dans Lieux hors ligne ou effacez les données du site/de l’application dans les réglages de l’appareil."
+        },
+        {
+          "title": "Prestataires et liens externes",
+          "body": "Supabase traite les données de compte et lieux sauvegardés. L’hébergeur traite les requêtes et journaux techniques. OpenStreetMap reçoit les requêtes de carte et Open-Meteo celles de météo pour Fort-de-France ; ces services peuvent recevoir votre adresse IP et des informations de requête. Les itinéraires et avis ouvrent Google Maps, soumis à ses propres règles. Une suggestion ouvre votre application email et n’est envoyée que lorsque vous l’y expédiez. Des prestataires peuvent traiter des informations hors de votre pays selon leurs garanties applicables."
+        },
+        {
+          "title": "Finalités, conservation et choix",
+          "body": "Les données du compte permettent le service demandé ; l’accès facultatif à la position repose sur votre autorisation. Les données techniques de sécurité préviennent les abus. Nous ne vendons pas de données personnelles et l’application n’intègre pas de traceurs publicitaires ou analytiques. Le compte reste conservé jusqu’à sa suppression. Les données locales restent jusqu’à leur effacement ou au retrait de l’application. Les prestataires peuvent conserver des journaux et sauvegardes selon leurs politiques. Contactez-nous pour l’accès, la rectification, la suppression, la limitation, l’opposition ou une copie de vos informations, ainsi que pour les durées et transferts."
+        },
+        {
+          "title": "Supprimer votre compte",
+          "body": "Connectez-vous, ouvrez Votre compte, choisissez Supprimer le compte puis confirmez avec votre mot de passe. Le profil, les favoris et revisites dans le cloud sont supprimés et les sessions de renouvellement révoquées. Les journées et recherches locales se suppriment séparément sur votre appareil. Sans accès au compte, écrivez à adejkervin@protonmail.com depuis son adresse pour demander la suppression ; la propriété sera vérifiée. Vous pouvez saisir l’autorité de protection des données compétente, dont la CNIL en France, si votre demande reste sans solution."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Conditions d’utilisation",
+      "intro": "Dernière mise à jour : 28 septembre 2026. MadaTours est un guide de découverte et de préparation de journées en Martinique.",
+      "sections": [
+        {
+          "title": "Utiliser le guide",
+          "body": "La découverte et le planificateur sont disponibles sans compte. Fournissez des informations exactes à l’inscription, gardez votre mot de passe privé et n’usurpez pas l’identité d’autrui. Ne perturbez pas le service et ne tentez pas d’accéder aux données d’un autre utilisateur."
+        },
+        {
+          "title": "Vérifier avant de partir",
+          "body": "Les fiches, coordonnées, photos et dates de sources servent de guide. Nous ne garantissons pas les horaires, accès, conditions d’accessibilité, prix ou disponibilités actuels. Respectez les restrictions, propriétaires, consignes locales et conditions météo. Les distances et temps du planificateur sont approximatifs ; vérifiez les trajets routiers avant de partir. MadaTours ne propose ni réservation ni assistance d’urgence."
+        },
+        {
+          "title": "Crédits et contributions",
+          "body": "Les photos et données tierces restent soumises à leurs licences. Conservez les crédits lors d’une réutilisation autorisée et obtenez les permissions nécessaires pour les autres contenus. Ne suggérez que des informations que vous pouvez partager. Les suggestions sont examinées, éventuellement modifiées ou refusées, et ne sont pas publiées automatiquement. Les avis externes suivent les règles du service concerné."
+        },
+        {
+          "title": "Disponibilité et contact",
+          "body": "Certaines fonctions nécessitent une connexion ou un service tiers. Les informations hors ligne peuvent être anciennes. Le guide et ces conditions peuvent évoluer. Aucune disposition ne supprime vos droits prévus par la loi applicable. Pour l’assistance, une correction ou une réclamation, contactez Kervin Adé à adejkervin@protonmail.com."
+        }
+      ]
+    },
+    "delete-account": {
+      "title": "Supprimer votre compte MadaTours",
+      "intro": "Vous pouvez supprimer votre compte directement dans l’application sans contacter l’assistance.",
+      "sections": [
+        {
+          "title": "Dans l’application",
+          "body": "Connectez-vous avec votre email et mot de passe. Ouvrez Votre compte via l’icône de compte, choisissez Supprimer le compte, saisissez votre mot de passe puis confirmez Supprimer définitivement mon compte. Le profil, les favoris et revisites dans le cloud sont retirés. Les sessions de renouvellement sont révoquées."
+        },
+        {
+          "title": "Si vous ne pouvez pas vous connecter",
+          "body": "Utilisez Mot de passe oublié pour récupérer l’accès. Si la récupération est indisponible ou si vous préférez demander la suppression, écrivez à adejkervin@protonmail.com avec l’objet Suppression du compte MadaTours depuis l’adresse du compte. Nous vérifierons sa propriété avant d’agir. N’envoyez jamais votre mot de passe par email."
+        },
+        {
+          "title": "Données locales et prestataires",
+          "body": "Journées, recherches récentes et catalogue en cache sont conservés séparément sur votre appareil. Effacez-les dans l’application ou les réglages de l’appareil. Les prestataires d’hébergement et d’authentification peuvent conserver des journaux ou sauvegardes selon leurs règles ; contactez-nous pour plus de détails."
+        }
+      ]
+    }
+  }
+}

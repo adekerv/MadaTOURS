@@ -1,5 +1,84 @@
 // English is the source language. Keep placeholders identical in both languages.
 export const french: Record<string, string> = {
+  "You're offline or the connection is unavailable. Browse the saved guide; updates need a connection.":
+    'Vous êtes hors ligne ou la connexion est indisponible. Consultez le guide sauvegardé ; les mises à jour nécessitent une connexion.',
+  'Find your next stop nearby': 'Trouvez votre prochaine étape à proximité',
+  'Sorted by distance from your location': 'Triés par distance depuis votre position',
+  'Places near me': 'Lieux autour de moi',
+  'A little inspiration': 'Un peu d’inspiration',
+  'Places to discover': 'Des lieux à découvrir',
+  'A few picks from our island guide. Find your own favorite.':
+    'Quelques suggestions de notre guide. Trouvez votre coup de cœur.',
+  'Explore all places': 'Explorer tous les lieux',
+  'Explore {name}': 'Explorer {name}',
+  'Loading map…': 'Chargement de la carte…',
+  'No rating in this guide yet': 'Pas encore de note dans ce guide',
+  'Be the first to rate': 'Donnez le premier avis',
+  'Find this venue on Google Maps to leave a review.':
+    'Retrouvez ce lieu sur Google Maps pour laisser un avis.',
+  'Hours unavailable': 'Horaires indisponibles',
+  'Call the venue': 'Appeler l’établissement',
+  'Venue contact and information': 'Contact et informations du lieu',
+  'Photo credits': 'Crédits photo',
+  'Recent searches': 'Recherches récentes',
+  'Clear history': 'Effacer l’historique',
+  'Welcome to your island guide': 'Bienvenue dans votre guide de l’île',
+  'Your island guide, no account needed': 'Votre guide de l’île, sans compte obligatoire',
+  'Explore beaches, food and hidden corners. Open Plan a day to arrange your stops and keep a trip on this device.':
+    'Explorez plages, bonnes tables et coins discrets. Ouvrez Préparer une journée pour organiser vos étapes et conserver un programme sur cet appareil.',
+  'Plan my first day': 'Préparer ma première journée',
+  'Dismiss introduction': 'Masquer l’introduction',
+  'Try a shorter name, remove accents, or explore these ideas.':
+    'Essayez un nom plus court, sans accents, ou explorez ces idées.',
+  'Public domain': 'Domaine public',
+  'Photo source': 'Source de la photo',
+  'Suggest a place': 'Suggérer un lieu',
+  'Open account settings': 'Ouvrir les paramètres du compte',
+  'Sign in to manage your account': 'Se connecter pour gérer son compte',
+  'Place name': 'Nom du lieu',
+  'Source link': 'Lien de la source',
+  'Your suggestion': 'Votre suggestion',
+  'MadaTours — place suggestion': 'MadaTours — suggestion de lieu',
+  'Prepare a suggestion, then send it from your email app. Nothing is sent automatically.':
+    'Préparez une suggestion, puis envoyez-la depuis votre messagerie. Rien n’est envoyé automatiquement.',
+  'Prepare email suggestion': 'Préparer l’email de suggestion',
+  'Your draft is ready. Send it in your email app to share it with us.':
+    'Votre brouillon est prêt. Envoyez-le depuis votre messagerie pour nous le transmettre.',
+  'Open email draft': 'Ouvrir le brouillon d’email',
+  'Day trip {number}': 'Journée {number}',
+  'Choose a day trip': 'Choisir une journée',
+  'Optimize route order': 'Optimiser l’ordre des étapes',
+  'Keeps your first stop and suggests nearby stops next. Check road directions before setting off.':
+    'Conserve votre première étape puis suggère les lieux les plus proches. Vérifiez les trajets routiers avant de partir.',
+  'Estimated total: {minutes} min': 'Durée totale estimée : {minutes} min',
+  'Visits: {visits} min · Travel allowance: {travel} min':
+    'Visites : {visits} min · Trajets estimés : {travel} min',
+  'Rough driving estimate only. Roads, traffic and stops may take longer; check directions for current travel times.':
+    'Estimation routière approximative. Routes, trafic et arrêts peuvent allonger le trajet ; consultez les itinéraires pour une estimation actuelle.',
+  'Some stops are unavailable. Their travel time is not included.':
+    'Certaines étapes sont indisponibles. Leur temps de trajet n’est pas inclus.',
+  'Your current order is already as short as this suggestion.':
+    'Votre ordre actuel est déjà aussi court que cette suggestion.',
+  'Stops reordered. Your first stop stays the same.':
+    'Étapes réorganisées. Votre première étape reste inchangée.',
+  'Étang des Salines landscape': 'Paysage de l’étang des Salines',
+  'Photo unavailable': 'Photo indisponible',
+  'Martinique scenery · illustrative photo': 'Paysage de Martinique · photo d’illustration',
+  'Discover freely. An account keeps your favorites with you across devices.':
+    'Explorez librement. Un compte conserve vos favoris sur tous vos appareils.',
+  Information: 'Informations',
+  'Weather and map data:': 'Données météo et cartographiques :',
+  About: 'À propos',
+  Contact: 'Contact',
+  'Privacy Policy': 'Politique de confidentialité',
+  Terms: 'Conditions',
+  'Your name': 'Votre nom',
+  'Start exploring right away. No email verification needed.':
+    'Commencez à explorer immédiatement. Aucune vérification par email nécessaire.',
+  'Welcome, {name}.': 'Bienvenue, {name}.',
+  'Thanks for signing up! Welcome, {name}.': 'Merci pour votre inscription ! Bienvenue, {name}.',
+  'Could not finish signup. Try signing in or resetting your password.':
+    'Impossible de terminer l’inscription. Essayez de vous connecter ou de réinitialiser votre mot de passe.',
   'Distance and sorting': 'Distance et tri',
   'A little closer to': 'Un peu plus près de la',
   'A taste of Martinique': 'Les saveurs de la Martinique',

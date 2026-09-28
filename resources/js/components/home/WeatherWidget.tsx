@@ -81,10 +81,11 @@ export function WeatherWidget() {
                 })
               : t('Weather is unavailable right now.')}
         </p>
+        {loading && <div aria-hidden="true" className="skeleton mt-2 h-4 w-3/4 rounded" />}
         {weather && !loading && (
           <p className="mt-1 text-xs text-slate-500">
             <a
-              className="underline"
+              className="inline-flex min-h-11 items-center underline"
               href="https://open-meteo.com/"
               target="_blank"
               rel="noreferrer"

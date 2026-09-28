@@ -32,7 +32,11 @@
     "serve": "php artisan serve --host=127.0.0.1",
     "build:mobile": "vite build --config vite.mobile.config.ts",
     "test:php": "php artisan test",
-    "check": "composer check && npm run lint && npm test && npm run build && npm run format:check"
+    "check": "composer check && npm run lint && npm test && npm run build && npm run format:check",
+    "auth:signup": "node --import tsx scripts/configure-signup.ts",
+    "admin:create": "php artisan admin:create",
+    "store:assets": "node --import tsx scripts/generate-share-assets.ts",
+    "store:screenshots": "node --import tsx scripts/capture-store-screenshots.ts"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",

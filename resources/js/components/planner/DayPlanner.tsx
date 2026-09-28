@@ -3,7 +3,7 @@ import { ArrowDown, ArrowUp, Plus, Trash2, Route, ExternalLink } from 'lucide-re
 import { Modal } from '../ui/Modal';
 import { useI18n } from '../../i18n/I18nProvider';
 import { useDayTrips } from '../../hooks/useDayTrips';
-import { legDirections, moveStop, tripSummary, type DayTrip } from '../../lib/trips';
+import { legDirections, moveStop, tripSummary, optimizeTrip, type DayTrip } from '../../lib/trips';
 import type { Place } from '../../types';
 export function DayPlanner({
   places,
@@ -16,7 +16,8 @@ export function DayPlanner({
 }) {
   const { t } = useI18n();
   const { trips, saveTrips, storageError } = useDayTrips();
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(() => trips[0]?.id ?? null);
+  const [optimization, setOptimization] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
   const trip = trips.find((item) => item.id === selected);
   const update = (next: DayTrip) =>
@@ -29,7 +30,7 @@ export function DayPlanner({
     if (trips.length >= 20) return;
     const next: DayTrip = {
       id: crypto.randomUUID(),
-      name: t('New day trip'),
+      name: t('Day trip {number}', { number: trips.length + 1 }),
       date: '',
       notes: '',
       stops: [],
@@ -38,6 +39,7 @@ export function DayPlanner({
     saveTrips([...trips, next]);
     setSelected(next.id);
     setConfirmDelete(false);
+    setOptimization('');
   };
   const savedIds = new Set(savedPlaces.map((place) => place.id));
   const choices = places
@@ -60,45 +62,74 @@ export function DayPlanner({
             {t('Device storage is unavailable. Changes will be lost when you close the app.')}
           </p>
         )}
-        <div className="flex flex-wrap gap-2">
-          {trips.map((item) => (
+        {trips.length > 0 && (
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="field-label min-w-0 flex-1">
+              {t('Choose a day trip')}
+              <select
+                className="field-input"
+                aria-label={t('Choose a day trip')}
+                value={selected ?? ''}
+                onChange={(event) => {
+                  setSelected(event.target.value);
+                  setConfirmDelete(false);
+                  setOptimization('');
+                }}
+              >
+                <option value="" disabled>
+                  {t('Choose a day trip')}
+                </option>
+                {trips.map((item, index) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name || t('Day trip {number}', { number: index + 1 })}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
-              key={item.id}
-              onClick={() => {
-                setSelected(item.id);
-                setConfirmDelete(false);
-              }}
-              aria-pressed={selected === item.id}
-              className={
-                selected === item.id
-                  ? 'primary-button max-w-full break-words'
-                  : 'secondary-button max-w-full break-words'
-              }
+              disabled={trips.length >= 20}
+              onClick={create}
+              className="secondary-button flex items-center gap-2"
             >
-              {item.name || t('New day trip')}
+              <Plus size={18} />
+              {t('New day trip')}
             </button>
-          ))}
-          <button
-            disabled={trips.length >= 20}
-            onClick={create}
-            className="secondary-button flex items-center gap-2"
-          >
-            <Plus size={18} />
-            {t('New day trip')}
-          </button>
-        </div>
+          </div>
+        )}
         {trips.length >= 20 && (
           <p className="text-sm text-slate-600">
             {t('You can keep up to 20 day trips on this device.')}
           </p>
         )}
         {!trips.length && (
-          <div className="rounded-2xl bg-orange-50 p-6">
-            <Route className="mb-3 text-orange-700" />
+          <div className="rounded-3xl bg-orange-50 p-7 text-center">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 240 100"
+              className="mx-auto mb-4 h-28 w-60 max-w-full"
+            >
+              <path
+                d="M30 72C60 8 97 108 133 43S192 19 211 57"
+                fill="none"
+                stroke="#ea580c"
+                strokeWidth="3"
+                strokeDasharray="5 6"
+              />
+              <circle cx="30" cy="72" r="12" fill="#fed7aa" />
+              <circle cx="133" cy="43" r="14" fill="#fdba74" />
+              <circle cx="211" cy="57" r="12" fill="#c2410c" />
+            </svg>
             <h3 className="font-bold">{t('No day trips yet')}</h3>
             <p className="mt-2 text-sm text-slate-600">
               {t('Create your first plan, then add places in the order you want to visit.')}
             </p>
+            <button
+              onClick={create}
+              className="primary-button mx-auto mt-5 flex items-center gap-2"
+            >
+              <Plus size={18} />
+              {t('New day trip')}
+            </button>
           </div>
         )}
         {trip && (
@@ -258,10 +289,45 @@ export function DayPlanner({
                 );
               })}
             </ol>
+            {trip.stops.length >= 3 && (
+              <div className="space-y-2">
+                <button
+                  className="secondary-button flex items-center gap-2"
+                  onClick={() => {
+                    const next = optimizeTrip(trip, places);
+                    update(next);
+                    setOptimization(
+                      next === trip
+                        ? 'Your current order is already as short as this suggestion.'
+                        : 'Stops reordered. Your first stop stays the same.',
+                    );
+                  }}
+                >
+                  <Route size={18} />
+                  {t('Optimize route order')}
+                </button>
+                <p className="text-xs text-slate-500">
+                  {t(
+                    'Keeps your first stop and suggests nearby stops next. Check road directions before setting off.',
+                  )}
+                </p>
+                {optimization && (
+                  <p role="status" className="text-sm text-orange-800">
+                    {t(optimization)}
+                  </p>
+                )}
+              </div>
+            )}
             {summary && trip.stops.length > 0 && (
               <div className="space-y-2 rounded-2xl bg-orange-50 p-4">
                 <p className="font-semibold">
-                  {t('Visit time: {minutes} min', { minutes: summary.minutes })}
+                  {t('Estimated total: {minutes} min', { minutes: summary.totalMinutes })}
+                </p>
+                <p className="text-sm">
+                  {t('Visits: {visits} min · Travel allowance: {travel} min', {
+                    visits: summary.minutes,
+                    travel: summary.travelMinutes,
+                  })}
                 </p>
                 <p className="text-sm">
                   {t('Straight-line distance: {distance} km', {
@@ -270,9 +336,14 @@ export function DayPlanner({
                 </p>
                 <p className="text-sm text-slate-600">
                   {t(
-                    'Travel time is not included. Open directions for road routes and current estimates.',
+                    'Rough driving estimate only. Roads, traffic and stops may take longer; check directions for current travel times.',
                   )}
                 </p>
+                {summary.missing && (
+                  <p className="text-sm text-amber-800">
+                    {t('Some stops are unavailable. Their travel time is not included.')}
+                  </p>
+                )}
               </div>
             )}
             <p role="status" className="text-xs text-slate-500">

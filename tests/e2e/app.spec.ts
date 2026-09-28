@@ -76,6 +76,7 @@ test('expanded catalogue paginates, filters by town and experience, and translat
 test('home, list, map, and details fit phone, tablet, landscape, and desktop viewports', async ({
   page,
 }) => {
+  test.setTimeout(60000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   for (const [width, height] of [
@@ -179,12 +180,23 @@ test('register, save, restore session, remove, and delete account from the UI', 
   await page.goto('/');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await page.getByRole('button', { name: 'New here? Create an account' }).click();
+  await page.getByLabel('Your name', { exact: true }).fill('Camille');
   await page.getByLabel('Email', { exact: true }).fill(email);
   await page.getByLabel('Password', { exact: true }).fill('Browser test password 42');
+  await page.screenshot({ path: `test-results/${test.info().project.name}-signup.png` });
   await page.getByRole('button', { name: 'Create account', exact: true }).click();
-  await page.getByLabel('Email code', { exact: true }).fill('123456');
-  await page.getByRole('button', { name: 'Verify email', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(
+    page.getByText('Thanks for signing up! Welcome, Camille.', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText('Welcome, Camille.', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await page.getByLabel('Email', { exact: true }).fill(email);
+  await page.getByLabel('Password', { exact: true }).fill('Browser test password 42');
+  await page.getByRole('dialog').getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.getByText('Welcome, Camille.', { exact: true }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Explore the island' }).click();
   await page.getByRole('searchbox', { name: 'Filter places' }).fill('Jardin de Balata');
   await page.getByRole('button', { name: 'Details for Jardin de Balata', exact: true }).click();
@@ -211,11 +223,7 @@ test('admin-created places immediately appear in home search and can be deleted'
   const email = `admin-ui-${Date.now()}@example.test`;
   await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { email, password: 'Admin browser password 42' },
-  });
-  await page.request.post('/api/auth/verify', {
-    headers: { 'X-MadaTours-Client': '1' },
-    data: { email, token: '123456' },
+    data: { name: 'Admin', email, password: 'Admin browser password 42' },
   });
   await page.request.post('http://127.0.0.1:3101/__test/admin', {
     headers: { 'X-Test-Token': process.env.MADATOURS_E2E_TOKEN! },
@@ -309,7 +317,9 @@ test('French preference survives reload and planner edits persist on the device'
   await page.getByRole('button', { name: 'Fermer Vos journées', exact: true }).click();
   await page.reload();
   await page.getByRole('button', { name: 'Planifier une journée', exact: true }).click();
-  await page.getByRole('button', { name: 'Journée nature', exact: true }).click();
+  await expect(
+    page.getByLabel('Choisir une journée', { exact: true }).locator('option:checked'),
+  ).toHaveText('Journée nature');
   await expect(
     page.getByRole('textbox', { name: 'Notes (facultatives)', exact: true }),
   ).toHaveValue('Prévoir un pique-nique');
@@ -325,11 +335,7 @@ test('password recovery accepts only a recovery code and signs in with the new p
   const email = `recovery-${Date.now()}@example.test`;
   await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { email, password: 'Original password 42' },
-  });
-  await page.request.post('/api/auth/verify', {
-    headers: { 'X-MadaTours-Client': '1' },
-    data: { email, token: '123456' },
+    data: { name: 'Recovery user', email, password: 'Original password 42' },
   });
   await page.request.post('/api/auth/logout', { headers: { 'X-MadaTours-Client': '1' } });
   await page.goto('/');

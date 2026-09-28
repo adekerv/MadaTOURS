@@ -2,7 +2,7 @@ import { useI18n } from '../i18n/I18nProvider';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Geolocation } from '@capacitor/geolocation';
-import { List, Map as MapIcon } from 'lucide-react';
+import { List, Map as MapIcon, LocateFixed } from 'lucide-react';
 import { MapComponent } from './MapComponent';
 import { PlaceDetailModal } from './PlaceDetailModal';
 import { Header } from './exploration/Header';
@@ -10,6 +10,7 @@ import { Sidebar } from './exploration/Sidebar';
 import { LocationPrompt } from './exploration/LocationPrompt';
 import { SelectedPlaceOverlay } from './exploration/SelectedPlaceOverlay';
 import { calculateDistance, mapsUrl, matchesInterest, matchesSearch } from '../lib/places-utils';
+import { exploreHash } from '../lib/explore-route';
 import { catalogueTown, matchesExperience } from '../lib/catalogue';
 import type { ExploreParams, Place, UserLocation, User } from '../types';
 interface Props {
@@ -60,9 +61,24 @@ export function ExplorationPage({
   const [sortBy, setSortBy] = useState<'default' | 'rating' | 'hiking' | 'entertainment'>(
     initialParams.sortBy ?? 'default',
   );
-  const [query, setQuery] = useState('');
-  const [town, setTown] = useState('');
-  const [experience, setExperience] = useState('');
+  const [query, setQuery] = useState(initialParams.query ?? '');
+  const [town, setTown] = useState(initialParams.town ?? '');
+  const [experience, setExperience] = useState(initialParams.experience ?? '');
+  useEffect(() => {
+    // Preserve browser Back while making the current filters and selection copyable.
+    // Device coordinates stay private and are never written into the URL.
+    const hash = exploreHash({
+      filter,
+      radius,
+      sortBy: sortBy === 'default' ? undefined : sortBy,
+      selectedPlaceId: selectedId ?? undefined,
+      query,
+      town,
+      experience,
+    });
+    if (location.hash.startsWith('#explore') && location.hash !== hash)
+      history.replaceState(history.state, '', hash);
+  }, [filter, radius, sortBy, selectedId, query, town, experience]);
   const towns = useMemo(
     () =>
       [...new Set(places.map((place) => catalogueTown(place.location)))].sort((a, b) =>
@@ -150,6 +166,8 @@ export function ExplorationPage({
           });
       if (request !== locationRequest.current) return;
       setCenter({ lat: position.coords.latitude, lng: position.coords.longitude, manual: false });
+      setSortBy('default');
+      setMobileView('list');
       setSelectedId(null);
       setLocationOpen(false);
       setManual(false);
@@ -165,6 +183,20 @@ export function ExplorationPage({
   return (
     <div className="explore-shell flex flex-col bg-slate-50">
       <Header onBack={onBack} userLocation={center} onGetLocation={() => setLocationOpen(true)} />
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-orange-100 bg-orange-50 px-4 text-sm">
+        <span className="text-orange-900">
+          {t(
+            center.manual ? 'Find your next stop nearby' : 'Sorted by distance from your location',
+          )}
+        </span>
+        <button
+          className="flex shrink-0 items-center gap-2 font-semibold text-orange-800"
+          onClick={() => setLocationOpen(true)}
+        >
+          <LocateFixed size={17} />
+          {t('Places near me')}
+        </button>
+      </div>
       <main id="main-content" className="relative flex min-h-0 flex-1" tabIndex={-1}>
         <div className={`explore-list ${mobileView === 'list' ? 'mobile-active' : ''}`}>
           <Sidebar

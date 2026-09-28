@@ -10,6 +10,20 @@ import { api, ApiError, errorMessage } from './lib/api';
 import type { ExploreParams, Place, User } from './types';
 import { clearOfflinePlaces, readOfflinePlaces, saveOfflinePlaces } from './lib/offline';
 import { normalizePlace } from './lib/places-utils';
+import { readExploreRoute, exploreHash } from './lib/explore-route';
+import type { InformationRoute } from './components/information/InformationPage';
+
+const InformationPage = lazy(() =>
+  import('./components/information/InformationPage').then((module) => ({
+    default: module.InformationPage,
+  })),
+);
+function readInformationRoute(): InformationRoute | null {
+  const page = location.hash.slice(1);
+  return ['about', 'contact', 'privacy', 'terms', 'delete-account'].includes(page)
+    ? (page as InformationRoute)
+    : null;
+}
 
 const DayPlanner = lazy(() =>
   import('./components/planner/DayPlanner').then((m) => ({ default: m.DayPlanner })),
@@ -25,31 +39,18 @@ const AdminDashboard = lazy(() =>
     default: module.AdminDashboard,
   })),
 );
-function readRoute(): ExploreParams | null {
-  if (!location.hash.startsWith('#explore')) return null;
-  const params = new URLSearchParams(location.hash.split('?')[1]);
-  const filter = params.get('filter');
-  const sortBy = params.get('sort');
-  const selected = Number(params.get('place'));
-  return {
-    filter: filter === 'restaurant' || filter === 'activity' ? filter : 'all',
-    radius: Math.min(100, Math.max(1, Number(params.get('radius')) || 50)),
-    sortBy:
-      sortBy === 'hiking' || sortBy === 'entertainment' || sortBy === 'rating' ? sortBy : undefined,
-    selectedPlaceId: Number.isSafeInteger(selected) && selected > 0 ? selected : undefined,
-  };
-}
 export default function App() {
   const { t } = useI18n();
   useNativeBack();
   const { places, catalogueStatus, refreshPlaces } = usePlaces();
-  const [exploreParams, setExploreParams] = useState(readRoute);
+  const [exploreParams, setExploreParams] = useState(() => readExploreRoute(location.hash));
+  const [informationRoute, setInformationRoute] = useState(readInformationRoute);
   const [user, setUser] = useState<User | null>(null);
   const [favorites, setFavorites] = useState<Place[]>([]);
   const [revisits, setRevisits] = useState<Place[]>([]);
   const [plannerOpen, setPlannerOpen] = useState(false);
   const [offlineOpen, setOfflineOpen] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
   const [adminOpen, setAdminOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [notice, setNotice] = useState('');
@@ -62,7 +63,8 @@ export default function App() {
 
   useEffect(() => {
     const onChange = () => {
-      setExploreParams(readRoute());
+      setExploreParams(readExploreRoute(location.hash));
+      setInformationRoute(readInformationRoute());
       window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', onChange);
@@ -129,7 +131,7 @@ export default function App() {
 
   const toggleSaved = async (collection: 'favorites' | 'revisits', place: Place) => {
     if (!user) {
-      setAuthOpen(true);
+      setAuthMode('login');
       return;
     }
     if (collectionsLoading) {
@@ -182,7 +184,7 @@ export default function App() {
       setNotice(errorMessage(error));
       if (error instanceof ApiError && error.status === 401) {
         setUser(null);
-        setAuthOpen(true);
+        setAuthMode('login');
       }
     } finally {
       pending.current.delete(key);
@@ -200,13 +202,7 @@ export default function App() {
     }
   };
   const startExplore = useCallback((params: ExploreParams = { filter: 'all', radius: 50 }) => {
-    const search = new URLSearchParams({
-      filter: params.filter,
-      radius: String(params.radius ?? 50),
-    });
-    if (params.sortBy) search.set('sort', params.sortBy);
-    if (params.selectedPlaceId) search.set('place', String(params.selectedPlaceId));
-    location.hash = `explore?${search}`;
+    location.hash = exploreHash(params);
   }, []);
   const backHome = () => {
     location.hash = '';
@@ -237,7 +233,13 @@ export default function App() {
           </div>
         }
       >
-        {exploreParams ? (
+        {informationRoute ? (
+          <InformationPage
+            page={informationRoute}
+            signedIn={!!user}
+            onAccount={() => (user ? setAccountOpen(true) : setAuthMode('login'))}
+          />
+        ) : exploreParams ? (
           <ExplorationPage
             key={JSON.stringify(exploreParams)}
             places={places}
@@ -249,7 +251,7 @@ export default function App() {
             onToggleFavorite={(place) => void toggleSaved('favorites', place)}
             onToggleRevisit={(place) => void toggleSaved('revisits', place)}
             user={user}
-            onLoginClick={() => setAuthOpen(true)}
+            onLoginClick={() => setAuthMode('login')}
             initialParams={exploreParams}
             onAdminClick={() => setAdminOpen(true)}
           />
@@ -257,9 +259,11 @@ export default function App() {
           <Homepage
             onStart={startExplore}
             onPlanDay={() => setPlannerOpen(true)}
+            onSignup={() => setAuthMode('register')}
             onOfflineClick={() => setOfflineOpen(true)}
             places={places}
             favorites={favorites}
+            catalogueLoading={catalogueStatus === 'loading'}
             revisits={revisits}
             onRemoveFavorite={(place) => void toggleSaved('favorites', place)}
             onRemoveRevisit={(place) => void toggleSaved('revisits', place)}
@@ -267,7 +271,7 @@ export default function App() {
             sessionLoading={sessionLoading}
             collectionsLoading={collectionsLoading}
             onAccountClick={() => setAccountOpen(true)}
-            onLoginClick={() => setAuthOpen(true)}
+            onLoginClick={() => setAuthMode('login')}
             onLogout={() => void logout()}
             onAdminClick={() => setAdminOpen(true)}
           />
@@ -291,6 +295,21 @@ export default function App() {
           />
         )}
       </Suspense>
+      {!exploreParams && catalogueStatus === 'offline' && (
+        <div
+          role="status"
+          className="mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-2xl bg-amber-50 px-4 py-2 text-sm text-amber-900"
+        >
+          <span>
+            {t(
+              "You're offline or the connection is unavailable. Browse the saved guide; updates need a connection.",
+            )}
+          </span>
+          <button onClick={refreshPlaces} className="shrink-0 font-semibold underline">
+            {t('Retry')}
+          </button>
+        </div>
+      )}
       {accountOpen && user && (
         <AccountModal
           user={user}
@@ -303,12 +322,17 @@ export default function App() {
           }}
         />
       )}
-      {authOpen && (
+      {authMode && (
         <AuthModal
-          onClose={() => setAuthOpen(false)}
-          onLoginSuccess={(loggedIn) => {
+          initialMode={authMode}
+          onClose={() => setAuthMode(null)}
+          onLoginSuccess={(loggedIn, created) => {
             setUser(loggedIn);
-            setNotice(t('You are signed in.'));
+            setNotice(
+              t(created ? 'Thanks for signing up! Welcome, {name}.' : 'Welcome, {name}.', {
+                name: loggedIn.name,
+              }),
+            );
           }}
         />
       )}

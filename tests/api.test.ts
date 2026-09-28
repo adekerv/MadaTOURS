@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { startLaravel } from './support/laravel';
-test('Laravel API: verification, ownership, roles, recovery, logout, validation, and deletion', async () => {
+test('Laravel API: immediate signup, ownership, roles, recovery, logout, validation, and deletion', async () => {
   const app = await startLaravel();
   const { fixture } = app;
   const base = `${app.origin}/api`;
@@ -39,37 +39,23 @@ test('Laravel API: verification, ownership, roles, recovery, logout, validation,
     assert.equal((await call('/health')).status, 200);
     assert.equal((await call('/favorites')).status, 401);
     const signup = await call('/auth/register', 'POST', {
+      name: 'Alice',
       email: 'Alice@example.test',
       password: 'long test password',
       role: 'admin',
     });
     assert.equal(signup.status, 201);
-    assert.equal(signup.body.verificationRequired, true);
-    assert.equal(signup.body.user, null);
-    assert.equal(
-      (
-        await call('/auth/login', 'POST', {
-          email: 'alice@example.test',
-          password: 'long test password',
-        })
-      ).status,
-      403,
-    );
-    const verified = await call('/auth/verify', 'POST', {
-      email: 'alice@example.test',
-      token: '123456',
-    });
-    assert.equal(verified.status, 200);
-    assert.equal(verified.body.user.role, 'user');
-    const aliceId = verified.body.user.id;
+    assert.equal(signup.body.verificationRequired, false);
+    assert.equal(signup.body.user.name, 'Alice');
+    assert.equal(signup.body.user.role, 'user');
+    const aliceId = signup.body.user.id;
     assert.equal((await call('/auth/session')).body.user.id, aliceId);
     await call(
       '/auth/register',
       'POST',
-      { email: 'bob@example.test', password: 'other test password' },
+      { name: 'Bob', email: 'bob@example.test', password: 'other test password' },
       'bob',
     );
-    await call('/auth/verify', 'POST', { email: 'bob@example.test', token: '123456' }, 'bob');
     assert.equal(
       (await call('/favorites', 'POST', { placeId: 1, userId: 'someone-else' })).status,
       200,

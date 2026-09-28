@@ -8,6 +8,7 @@ type Account = {
   email: string;
   password: string;
   confirmed: boolean;
+  name: string;
   verify?: string;
   recovery?: string;
 };
@@ -46,7 +47,7 @@ export function testClients(db: PGlite) {
       session = randomUUID();
       sessions.set(session, user.id);
       return {
-        user: { id: user.id, email: user.email },
+        user: { id: user.id, email: user.email, user_metadata: { display_name: user.name } },
         session: { access_token: session, refresh_token: session, expires_in: 3600 },
       };
     };
@@ -59,23 +60,38 @@ export function testClients(db: PGlite) {
           account() ? success(signIn(account()!)) : failure('refresh_token_not_found'),
         getUser: () =>
           account()
-            ? success({ user: { id: account()!.id, email: account()!.email } })
+            ? success({
+                user: {
+                  id: account()!.id,
+                  email: account()!.email,
+                  user_metadata: { display_name: account()!.name },
+                },
+              })
             : failure('session_not_found'),
-        signUp: async ({ email, password }: { email: string; password: string }) => {
+        signUp: async ({
+          email,
+          password,
+          data,
+        }: {
+          email: string;
+          password: string;
+          data?: { display_name?: string };
+        }) => {
           if ([...accounts.values()].some((a) => a.email === email))
-            return success({ user: null, session: null });
+            return failure('user_already_exists');
           const user: Account = {
             id: randomUUID(),
             email,
             password,
-            confirmed: false,
+            confirmed: true,
+            name: data?.display_name || email.split('@')[0],
             verify: '123456',
           };
           await locked(() =>
             db.query('INSERT INTO auth.users(id,email) VALUES($1,$2)', [user.id, email]),
           );
           accounts.set(user.id, user);
-          return success({ user: { id: user.id, email }, session: null });
+          return success(signIn(user));
         },
         signInWithPassword: ({ email, password }: { email: string; password: string }) => {
           const user = [...accounts.values()].find(
@@ -107,7 +123,9 @@ export function testClients(db: PGlite) {
           const user = account();
           if (!user) return failure('session_not_found');
           user.password = password;
-          return success({ user: { id: user.id, email: user.email } });
+          return success({
+            user: { id: user.id, email: user.email, user_metadata: { display_name: user.name } },
+          });
         },
         signOut: ({ scope }: { scope: string }) => {
           const id = account()?.id;

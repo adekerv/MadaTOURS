@@ -39,12 +39,45 @@ export function moveStop(trip: DayTrip, index: number, direction: -1 | 1): DayTr
 export function tripSummary(trip: DayTrip, places: Place[]) {
   const byId = new Map(places.map((p) => [p.id, p]));
   let distance = 0;
+  let legs = 0;
+  let missing = trip.stops.some((stop) => !byId.has(stop.placeId));
   for (let i = 1; i < trip.stops.length; i++) {
     const a = byId.get(trip.stops[i - 1].placeId),
       b = byId.get(trip.stops[i].placeId);
-    if (a && b) distance += calculateDistance(a.lat, a.lng, b.lat, b.lng);
+    if (a && b) {
+      distance += calculateDistance(a.lat, a.lng, b.lat, b.lng);
+      legs++;
+    } else missing = true;
   }
-  return { distance, minutes: trip.stops.reduce((sum, stop) => sum + stop.minutes, 0) };
+  const minutes = trip.stops.reduce((sum, stop) => sum + stop.minutes, 0);
+  // A planning allowance, not a routed ETA: 1.4x straight-line distance at 30 km/h,
+  // plus five minutes per transfer. Live directions remain the source for road times.
+  const travelMinutes = Math.ceil(((distance * 1.4) / 30) * 60 + legs * 5);
+  return { distance, minutes, travelMinutes, totalMinutes: minutes + travelMinutes, missing };
+}
+export function optimizeTrip(trip: DayTrip, places: Place[]): DayTrip {
+  const byId = new Map(places.map((place) => [place.id, place]));
+  if (trip.stops.length < 3 || trip.stops.some((stop) => !byId.has(stop.placeId))) return trip;
+  const stops = [trip.stops[0]];
+  const remaining = trip.stops.slice(1);
+  while (remaining.length) {
+    const previous = byId.get(stops[stops.length - 1].placeId)!;
+    let nearest = 0;
+    let distance = Infinity;
+    remaining.forEach((stop, index) => {
+      const next = byId.get(stop.placeId)!;
+      const candidate = calculateDistance(previous.lat, previous.lng, next.lat, next.lng);
+      if (candidate < distance) {
+        nearest = index;
+        distance = candidate;
+      }
+    });
+    stops.push(remaining.splice(nearest, 1)[0]);
+  }
+  const candidate = { ...trip, stops };
+  return tripSummary(candidate, places).distance < tripSummary(trip, places).distance
+    ? { ...candidate, updatedAt: new Date().toISOString() }
+    : trip;
 }
 export function legDirections(place: Place, previous?: Place) {
   const query = new URLSearchParams({ api: '1', destination: `${place.lat},${place.lng}` });

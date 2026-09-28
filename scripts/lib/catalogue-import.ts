@@ -9,6 +9,10 @@ const point = z.object({
   lng: z.number().min(-61.25).max(-60.79),
   sources: sourceSchema.array().min(1),
 });
+const correction = point.extend({
+  description: z.string().min(1).max(3000).optional(),
+  description_fr: z.string().min(1).max(3000).optional(),
+});
 export const batchSchema = z.object({
   batch: z.string().regex(/^[a-z0-9-]+$/),
   checkedAt: z.iso.date(),
@@ -28,8 +32,8 @@ export const batchSchema = z.object({
     z.object({
       id: z.number().int().positive(),
       name: z.string(),
-      before: point,
-      after: point,
+      before: correction,
+      after: correction,
     }),
   ),
 });
@@ -60,7 +64,9 @@ export function planImport(batch: CatalogueBatch, rows: CatalogueRow[], receipt:
   const updates = batch.updates.filter((update) => {
     const current = rows.find((row) => row.id === update.id);
     if (!current) return false;
-    const values = { lat: current.lat, lng: current.lng, sources: current.sources };
+    if (Object.keys(update.before).sort().join() !== Object.keys(update.after).sort().join())
+      throw new Error(`Correction fields differ: ${update.name}`);
+    const values = Object.fromEntries(Object.keys(update.before).map((key) => [key, current[key]]));
     if (isDeepStrictEqual(values, update.after)) return false;
     if (current.name !== update.name || !isDeepStrictEqual(values, update.before))
       throw new Error(`Existing listing changed; review before import: ${update.name}`);

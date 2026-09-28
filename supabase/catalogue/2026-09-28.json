@@ -1,0 +1,247 @@
+{
+  "batch": "description-review-2026-09-28",
+  "checkedAt": "2026-09-28",
+  "additions": [],
+  "updates": [
+    {
+      "id": 56,
+      "name": "Le Sunny's Beach",
+      "before": {
+        "lat": 14.4649963,
+        "lng": -60.9061634,
+        "sources": [
+          {
+            "url": "https://www.martinique.org/fr/bars-restaurants/restaurants/le-sunnys-beach",
+            "title": "Comité Martiniquais du Tourisme",
+            "fields": ["Name", "Town", "Category", "Description", "Map point", "Address"],
+            "checkedAt": "2026-09-24"
+          }
+        ],
+        "description": "A restaurant listed at Anse Figuier. Contact the venue for its current menu and service arrangements. Listed address: Anse Figuier, 97211.",
+        "description_fr": "Un restaurant répertorié à l’Anse Figuier. Contactez l’établissement pour sa carte et les modalités de service actuelles. Adresse indiquée : Anse Figuier, 97211."
+      },
+      "after": {
+        "lat": 14.4649963,
+        "lng": -60.9061634,
+        "sources": [
+          {
+            "url": "https://www.martinique.org/fr/bars-restaurants/restaurants/le-sunnys-beach",
+            "title": "Comité Martiniquais du Tourisme",
+            "fields": ["Name", "Town", "Category", "Description", "Map point", "Address"],
+            "checkedAt": "2026-09-28"
+          }
+        ],
+        "description": "Traditional-cuisine restaurant at Anse Figuier in Rivière-Pilote, beside the bay's beach. Address: Anse Figuier, 97211.",
+        "description_fr": "Restaurant de cuisine traditionnelle à l’Anse Figuier, à Rivière-Pilote, près de la plage de la baie. Adresse : Anse Figuier, 97211."
+      }
+    },
+    {
+      "id": 64,
+      "name": "Quinoa Beach",
+      "before": {
+        "lat": 14.6421449,
+        "lng": -61.1388076,
+        "sources": [
+          {
+            "url": "https://www.martinique.org/fr/bars-restaurants/restaurants/quinoa-beach",
+            "title": "Comité Martiniquais du Tourisme",
+            "fields": ["Name", "Town", "Category", "Description", "Map point", "Address"],
+            "checkedAt": "2026-09-24"
+          }
+        ],
+        "description": "A restaurant listed on Rue de la Plage in Case-Pilote. Ask the venue about its current menu and opening days. Listed address: Rue de la Plage.",
+        "description_fr": "Un restaurant répertorié rue de la Plage à Case-Pilote. Renseignez-vous auprès du lieu sur la carte et les jours d’ouverture. Adresse indiquée : Rue de la Plage."
+      },
+      "after": {
+        "lat": 14.6421449,
+        "lng": -61.1388076,
+        "sources": [
+          {
+            "url": "https://www.martinique.org/fr/quinoa-beach",
+            "title": "Comité Martiniquais du Tourisme",
+            "fields": ["Name", "Town", "Category", "Description", "Map point", "Address"],
+            "checkedAt": "2026-09-28"
+          }
+        ],
+        "description": "Traditional-cuisine restaurant on Rue de la Plage in Case-Pilote, on Martinique’s Caribbean coast.",
+        "description_fr": "Restaurant de cuisine traditionnelle situé rue de la Plage, à Case-Pilote, sur la côte caraïbe de la Martinique."
+      }
+    },
+    {
+      "id": 348,
+      "name": "Senat Beach",
+      "before": {
+        "lat": 14.6179855,
+        "lng": -61.1035479,
+        "sources": [
+          {
+            "url": "https://terresducentremartinique.fr/restaurant/senat-beach/",
+            "title": "Terres du Centre Martinique",
+            "fields": ["Name", "Town", "Description", "Address", "Telephone"],
+            "checkedAt": "2026-09-24"
+          },
+          {
+            "url": "https://terresducentremartinique.fr/se-restaurer/",
+            "title": "Terres du Centre Martinique — map",
+            "fields": ["Map point"],
+            "checkedAt": "2026-09-24"
+          }
+        ],
+        "description": "A restaurant address beside Anse Madame in Schœlcher. Confirm the current menu directly. Listed street: 6 Rue Bernard Boromé. Contact: +596 596 614 644.",
+        "description_fr": "Une adresse de restauration près de l’Anse Madame à Schœlcher. Confirmez directement la carte actuelle. Voie indiquée : 6 Rue Bernard Boromé. Contact : +596 596 614 644."
+      },
+      "after": {
+        "lat": 14.6179855,
+        "lng": -61.1035479,
+        "sources": [
+          {
+            "url": "https://terresducentremartinique.fr/restaurant/senat-beach/",
+            "title": "Terres du Centre Martinique",
+            "fields": ["Name", "Town", "Description", "Address", "Telephone"],
+            "checkedAt": "2026-09-28"
+          },
+          {
+            "url": "https://terresducentremartinique.fr/se-restaurer/",
+            "title": "Terres du Centre Martinique — map",
+            "fields": ["Map point"],
+            "checkedAt": "2026-09-24"
+          }
+        ],
+        "description": "Restaurant at 6 Rue Bernard Boromé, by Anse Madame in Schœlcher. The tourism office lists lunchtime service and evening service from Thursday to Saturday; call to confirm before visiting. Contact: +596 596 61 46 44.",
+        "description_fr": "Restaurant au 6 rue Bernard Boromé, près de l’Anse Madame à Schœlcher. L’office de tourisme indique un service le midi et le soir du jeudi au samedi ; appelez avant votre visite pour confirmer. Contact : +596 596 61 46 44."
+      }
+    },
+    {
+      "id": 359,
+      "name": "Chez Bernadette",
+      "before": {
+        "lat": 14.6031997,
+        "lng": -61.0684527,
+        "sources": [
+          {
+            "url": "https://terresducentremartinique.fr/restaurant/chez-bernadette/",
+            "title": "Terres du Centre Martinique",
+            "fields": ["Name", "Town", "Description", "Address", "Telephone"],
+            "checkedAt": "2026-09-24"
+          },
+          {
+            "url": "https://terresducentremartinique.fr/se-restaurer/",
+            "title": "Terres du Centre Martinique — map",
+            "fields": ["Map point"],
+            "checkedAt": "2026-09-24"
+          }
+        ],
+        "description": "A food kiosk on Place de la Savane in Fort-de-France. Confirm the current dishes and service times. Contact: +596 696 73 43 62.",
+        "description_fr": "Un kiosque de restauration sur la place de la Savane à Fort-de-France. Confirmez les plats et horaires de service. Contact : +596 696 73 43 62."
+      },
+      "after": {
+        "lat": 14.6031997,
+        "lng": -61.0684527,
+        "sources": [
+          {
+            "url": "https://terresducentremartinique.fr/restaurant/chez-bernadette/",
+            "title": "Terres du Centre Martinique",
+            "fields": ["Name", "Town", "Description", "Address", "Telephone"],
+            "checkedAt": "2026-09-28"
+          },
+          {
+            "url": "https://terresducentremartinique.fr/se-restaurer/",
+            "title": "Terres du Centre Martinique — map",
+            "fields": ["Map point"],
+            "checkedAt": "2026-09-24"
+          }
+        ],
+        "description": "Find Chez Bernadette at kiosk 9 on Place de la Savane in central Fort-de-France, a food stop beside the city's main waterfront park. Contact: +596 696 73 43 62.",
+        "description_fr": "Retrouvez Chez Bernadette au kiosque 9 de la place de la Savane, au centre de Fort-de-France, pour une halte gourmande près du grand parc du front de mer. Contact : +596 696 73 43 62."
+      }
+    },
+    {
+      "id": 362,
+      "name": "Cotton BAY",
+      "before": {
+        "lat": 14.6013238,
+        "lng": -61.0754254,
+        "sources": [
+          {
+            "url": "https://terresducentremartinique.fr/restaurant/cotton-bay/",
+            "title": "Terres du Centre Martinique",
+            "fields": ["Name", "Town", "Description", "Address", "Telephone"],
+            "checkedAt": "2026-09-24"
+          },
+          {
+            "url": "https://terresducentremartinique.fr/se-restaurer/",
+            "title": "Terres du Centre Martinique — map",
+            "fields": ["Map point"],
+            "checkedAt": "2026-09-24"
+          }
+        ],
+        "description": "A bar and dining address on the Fort-de-France waterfront. Confirm the current programme and menu. Contact: +596 696 16 76 76.",
+        "description_fr": "Une adresse de bar et de restauration sur le front de mer de Fort-de-France. Confirmez le programme et la carte. Contact : +596 696 16 76 76."
+      },
+      "after": {
+        "lat": 14.6013238,
+        "lng": -61.0754254,
+        "sources": [
+          {
+            "url": "https://terresducentremartinique.fr/restaurant/cotton-bay/",
+            "title": "Terres du Centre Martinique",
+            "fields": ["Name", "Town", "Description", "Address", "Telephone"],
+            "checkedAt": "2026-09-28"
+          },
+          {
+            "url": "https://terresducentremartinique.fr/se-restaurer/",
+            "title": "Terres du Centre Martinique — map",
+            "fields": ["Map point"],
+            "checkedAt": "2026-09-24"
+          }
+        ],
+        "description": "Cotton BAY welcomes visitors on Rue du Grand Caraïbes, on the Fort-de-France waterfront. Contact the team for dining and bar service: +596 696 16 76 76.",
+        "description_fr": "Cotton BAY accueille les visiteurs rue du Grand Caraïbes, sur le front de mer de Fort-de-France. Contactez l’équipe pour la restauration et le bar : +596 696 16 76 76."
+      }
+    },
+    {
+      "id": 363,
+      "name": "La Presqu’ilienne",
+      "before": {
+        "lat": 14.661045,
+        "lng": -61.0458066,
+        "sources": [
+          {
+            "url": "https://terresducentremartinique.fr/restaurant/la-presquilienne/",
+            "title": "Terres du Centre Martinique",
+            "fields": ["Name", "Town", "Description", "Address", "Telephone"],
+            "checkedAt": "2026-09-24"
+          },
+          {
+            "url": "https://terresducentremartinique.fr/se-restaurer/",
+            "title": "Terres du Centre Martinique — map",
+            "fields": ["Map point"],
+            "checkedAt": "2026-09-24"
+          }
+        ],
+        "description": "A food and restaurant address in the Presqu’île area of Saint-Joseph. Confirm the current service offer. Listed street: route de bambou du champ. Contact: +596 696 03 89 80.",
+        "description_fr": "Une adresse de restauration au quartier Presqu’île de Saint-Joseph. Confirmez les services actuels. Voie indiquée : route de bambou du champ. Contact : +596 696 03 89 80."
+      },
+      "after": {
+        "lat": 14.661045,
+        "lng": -61.0458066,
+        "sources": [
+          {
+            "url": "https://terresducentremartinique.fr/restaurant/la-presquilienne/",
+            "title": "Terres du Centre Martinique",
+            "fields": ["Name", "Town", "Description", "Address", "Telephone"],
+            "checkedAt": "2026-09-28"
+          },
+          {
+            "url": "https://terresducentremartinique.fr/se-restaurer/",
+            "title": "Terres du Centre Martinique — map",
+            "fields": ["Map point"],
+            "checkedAt": "2026-09-24"
+          }
+        ],
+        "description": "A point-chaud (hot-snack counter) on Route de Bambou du Champ in Saint-Joseph’s Presqu’île neighbourhood. Contact: +596 696 03 89 80.",
+        "description_fr": "Un point-chaud situé route de Bambou du Champ, au quartier Presqu’île à Saint-Joseph. Contact : +596 696 03 89 80."
+      }
+    }
+  ]
+}

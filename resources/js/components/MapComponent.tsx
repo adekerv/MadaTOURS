@@ -84,6 +84,7 @@ function PlaceMarker({ place, onSelect }: { place: Place; onSelect: (place: Plac
 export function MapComponent(props: Props) {
   const { t } = useI18n();
   const [tileError, setTileError] = useState(false);
+  const [tilesLoading, setTilesLoading] = useState(true);
   const userIcon = useMemo(
     () =>
       L.divIcon({
@@ -106,13 +107,22 @@ export function MapComponent(props: Props) {
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          eventHandlers={{ tileerror: () => setTileError(true) }}
+          eventHandlers={{
+            loading: () => setTilesLoading(true),
+            load: () => setTilesLoading(false),
+            tileerror: () => {
+              setTileError(true);
+              setTilesLoading(false);
+            },
+          }}
         />
         <ZoomControl position="topright" />
         <MapHandler {...props} />
         <Marker
           position={[props.userLocation.lat, props.userLocation.lng]}
           icon={userIcon}
+          interactive={false}
+          keyboard={false}
           title={props.userLocation.manual ? t('Search center') : t('Your location')}
           alt={t('Search center')}
         />
@@ -125,6 +135,14 @@ export function MapComponent(props: Props) {
           <PlaceMarker key={place.id} place={place} onSelect={props.onPlaceSelect} />
         ))}
       </MapContainer>
+      {tilesLoading && !tileError && (
+        <div role="status" className="pointer-events-none absolute inset-0 z-[450] bg-orange-50/70">
+          <div className="skeleton h-full w-full" />
+          <span className="absolute left-4 top-4 rounded-xl bg-white px-4 py-3 text-sm text-slate-700 shadow">
+            {t('Loading map…')}
+          </span>
+        </div>
+      )}
       {tileError && (
         <p
           role="status"

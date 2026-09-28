@@ -11,7 +11,7 @@ export function useNativeBack() {
         dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
         return;
       }
-      if (location.hash.startsWith('#explore')) location.hash = '';
+      if (location.hash && location.hash !== '#') location.hash = '';
       else void App.minimizeApp();
     });
     return () => {

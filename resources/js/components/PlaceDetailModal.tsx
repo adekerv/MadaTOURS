@@ -1,6 +1,6 @@
 import { useI18n } from '../i18n/I18nProvider';
-import { Heart, Calendar, ExternalLink, Clock, Star, MapPin } from 'lucide-react';
-import { useState } from 'react';
+import { Heart, Calendar, ExternalLink, Clock, Star } from 'lucide-react';
+import { PlacePhoto } from './ui/PlacePhoto';
 import type { Place, User } from '../types';
 import { Modal } from './ui/Modal';
 export function PlaceDetailModal({
@@ -25,30 +25,12 @@ export function PlaceDetailModal({
   googleMapsUrl: string;
 }) {
   const { t, language } = useI18n();
-  const [imageError, setImageError] = useState(false);
+  const venueSearch = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name}, ${place.location}, Martinique`)}`;
+  const phone = /Contact:\s*(\+[\d\s-]{8,})/.exec(place.description)?.[1]?.replace(/[\s-]/g, '');
+  const contactUrl = phone ? `tel:${phone}` : place.sources?.[0]?.url || venueSearch;
   return (
     <Modal title={place.name} onClose={onClose} wide>
-      <div className="relative h-40 bg-orange-50 sm:h-56">
-        {place.image && !imageError ? (
-          <img
-            src={place.image}
-            onError={() => setImageError(true)}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="grid h-full place-items-center text-orange-600">
-            <MapPin size={48} />
-          </div>
-        )}
-        <span className="absolute bottom-2 right-3 rounded bg-white/90 px-2 py-1 text-xs text-slate-700">
-          {place.image && !imageError
-            ? (place.photoCredit?.caption ?? t('Illustrative photo'))
-            : t('No venue photo yet')}
-        </span>
-      </div>
+      <PlacePhoto place={place} className="h-44 sm:h-64" />
       <div className="space-y-5 p-5 sm:p-7">
         <p className="text-sm font-semibold text-orange-700">
           {place.type === 'restaurant' ? t('Restaurant') : t('Activity')} · {place.location}
@@ -63,7 +45,26 @@ export function PlaceDetailModal({
               {t('Guide rating')}
             </dt>
             <dd className="mt-1 font-semibold">
-              {place.rating !== undefined ? `${place.rating} / 5` : t('Not rated')}
+              {place.rating !== undefined ? (
+                `${place.rating} / 5`
+              ) : (
+                <>
+                  <span className="block text-sm font-normal text-slate-600">
+                    {t('No rating in this guide yet')}
+                  </span>
+                  <a
+                    href={venueSearch}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center text-sm text-orange-800 underline"
+                  >
+                    {t('Be the first to rate')}
+                  </a>
+                  <span className="block text-xs font-normal text-slate-500">
+                    {t('Find this venue on Google Maps to leave a review.')}
+                  </span>
+                </>
+              )}
             </dd>
           </div>
           <div className="rounded-2xl bg-slate-50 p-4">
@@ -71,7 +72,21 @@ export function PlaceDetailModal({
               <Clock size={17} />
               {t('Listed hours')}
             </dt>
-            <dd className="mt-1 font-semibold">{place.hours || t('Check with the venue')}</dd>
+            <dd className="mt-1 font-semibold">
+              {place.hours || (
+                <>
+                  <span className="block">{t('Hours unavailable')}</span>
+                  <a
+                    href={contactUrl}
+                    target={phone ? undefined : '_blank'}
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center text-sm text-orange-800 underline"
+                  >
+                    {t(phone ? 'Call the venue' : 'Venue contact and information')}
+                  </a>
+                </>
+              )}
+            </dd>
           </div>
         </dl>
         <p className="text-xs leading-relaxed text-slate-500">
@@ -161,6 +176,14 @@ export function PlaceDetailModal({
             </a>{' '}
             · {t('Displayed cropped to fit.')}
           </p>
+        )}
+        {!place.photoCredit && (
+          <a
+            href="#about"
+            className="inline-flex min-h-11 items-center text-xs text-orange-800 underline"
+          >
+            {t('Photo credits')}
+          </a>
         )}
         {place.access === 'restricted' ? (
           <p role="note" className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">

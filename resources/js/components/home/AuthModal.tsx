@@ -7,14 +7,17 @@ type Mode = 'login' | 'register' | 'verify' | 'forgot' | 'reset';
 export function AuthModal({
   onClose,
   onLoginSuccess,
+  initialMode = 'login',
 }: {
   onClose: () => void;
-  onLoginSuccess: (user: User) => void;
+  initialMode?: 'login' | 'register';
+  onLoginSuccess: (user: User, created: boolean) => void;
 }) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const hint = useId();
-  const [mode, setMode] = useState<Mode>('login');
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [token, setToken] = useState('');
   const [error, setError] = useState('');
@@ -45,16 +48,23 @@ export function AuthModal({
         mode === 'forgot' ? 'forgot-password' : mode === 'reset' ? 'reset-password' : mode;
       const result = await api<{ user?: User | null; verificationRequired?: boolean }>(
         `/auth/${endpoint}`,
-        { method: 'POST', body: JSON.stringify({ email, password, token }) },
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            email,
+            password,
+            token,
+            ...(mode === 'register' ? { name, language } : {}),
+          }),
+        },
       );
       if (result.user) {
-        onLoginSuccess(result.user);
+        onLoginSuccess(result.user, mode === 'register');
         onClose();
         return;
       }
       if (mode === 'register') {
-        change('verify');
-        setMessage('Check your email and enter the verification code.');
+        setError('Could not finish signup. Try signing in or resetting your password.');
       } else if (mode === 'forgot') {
         change('reset');
         setMessage(
@@ -90,6 +100,26 @@ export function AuthModal({
         <p className="text-sm text-slate-600">
           {t('Save your favorite places and keep a list of places to visit again.')}
         </p>
+        {mode === 'register' && (
+          <>
+            <label className="field-label">
+              {t('Your name')}
+              <input
+                type="text"
+                autoComplete="name"
+                required
+                maxLength={80}
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                className="field-input"
+                disabled={busy}
+              />
+            </label>
+            <p className="text-sm text-slate-600">
+              {t('Start exploring right away. No email verification needed.')}
+            </p>
+          </>
+        )}
         <label className="field-label">
           {t('Email')}
           <input

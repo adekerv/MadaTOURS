@@ -25,7 +25,7 @@ php artisan supabase:check
 
 Run database migrations once in a controlled release step, after a backup. Container startup deliberately does not migrate a shared database. SQL Editor installations can use `php artisan db:export-setup`; later `migrate --seed` safely records the Laravel migration history. The first migration requires Supabase's existing auth schema.
 
-`/up` checks application liveness. `/api/health` checks the database schema through the public Data API. After release, verify signup/email confirmation, login, saved lists in another browser, recovery and admin changes. Existing Express cookies are replaced by Laravel sessions, so users sign in again.
+`/up` checks application liveness. `/api/health` checks the database schema through the public Data API. After release, verify immediate signup and the welcome message, login, saved lists in another browser, recovery and admin changes. Existing Express cookies are replaced by Laravel sessions, so users sign in again.
 
 ## Sessions, cache and scaling
 

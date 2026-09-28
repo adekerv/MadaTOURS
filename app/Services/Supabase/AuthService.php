@@ -44,7 +44,15 @@ class AuthService
             throw new ApiException(503, 'Your account profile is not available.');
         }
 
-        return ['id' => $user['id'], 'email' => $user['email'] ?? '', 'role' => $profiles[0]['role'] === 'admin' ? 'admin' : 'user'];
+        $name = $user['user_metadata']['display_name'] ?? null;
+        $name = is_string($name) ? trim(preg_replace('/[\p{C}<>]/u', '', $name)) : '';
+
+        return [
+            'id' => $user['id'],
+            'name' => mb_substr($name ?: (strtok($user['email'] ?? '', '@') ?: 'Explorer'), 0, 80),
+            'email' => $user['email'] ?? '',
+            'role' => $profiles[0]['role'] === 'admin' ? 'admin' : 'user',
+        ];
     }
 
     public function authenticate(string $path, array $input): array
@@ -89,9 +97,9 @@ class AuthService
         $this->request->session()->regenerateToken();
     }
 
-    public function limit(string $kind, string $email): void
+    public function limit(string $kind, string $identity): void
     {
-        foreach ([[$kind.':ip:'.$this->request->ip(), 30], [$kind.':email:'.$email, 10]] as [$identifier, $ceiling]) {
+        foreach ([[$kind.':ip:'.$this->request->ip(), 30], [$kind.':identity:'.$identity, 10]] as [$identifier, $ceiling]) {
             $allowed = $this->client->request('POST', '/rest/v1/rpc/mt_check_rate_limit', ['identifier' => hash('sha256', $identifier), 'ceiling' => $ceiling], admin: true);
             if ($allowed !== true) {
                 throw new ApiException(429, 'Too many attempts. Please try again in 15 minutes.');

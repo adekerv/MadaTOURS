@@ -6,19 +6,28 @@ use App\Exceptions\ApiException;
 use App\Http\Requests\AuthRequest;
 use App\Services\Supabase\AuthService;
 use App\Services\Supabase\SupabaseClient;
+use App\Services\WelcomeMessage;
 use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
     public function __construct(private AuthService $auth, private SupabaseClient $client) {}
 
-    public function register(AuthRequest $request): JsonResponse
+    public function register(AuthRequest $request, WelcomeMessage $welcome): JsonResponse
     {
         $input = $request->validated();
         $this->auth->limit('auth', $input['email']);
-        $data = $this->auth->authenticate('signup', $input);
+        $data = $this->auth->authenticate('signup', [
+            'email' => $input['email'],
+            'password' => $input['password'],
+            'data' => ['display_name' => $input['name'], 'language' => $input['language'] ?? 'en'],
+        ]);
+        $user = isset($data['access_token']) ? $this->auth->user() : null;
+        if ($user && $user['email']) {
+            $welcome->send($user, $input['language'] ?? 'en');
+        }
 
-        return response()->json(['user' => isset($data['access_token']) ? $this->auth->user() : null, 'verificationRequired' => ! isset($data['access_token'])], 201);
+        return response()->json(['user' => $user, 'verificationRequired' => $user === null], 201);
     }
 
     public function login(AuthRequest $request): JsonResponse

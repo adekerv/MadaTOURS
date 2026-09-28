@@ -29,29 +29,29 @@ Review `supabase/setup.sql` and run it once in your project's SQL Editor. It is 
 
 Do not use `migrate:fresh`, `db:wipe` or drop the auth schema on an existing project. Back up before adopting a production database. For catalogue expansion on an already seeded database, follow [catalogue import](CATALOGUE-RESEARCH.md).
 
-## 3. Configure email verification and recovery
+## 3. Immediate signup, welcome emails and password recovery
 
-Enable email signup and confirmation in Supabase Auth. Set the Auth Site URL to the deployed Laravel HTTPS origin. The app accepts numeric codes rather than link callbacks:
+Keep the email provider enabled, and disable **Confirm email** for new signups. The application asks for a display name, email and password, then signs the user in immediately. Name metadata is used only for display; administrator roles still come from the protected profile table. Phone signup is postponed.
 
-- Use `supabase/templates/confirm-signup.html` for signup confirmation.
-- Use `supabase/templates/reset-password.html` for password recovery.
-- Both templates must contain `{{ .Token }}`. Signup and recovery use separate verification types.
+```sh
+npm run auth:signup
+npm run auth:signup -- --apply
+```
 
-Configure a transactional SMTP provider for delivery to your intended users. Keep its password only in private configuration.
+This explicit maintenance command requires a private `SUPABASE_ACCESS_TOKEN`. It previews, backs up and changes only `mailer_autoconfirm`, then reads it back. It does not reset existing passwords, enable SMS, or configure SMTP. Remove management credentials from production runtime environments.
 
-The optional management tool previews changes by default:
+Welcome messages are sent by Laravel using `resources/views/emails/welcome.blade.php` and its text alternative. Set `MAIL_MAILER=smtp`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, and `MAIL_FROM_NAME` in private configuration to deliver them. With `MAIL_MAILER=log`, emails are previews in the local Laravel log, not delivered messages. A delivery failure is logged without credentials and does not undo a successful signup. The app always shows the signup thank-you and personalized welcome.
+
+Password recovery still verifies ownership using a numeric code sent by Supabase. Set the Auth Site URL to the deployed Laravel HTTPS origin and use `supabase/templates/reset-password.html` as the recovery template. The existing confirmation template and verification endpoint remain only for older pending accounts; new signups do not enter this flow.
+
+For hosted recovery email delivery, configure your provider in Supabase separately. The existing helper previews/applies the numeric templates and can configure `SUPABASE_SMTP_*` settings when credentials are available:
 
 ```sh
 npm run auth:configure
-npm run auth:configure -- --apply
-# To configure the SMTP settings from SUPABASE_SMTP_* too:
-npm run auth:configure -- --smtp
 npm run auth:configure -- --smtp --apply
 ```
 
-This maintenance tool requires `SUPABASE_ACCESS_TOKEN` from your Supabase account settings. It backs up affected configuration, applies the requested settings, and reads them back. Without `--smtp` it does not submit SMTP credentials. It does not disable confirmation or send a test email. Remove management credentials from runtime environments afterward.
-
-Verify delivery with an inbox you control: create an account, enter its confirmation code, sign out and back in, then request a recovery code and set a new password. The automated test provider cannot verify real SMTP delivery.
+This helper does not re-enable confirmation. Laravel welcome SMTP and Supabase recovery SMTP are separate settings and may use the same provider. The built-in Supabase sender has recipient restrictions, so it is not a replacement for production SMTP. Without a provider, do not claim real inbox delivery has been verified.
 
 ## 4. Run and provision administrators
 
@@ -59,10 +59,12 @@ Verify delivery with an inbox you control: create an account, enter its confirma
 composer dev
 # In another terminal:
 php artisan supabase:check
-php artisan admin:grant your-verified-email@example.com
+php artisan admin:create your-email@example.com --name="Your name"
 ```
 
-Open `http://127.0.0.1:8000/api/health`; a configured schema returns `{"status":"ok","database":"supabase","framework":"laravel"}`. Administrator provisioning requires an existing verified account and uses only server-held credentials. Users cannot assign their own roles.
+Open `http://127.0.0.1:8000/api/health`; a configured schema returns `{"status":"ok","database":"supabase","framework":"laravel"}`. Administrator provisioning uses only server-held credentials and can create an account or explicitly update an existing one. Users cannot assign their own roles.
+
+The generated password is written once to a private file under `.data/admin-credentials/` (file permissions 0600; ignored by Git). The command verifies password sign-in and administrator access. It refuses to replace an existing password unless `--replace-password` is explicitly supplied. `admin:grant` remains available when an existing account only needs a role change. Passwords are held by Supabase Auth as hashes, not in application source code.
 
 ## 5. Verify a deployment
 

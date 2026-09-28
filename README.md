@@ -2,7 +2,7 @@
 
 A Laravel 13 application for discovering Martinique, with a React 19 / TypeScript interface, Leaflet maps, and Supabase PostgreSQL and Auth. Laravel serves the website and every API endpoint; Vite builds the interface. Capacitor projects support iOS and Android.
 
-Browse 354 published places, search in French or English, create a verified account, save favorites and revisit lists across devices, recover a password, and manage places as an administrator. Day plans and offline place copies remain on the device; map tiles and itineraries are not synced offline.
+Browse 354 published places, search in French or English, create an account without email verification, save favorites and revisit lists across devices, recover a password, and manage places as an administrator. Day plans and offline place copies remain on the device; map tiles and itineraries are not synced offline.
 
 ## Requirements and local setup
 
@@ -63,7 +63,7 @@ npm run build                  # Typecheck and production web build
 npx playwright install chromium webkit
 npm run test:e2e                # Desktop/mobile flows through Laravel
 npm run format:check
-php artisan admin:grant verified-account@example.com
+php artisan admin:create your-email@example.com --name="Your name"
 ```
 
 Automated tests use an isolated PostgreSQL engine and an Auth contract double; they do not use real accounts or send email. `php artisan supabase:check` is a read-only live check. The opt-in `npm run test:live -- --run --url http://127.0.0.1:8000` tests the running Laravel server with temporary Supabase accounts and cleans them up. Actual inbox delivery needs a separate check.

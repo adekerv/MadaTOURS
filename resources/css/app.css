@@ -37,6 +37,7 @@
   }
   button {
     min-height: 44px;
+    min-width: 44px;
     cursor: pointer;
     touch-action: manipulation;
   }
@@ -50,6 +51,15 @@
     font: inherit;
     font-size: 16px;
     min-width: 0;
+  }
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 44px;
+    padding-right: 2rem !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
   }
   input[type='range'] {
     min-height: 44px;
@@ -71,6 +81,85 @@
   svg {
     flex-shrink: 0;
   }
+}
+.skeleton {
+  background: linear-gradient(100deg, #f1ede8 20%, #faf8f4 45%, #f1ede8 70%);
+  background-size: 220% 100%;
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+@keyframes skeleton-pulse {
+  to {
+    background-position: -220% 0;
+  }
+}
+.place-card {
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+.place-card:active {
+  transform: scale(0.992);
+}
+@media (hover: hover) {
+  .place-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px #4314070d;
+  }
+}
+.place-results > article {
+  animation: card-appear 160ms ease-out;
+}
+@keyframes card-appear {
+  from {
+    opacity: 0.5;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes dialog-open {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes dialog-close {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+}
+.app-dialog[open] {
+  animation: dialog-open 180ms ease-out;
+}
+.app-dialog[open].dialog-closing {
+  animation: dialog-close 150ms ease-in forwards;
+}
+.site-footer {
+  padding-bottom: max(1.75rem, env(safe-area-inset-bottom));
+}
+.app-dialog a,
+.home-shell footer a,
+.info-page a,
+.leaflet-control-attribution a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+}
+summary {
+  min-height: 44px;
+  align-content: center;
+}
+.app-dialog {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 @layer components {
   .primary-button {

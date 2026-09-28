@@ -43,6 +43,7 @@ export async function startLaravel(port = 0, providerPort = 0) {
         ...process.env,
         APP_ENV: 'testing',
         APP_DEBUG: 'false',
+        MAIL_MAILER: 'array',
         APP_KEY: `base64:${randomBytes(32).toString('base64')}`,
         APP_URL: origin,
         APP_ORIGIN: origin,

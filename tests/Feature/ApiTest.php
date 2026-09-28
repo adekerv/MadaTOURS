@@ -58,7 +58,7 @@ class ApiTest extends TestCase
             '*/rpc/mt_check_rate_limit' => Http::response('true'),
             '*/auth/v1/signup' => Http::response(['id' => 'user-id']),
         ]);
-        $this->withHeader('X-MadaTours-Client', '1')->postJson('/api/auth/register', ['email' => ' USER@example.com ', 'password' => 'a long test password', 'role' => 'admin'])->assertCreated()->assertExactJson(['user' => null, 'verificationRequired' => true]);
+        $this->withHeader('X-MadaTours-Client', '1')->postJson('/api/auth/register', ['name' => 'User', 'email' => ' USER@example.com ', 'password' => 'a long test password', 'role' => 'admin'])->assertCreated()->assertExactJson(['user' => null, 'verificationRequired' => true]);
         Http::assertSent(fn ($r) => str_ends_with($r->url(), '/signup') && $r['email'] === 'user@example.com' && ! isset($r['role']) && $r->header('apikey')[0] === 'public-key');
     }
 

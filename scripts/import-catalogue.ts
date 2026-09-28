@@ -8,17 +8,17 @@ config({ path: ['.env', '.env.local'], quiet: true });
 const args = process.argv.slice(2);
 if (args.includes('--help')) {
   console.log(
-    'npm run catalogue:import -- [--apply] [--sync-seed]\nReads the reviewed 2026-09-24 batch. Defaults to read-only preview. Run only one importer at a time.',
+    'npm run catalogue:import -- [--apply] [--sync-seed] [--batch=path.json]\nReads a reviewed batch (default: 2026-09-24). Defaults to read-only preview. Run only one importer at a time.',
   );
   process.exit(0);
 }
-if (args.some((arg) => !['--apply', '--sync-seed'].includes(arg)))
+if (args.some((arg) => !['--apply', '--sync-seed'].includes(arg) && !arg.startsWith('--batch=')))
   throw new Error('Unknown argument. Use --help.');
+const batchArgument = args.find((arg) => arg.startsWith('--batch='));
+const batchPath = batchArgument?.slice('--batch='.length) || 'supabase/catalogue/2026-09-24.json';
 const apply = args.includes('--apply');
 if (args.includes('--sync-seed') && !apply) throw new Error('--sync-seed requires --apply.');
-const batch = batchSchema.parse(
-  JSON.parse(await readFile('supabase/catalogue/2026-09-24.json', 'utf8')),
-);
+const batch = batchSchema.parse(JSON.parse(await readFile(batchPath, 'utf8')));
 const url = process.env.SUPABASE_URL;
 const key = process.env.SUPABASE_SECRET_KEY;
 if (!url || !key) throw new Error('Set SUPABASE_URL and SUPABASE_SECRET_KEY in .env.local.');
@@ -57,7 +57,7 @@ try {
     .parse(saved.data ? JSON.parse(saved.data.value) : {});
   const plan = planImport(batch, rows, receipt);
   console.log(
-    `${apply ? 'APPLY' : 'PREVIEW'} ${new URL(url).hostname}: ${plan.additions.length} additions, ${plan.updates.length} existing map/source corrections.`,
+    `${apply ? 'APPLY' : 'PREVIEW'} ${new URL(url).hostname}: ${plan.additions.length} additions, ${plan.updates.length} existing listing corrections.`,
   );
   if (apply) {
     const backup = `.data/catalogue-import/${Date.now()}-before.json`;
@@ -87,15 +87,14 @@ try {
         `Import history write failed (${recorded.error.code}); preserve the backup and inspect before retrying.`,
       );
     for (const update of plan.updates) {
-      const result = await client
+      let query = client
         .from('mt_places')
         .update(update.after)
         .eq('id', update.id)
-        .eq('name', update.name)
-        .eq('lat', update.before.lat)
-        .eq('lng', update.before.lng)
-        .eq('sources', JSON.stringify(update.before.sources))
-        .select('id');
+        .eq('name', update.name);
+      for (const [field, value] of Object.entries(update.before))
+        query = query.eq(field, typeof value === 'object' ? JSON.stringify(value) : value);
+      const result = await query.select('id');
       if (result.error || result.data?.length !== 1)
         throw new Error(
           `Correction stopped for ${update.name}; the record changed or the request failed.`,

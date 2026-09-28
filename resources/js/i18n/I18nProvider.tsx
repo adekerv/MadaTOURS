@@ -11,6 +11,8 @@ const context = createContext<{
   t: (message, values) => translate('en', message, values),
 });
 function initialLanguage(): Language {
+  const requested = new URLSearchParams(location.search).get('lang');
+  if (requested === 'en' || requested === 'fr') return requested;
   try {
     const value = localStorage.getItem(key);
     if (value === 'en' || value === 'fr') return value;

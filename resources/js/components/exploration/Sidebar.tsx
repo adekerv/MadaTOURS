@@ -4,6 +4,8 @@ import type { Place, User } from '../../types';
 import { PlaceCard } from './PlaceCard';
 import { useEffect, useState } from 'react';
 import { experiences } from '../../lib/catalogue';
+import { PlaceCardSkeleton } from '../ui/PlacePhoto';
+import { recentSearches, rememberSearch, clearSearches } from '../../lib/local-preferences';
 interface Props {
   filter: 'all' | 'restaurant' | 'activity';
   setFilter: (filter: 'all' | 'restaurant' | 'activity') => void;
@@ -32,6 +34,7 @@ interface Props {
 export function Sidebar(props: Props) {
   const { t } = useI18n();
   const [visibleCount, setVisibleCount] = useState(30);
+  const [history, setHistory] = useState(recentSearches);
   useEffect(() => setVisibleCount(30), [props.filteredPlaces]);
   const {
     filter,
@@ -73,10 +76,41 @@ export function Sidebar(props: Props) {
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          onBlur={() => setHistory(rememberSearch(query))}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') setHistory(rememberSearch(query));
+          }}
           placeholder={t('Search this area')}
           className="w-full min-w-0 py-3 outline-none"
         />
       </label>
+      {!query && history.length > 0 && (
+        <div className="mb-4">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold text-slate-600">{t('Recent searches')}</p>
+            <button
+              className="px-2 text-xs text-orange-800 underline"
+              onClick={() => {
+                clearSearches();
+                setHistory([]);
+              }}
+            >
+              {t('Clear history')}
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {history.map((term) => (
+              <button
+                key={term}
+                className="secondary-button max-w-full break-words"
+                onClick={() => setQuery(term)}
+              >
+                {term}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="mb-4 grid grid-cols-2 gap-3">
         <label className="field-label">
           {t('Town')}
@@ -170,8 +204,13 @@ export function Sidebar(props: Props) {
               count: filteredPlaces.length,
             })}
       </p>
-      <div className="space-y-3">
-        {filteredPlaces.length ? (
+      <div className="place-results space-y-3">
+        {loading && !filteredPlaces.length ? (
+          <>
+            <PlaceCardSkeleton />
+            <PlaceCardSkeleton />
+          </>
+        ) : filteredPlaces.length ? (
           filteredPlaces
             .slice(0, visibleCount)
             .map((place) => (

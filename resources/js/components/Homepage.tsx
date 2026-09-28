@@ -17,11 +17,16 @@ import { SavedPlaceCard } from './home/SavedPlaceCard';
 import { SearchBar } from './home/SearchBar';
 import { LanguageSelect } from './ui/LanguageSelect';
 import { WeatherWidget } from './home/WeatherWidget';
+import { OnboardingHint } from './home/OnboardingHint';
+import { SiteFooter } from './ui/SiteFooter';
+import { PlacePhoto, PlaceCardSkeleton } from './ui/PlacePhoto';
 interface Props {
   onPlanDay: () => void;
+  onSignup: () => void;
   onOfflineClick: () => void;
   onStart: (params?: ExploreParams) => void;
   places: Place[];
+  catalogueLoading: boolean;
   favorites: Place[];
   revisits: Place[];
   onRemoveFavorite: (place: Place) => void;
@@ -66,8 +71,10 @@ const features = [
 export function Homepage({
   onStart,
   onPlanDay,
+  onSignup,
   onOfflineClick,
   places,
+  catalogueLoading,
   favorites,
   revisits,
   onRemoveFavorite,
@@ -137,6 +144,12 @@ export function Homepage({
         </div>
       </header>
       <main id="main-content" tabIndex={-1}>
+        <OnboardingHint onPlan={onPlanDay} />
+        {user && (
+          <p className="mt-6 break-words text-center text-lg font-semibold text-orange-800">
+            {t('Welcome, {name}.', { name: user.name })}
+          </p>
+        )}
         <section className="relative py-10 sm:py-16 lg:py-20 text-center">
           <div
             aria-hidden="true"
@@ -169,6 +182,53 @@ export function Homepage({
           </div>
           <div className="mx-auto mt-8 max-w-xl">
             <WeatherWidget />
+          </div>
+        </section>
+        <section aria-labelledby="island-picks" className="mb-12">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-orange-700">
+                {t('A little inspiration')}
+              </p>
+              <h2 id="island-picks" className="mt-2 text-2xl font-bold sm:text-3xl">
+                {t('Places to discover')}
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                {t('A few picks from our island guide. Find your own favorite.')}
+              </p>
+            </div>
+            <button onClick={() => onStart()} className="secondary-button">
+              {t('Explore all places')}
+            </button>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {catalogueLoading && !places.length
+              ? [0, 1, 2].map((id) => <PlaceCardSkeleton key={id} />)
+              : [...places]
+                  .filter((place) => place.access !== 'restricted')
+                  .sort((a, b) => Number(!!b.image) - Number(!!a.image))
+                  .slice(0, 3)
+                  .map((place) => (
+                    <article
+                      key={place.id}
+                      className="place-card overflow-hidden rounded-3xl border border-slate-200 bg-white"
+                    >
+                      <a
+                        href={`#explore?filter=${place.type}&radius=50&place=${place.id}`}
+                        className="block"
+                        aria-label={t('Explore {name}', { name: place.name })}
+                      >
+                        <PlacePhoto place={place} className="h-48" />
+                        <div className="p-5">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">
+                            {t(place.type === 'restaurant' ? 'Restaurant' : 'Activity')}
+                          </p>
+                          <h3 className="mt-2 text-lg font-bold">{place.name}</h3>
+                          <p className="mt-1 text-sm text-slate-600">{place.location}</p>
+                        </div>
+                      </a>
+                    </article>
+                  ))}
           </div>
         </section>
         <section
@@ -303,16 +363,13 @@ export function Homepage({
                 )}
               </p>
             </div>
-            <button onClick={onLoginClick} className="primary-button shrink-0">
+            <button onClick={onSignup} className="primary-button shrink-0">
               {t('Create an account')}
             </button>
           </section>
         )}
       </main>
-      <footer className="border-t border-slate-200 py-7 text-sm text-slate-500 flex flex-wrap justify-between gap-3">
-        <span>MadaTours © {new Date().getFullYear()}</span>
-        <span>{t('Made for discovering Martinique')}</span>
-      </footer>
+      <SiteFooter onSignup={user ? undefined : onSignup} />
     </div>
   );
 }

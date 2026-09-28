@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useId, type KeyboardEvent } from 'react';
 import { Search, X, MapPin } from 'lucide-react';
 import type { Place } from '../../types';
 import { matchesSearch } from '../../lib/places-utils';
+import { recentSearches, rememberSearch, clearSearches } from '../../lib/local-preferences';
 export function SearchBar({
   places,
   onSelectPlace,
@@ -14,6 +15,7 @@ export function SearchBar({
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
+  const [history, setHistory] = useState(recentSearches);
   const ref = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const id = useId();
@@ -33,6 +35,7 @@ export function SearchBar({
       document.getElementById(`${id}-${active}`)?.scrollIntoView({ block: 'nearest' });
   }, [active, id]);
   function select(place: Place) {
+    setHistory(rememberSearch(query || place.name));
     onSelectPlace(place);
     setOpen(false);
     setQuery('');
@@ -99,6 +102,35 @@ export function SearchBar({
           </button>
         )}
       </div>
+      {open && !query.trim() && history.length > 0 && (
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-semibold">{t('Recent searches')}</p>
+            <button
+              className="px-2 text-sm text-orange-800 underline"
+              onClick={() => {
+                clearSearches();
+                setHistory([]);
+              }}
+            >
+              {t('Clear history')}
+            </button>
+          </div>
+          {history.map((term) => (
+            <button
+              key={term}
+              className="block min-h-11 w-full rounded-xl px-3 text-left text-sm hover:bg-orange-50"
+              onClick={() => {
+                setQuery(term);
+                setActive(-1);
+                input.current?.focus();
+              }}
+            >
+              {term}
+            </button>
+          ))}
+        </div>
+      )}
       {expanded && (
         <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
           <ul
@@ -126,9 +158,29 @@ export function SearchBar({
             ))}
           </ul>
           {!filtered.length && (
-            <p role="status" className="p-5 text-sm text-slate-600">
-              {t('No places found. Try a town name or activity.')}
-            </p>
+            <div className="p-5">
+              <Search aria-hidden="true" className="mb-2 text-orange-700" />
+              <p role="status" className="text-sm text-slate-600">
+                {t('No places found. Try a town name or activity.')}
+              </p>
+              <p className="mt-2 text-xs text-slate-500">
+                {t('Try a shorter name, remove accents, or explore these ideas.')}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {['Sainte-Anne', 'Fort-de-France', 'Balata'].map((term) => (
+                  <button
+                    key={term}
+                    className="secondary-button"
+                    onClick={() => {
+                      setQuery(term);
+                      input.current?.focus();
+                    }}
+                  >
+                    {term}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}
