@@ -7,6 +7,23 @@ use Tests\TestCase;
 
 class ApiTest extends TestCase
 {
+    public function test_public_shell_does_not_replace_the_api_session_cookie(): void
+    {
+        $this->withoutVite()->get('/')->assertOk()->assertCookieMissing('madatours-session');
+        Http::fake([
+            '*/mt_places*' => Http::response([]),
+            '*/mt_metadata*' => Http::response([['value' => '1']]),
+        ]);
+        $this->getJson('/api/places')->assertOk()->assertCookieMissing('madatours-session');
+        $this->getJson('/api/health')->assertOk()->assertCookieMissing('madatours-session');
+    }
+
+    public function test_guests_receive_json_without_an_accept_header(): void
+    {
+        $this->get('/api/favorites')->assertUnauthorized()->assertExactJson(['error' => 'Please sign in to continue.']);
+        Http::assertNothingSent();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -42,7 +59,7 @@ class ApiTest extends TestCase
             '*/auth/v1/signup' => Http::response(['id' => 'user-id']),
         ]);
         $this->withHeader('X-MadaTours-Client', '1')->postJson('/api/auth/register', ['email' => ' USER@example.com ', 'password' => 'a long test password', 'role' => 'admin'])->assertCreated()->assertExactJson(['user' => null, 'verificationRequired' => true]);
-        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/signup') && $r['email'] === 'user@example.com' && !isset($r['role']) && $r->header('apikey')[0] === 'public-key');
+        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/signup') && $r['email'] === 'user@example.com' && ! isset($r['role']) && $r->header('apikey')[0] === 'public-key');
     }
 
     public function test_saved_places_use_validated_user_identity_and_user_bearer(): void
@@ -102,6 +119,6 @@ class ApiTest extends TestCase
         $place = ['id' => 1, 'name' => 'Place', 'type' => 'activity', 'lat' => 14.6, 'lng' => -61, 'location' => 'Martinique', 'description' => 'Test'];
         Http::fakeSequence()->push(array_fill(0, 500, $place))->push([$place + ['extra' => 'not exposed']]);
         $this->getJson('/api/places')->assertOk()->assertJsonCount(501)->assertJsonMissing(['extra' => 'not exposed']);
-        Http::assertSent(fn ($r) => str_contains($r->url(), 'offset=500') && $r->header('apikey')[0] === 'public-key' && !$r->hasHeader('Authorization'));
+        Http::assertSent(fn ($r) => str_contains($r->url(), 'offset=500') && $r->header('apikey')[0] === 'public-key' && ! $r->hasHeader('Authorization'));
     }
 }

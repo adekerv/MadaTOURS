@@ -2,15 +2,14 @@
 
 namespace App\Http\Requests;
 
-use App\Exceptions\ApiException;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class StorePlaceRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        if ($this->attributes->get('account')['role'] !== 'admin') throw new ApiException(403, 'Only administrators can manage places.');
-        return true;
+        return Gate::allows('manage-places');
     }
 
     public function rules(): array
