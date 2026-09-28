@@ -12,7 +12,7 @@
 
 ## Finish the class release first
 
-The database, production environment and public deployment are configured, and live account/saved-place checks pass. Complete the email templates/SMTP setup in [SUPABASE-SETUP.md](SUPABASE-SETUP.md) if classmates should register themselves; separate confirmed demo accounts are an alternative for class. Rehearse on your own computer and phone. Email inbox delivery remains unverified.
+The Laravel migration is ready for deployment to a PHP/container host; previous live checks describe the retired Node deployment. Follow [deployment](DEPLOYMENT.md) and repeat account/saved-place checks after deploying Laravel. Complete the email templates/SMTP setup in [SUPABASE-SETUP.md](SUPABASE-SETUP.md) if classmates should register themselves; separate confirmed demo accounts are an alternative for class. Rehearse on your own computer and phone. Email inbox delivery remains unverified.
 
 ## Suggested next product work
 
@@ -24,4 +24,4 @@ The database, production environment and public deployment are configured, and l
 
 ## Repository maintenance
 
-The repository currently includes `oracleJdk-27.jdk`, a roughly 368 MB development tool installation. It is excluded from web deployment and formatting. Move Java tooling outside the project and remove it from version control in a reviewed cleanup; `.gitignore` alone cannot untrack existing files. Keep downloaded SDKs, build outputs and secrets out of future commits.
+Keep PHP application code under `app/`, frontend code under `resources/`, and database changes under `database/migrations/`. Do not add a second API server. Generated assets, dependencies, local SDKs and private environment files are ignored. `composer check`, `npm test` and the browser suite verify the maintained Laravel paths.

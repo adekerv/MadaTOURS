@@ -1,167 +1,75 @@
-# Supabase + your existing Vercel project
+# Laravel and Supabase setup
 
-The selected setup is Supabase Free for PostgreSQL and accounts, with the existing Vercel `mada-tours` project for the website and API. A custom website domain is unnecessary for the class demonstration. Free-tier limits can change; check [Supabase pricing](https://supabase.com/pricing) and [Vercel Hobby](https://vercel.com/docs/plans/hobby). Supabase Free projects may pause after inactivity, so check the project before your presentation.
+Laravel serves the website and API. Supabase provides PostgreSQL and Auth; the migration preserves existing accounts and saved places. See [deployment](DEPLOYMENT.md) for PHP/container hosting.
 
-## Current project status — September 24, 2026
+## 1. Configure Laravel
 
-The database and production environment are already configured. The live site is https://mada-tours.vercel.app, and both its public API and mobile browser sign-in/favorites have passed live checks. You do not need a DATABASE_URL or another database initialization for the current setup. The remaining decision is demo accounts versus email-provider setup for classmates' self-service signup; email templates and actual delivery still need verification. The sections below remain the repeatable setup reference.
+Install PHP/Composer and Node dependencies as described in the [README](../README.md). Copy `.env.example` to `.env` for a new installation and run `php artisan key:generate` once. Existing private `.env.local` files remain supported when `.env` is absent; transfer settings before creating `.env` on an existing installation.
 
-## 1. Local configuration
+Set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` from your project's Connect/API settings. All three are server-only in this application. `APP_URL` and `APP_ORIGIN` must match the application origin (`http://127.0.0.1:8000` locally). Leave `VITE_API_URL` empty for web builds. Keep secrets out of Git and browser-prefixed variables.
 
-Your `.env.local` should contain the project URL, publishable key, and server-only secret from Supabase Project Settings → API Keys. These are three distinct values. Do not replace an existing file with the example or paste secrets into chat.
+## 2. Initialize or adopt the database
 
-```dotenv
-SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
-SUPABASE_SECRET_KEY=YOUR_SECRET_KEY
-APP_ORIGIN=https://YOUR_PUBLIC_WEBSITE.vercel.app
-ALLOWED_ORIGINS=capacitor://localhost,https://localhost
-VITE_API_URL=
-```
-
-`APP_ORIGIN` is the exact website origin: no path, `/api`, trailing slash, or `vercel.com` dashboard address. Find it in your Vercel project → Settings → Domains. Empty `VITE_API_URL` is correct for the website. The secret key must never appear in a `VITE_` variable or client code.
-
-## 2. Initialize the database once
-
-Generate the current schema and seed:
+Use the Supabase **direct connection or session pooler** PostgreSQL URI for `DB_URL`. Percent-encode reserved characters in passwords. `DATABASE_URL` is an alias when `DB_URL` is absent. Keep TLS enabled for hosted connections.
 
 ```sh
-npm run db:prepare
+php artisan migrate --seed
+php artisan supabase:check
 ```
 
-Choose one method:
+Migrations create or adopt the `mt_*` schema and add query indexes. The transaction-protected seed inserts 364 records on first initialization (354 public, 10 drafts). An advisory lock prevents concurrent seed runs; a metadata receipt preserves later edits and deletions. Existing accounts and IDs remain in place. Migrations require Supabase's `auth.users`, `auth.uid()` and API roles; a plain empty PostgreSQL database is not a substitute for Supabase Auth.
 
-- **SQL Editor:** open your Supabase project → SQL Editor → New query, paste the complete contents of `supabase/setup.sql`, and run it.
-- **Command line:** open Supabase's **Connect** dialog and copy a PostgreSQL connection string into `DATABASE_URL` in `.env.local`. Replace its password placeholder with the database password, URL-encoding special characters in that password. The Session pooler is suitable when your network lacks IPv6. Then run:
+If direct database credentials are unavailable:
 
 ```sh
-npm run db:apply -- --apply
+php artisan db:export-setup
 ```
 
-The command requires certificate-verified TLS. If your local trust setup cannot validate Supabase's certificate, use the SQL Editor; do not disable certificate verification. See [Supabase connection methods](https://supabase.com/docs/guides/database/connecting-to-postgres).
+Review `supabase/setup.sql` and run it once in your project's SQL Editor. It is generated from the same Laravel schema and seed sources, and is repeat-safe. `php artisan migrate --seed` can later adopt that installation and record migration history. The application runtime only needs the API settings, so remove `DB_URL` from runtime containers when migrations run elsewhere.
 
-The SQL runs in one transaction, creates namespaced `mt_*` tables, enables row-level security and seeds 364 records (354 public, 10 awaiting verification). Re-running the same setup preserves existing place edits and deletions. For an existing pre-expansion database, use the [catalogue import instructions](CATALOGUE-RESEARCH.md); rerunning setup alone does not add the expansion. It does not migrate old SQLite accounts or arbitrary existing schemas. `DATABASE_URL` is only needed by the setup command, not the running application or Vercel.
+Do not use `migrate:fresh`, `db:wipe` or drop the auth schema on an existing project. Back up before adopting a production database. For catalogue expansion on an already seeded database, follow [catalogue import](CATALOGUE-RESEARCH.md).
 
-## 3. Configure email authentication
+## 3. Configure email verification and recovery
 
-In Supabase Authentication:
+Enable email signup and confirmation in Supabase Auth. Set the Auth Site URL to the deployed Laravel HTTPS origin. The app accepts numeric codes rather than link callbacks:
 
-1. Enable email/password signup and keep **Confirm email** enabled.
-2. Set the minimum password length to **12** to match the app. Use a short email OTP expiry such as **600 seconds**; the form accepts 6–10 numeric digits.
-3. Under Email Templates, replace **Confirm signup** with `supabase/templates/confirm-signup.html`, and **Reset password** with `supabase/templates/reset-password.html`. Preserve `{{ .Token }}` exactly. This app asks users to enter an emailed code; the default link-only templates do not match that flow.
-4. Under URL Configuration, set **Site URL** to the actual public Vercel website. The code-based flow does not require broad wildcard redirect URLs.
-5. Configure a custom SMTP provider and verified sender in Supabase's SMTP settings. Enter SMTP credentials there, not in frontend variables.
+- Use `supabase/templates/confirm-signup.html` for signup confirmation.
+- Use `supabase/templates/reset-password.html` for password recovery.
+- Both templates must contain `{{ .Token }}`. Signup and recovery use separate verification types.
 
-Supabase's built-in sender is currently limited to project-team addresses and two messages per hour. Arbitrary classmates cannot register through it. A custom SMTP service is required for their verification and recovery emails. Provider signup, sender verification and deliverability must be completed and tested before presenting. See [Supabase SMTP instructions](https://supabase.com/docs/guides/auth/auth-smtp).
+Configure a transactional SMTP provider for delivery to your intended users. Keep its password only in private configuration.
 
-For a class demonstration before SMTP is ready, you can deliberately create separate demonstration users in Supabase Authentication → Users with confirmed emails, then demonstrate login and saved-place persistence. This does not demonstrate verification/recovery delivery; do not claim that it does. Do not disable email confirmation for general public signup.
-
-## 4. Check and run locally
-
-```sh
-npm run setup:check
-npm run dev
-```
-
-The checker reports key acceptance, schema version, catalogue visibility, guest restrictions, and public Auth settings. It prints no keys, passwords, email addresses, or user records. A passing check does not establish SMTP delivery or full RLS correctness; automated SQL tests and the live demonstration provide additional checks.
-
-Visit http://localhost:3000/api/health. The expected response is:
-
-```json
-{ "status": "ok", "database": "supabase" }
-```
-
-For an optional live backend smoke test:
-
-```sh
-npm run test:live -- --run
-```
-
-This creates two temporary accounts, generates real Supabase verification/recovery codes without sending emails, checks the application API and direct RLS restrictions, and deletes its test accounts. It does not change existing accounts or venues. It targets the configured Supabase project; expect ordinary Supabase audit records and short-lived rate-limit counters. To check the deployed API instead of a local API instance, use `npm run test:live -- --run --url https://mada-tours.vercel.app`; the URL must exactly match your HTTPS APP_ORIGIN. This is separate from the isolated `npm test` suite.
-
-Create and verify your own account. If you need catalogue administration:
-
-```sh
-npm run admin:grant -- your-confirmed-email@example.com
-```
-
-Reload afterward. Only grant admin to an account you control. Roles come from the database, never from signup form metadata.
-
-## Repair verification emails that contain links instead of codes
-
-The app accepts numeric email codes. Editing the files in `supabase/templates/` alone does not update a hosted Supabase project's email templates.
-
-**Free-plan prerequisite:** Supabase rejected template changes on this project because it still uses the default email sender. Configure a custom SMTP provider first; using custom SMTP does not require upgrading Supabase. Dashboard editing has the same provider restriction. On September 25 the website URL was corrected, but the code templates remain pending SMTP setup.
-
-In Supabase → Authentication → Email Templates, replace **Confirm signup** with `supabase/templates/confirm-signup.html` and **Reset password** with `supabase/templates/reset-password.html`, then save each. Both templates must contain the literal `{{ .Token }}`. Do not replace it with `{{ .ConfirmationURL }}` or `{{ .TokenHash }}`. Request a fresh code afterward; previously delivered emails do not change.
-
-Alternatively, create a personal access token at [Supabase account tokens](https://supabase.com/dashboard/account/tokens), enter it as `SUPABASE_ACCESS_TOKEN` in `.env.local`, and run:
+The optional management tool previews changes by default:
 
 ```sh
 npm run auth:configure
 npm run auth:configure -- --apply
-```
-
-The first command previews changes. The second backs up only the affected URL/templates, updates the two email subjects and bodies plus the website URL, and reads the settings back to verify them. Without `--smtp`, it does not change SMTP credentials. Neither command disables email confirmation, resets passwords or sends emails. Remove the management token from `.env.local` when finished; the app and Vercel do not need it. SMTP delivery still needs a separate real-inbox check.
-
-### Set up Brevo Free for the class demonstration
-
-1. Create a [Brevo account](https://www.brevo.com/) on the Free plan and complete account verification. Brevo currently advertises up to 300 emails per day; Supabase's own Auth rate limits apply separately.
-2. Open **Settings → Senders, Domains, IPs → Senders → Add a sender**. Set the name to **MadaTours** and use an email address whose inbox you control. Enter the verification code Brevo sends to that inbox in Brevo. Do not invent an address ending in `vercel.app`.
-3. If you own a domain, authenticate it following Brevo's DNS instructions. Without a domain, Brevo documents temporary sender-address replacement for transactional emails sent from free email addresses. This may support the class demonstration, subject to account approval and actual delivery testing; it is not a permanent authenticated-domain setup. If Brevo requires domain authentication or SMTP activation for your account, resolve that before applying the settings below.
-4. Open **Settings → SMTP & API → SMTP**. Copy the **SMTP Login**, then generate an **SMTP key** named `MadaTours`. Use this key, not a Brevo API key or your account password.
-5. Fill these entries in `.env.local` (quote values if they contain `#` or spaces):
-
-```dotenv
-SUPABASE_SMTP_HOST=smtp-relay.brevo.com
-SUPABASE_SMTP_PORT=587
-SUPABASE_SMTP_USER="your SMTP Login from Brevo"
-SUPABASE_SMTP_PASS="your generated SMTP key"
-SUPABASE_SMTP_FROM_EMAIL="the sender address you verified in Brevo"
-SUPABASE_SMTP_SENDER_NAME=MadaTours
-```
-
-Keep the existing `SUPABASE_ACCESS_TOKEN`, `SUPABASE_URL` and `APP_ORIGIN`. Then run:
-
-```sh
+# To configure the SMTP settings from SUPABASE_SMTP_* too:
 npm run auth:configure -- --smtp
 npm run auth:configure -- --smtp --apply
 ```
 
-The preview makes no changes. Apply saves SMTP to Supabase first, reads the non-secret settings back, then applies the numeric-code templates. Credentials are never printed or included in the template backup. If the template step fails after SMTP succeeds, SMTP remains configured; fix the reported issue and rerun `npm run auth:configure -- --apply` without `--smtp`. A successful configuration read-back does not prove SMTP authentication or inbox delivery.
+This maintenance tool requires `SUPABASE_ACCESS_TOKEN` from your Supabase account settings. It backs up affected configuration, applies the requested settings, and reads them back. Without `--smtp` it does not submit SMTP credentials. It does not disable confirmation or send a test email. Remove management credentials from runtime environments afterward.
 
-Finally, on `https://mada-tours.vercel.app`, create an account with an inbox you control, check inbox/spam for the numeric code and complete verification. Sign out, sign in, and test password recovery with a fresh code. Check Brevo's transactional logs if a message is rejected. No Vercel redeployment is required for these hosted Supabase settings. Once verified, remove the local management token and SMTP credentials; retain the SMTP key in Brevo, because Supabase needs it to keep sending.
+Verify delivery with an inbox you control: create an account, enter its confirmation code, sign out and back in, then request a recovery code and set a new password. The automated test provider cannot verify real SMTP delivery.
 
-Sources: [Brevo SMTP setup](https://help.brevo.com/hc/en-us/articles/7924908994450-Send-transactional-emails-using-Brevo-SMTP), [verify a sender](https://help.brevo.com/hc/en-us/articles/208836149-Create-a-new-sender-From-name-and-From-email), [temporary sender replacement](https://help.brevo.com/hc/en-us/articles/14925263522578-Comply-with-Gmail-Yahoo-and-Microsoft-s-requirements-for-email-senders), [Free plan](https://www.brevo.com/products/transactional-email/).
+## 4. Run and provision administrators
 
-## Repair “This origin is not allowed”
+```sh
+composer dev
+# In another terminal:
+php artisan supabase:check
+php artisan admin:grant your-verified-email@example.com
+```
 
-Use the current public address, `https://mada-tours.vercel.app`. The API accepts `APP_ORIGIN`, explicit comma-separated `ALLOWED_ORIGINS`, and the exact production, deployment and branch domains supplied by Vercel's system variables. Keep system environment variables enabled in Vercel. Additional project aliases/custom domains need explicit entries in `ALLOWED_ORIGINS`; unrelated `*.vercel.app` sites are never trusted automatically. Environment changes require a new deployment. Older immutable deployment URLs retain their old code.
+Open `http://127.0.0.1:8000/api/health`; a configured schema returns `{"status":"ok","database":"supabase","framework":"laravel"}`. Administrator provisioning requires an existing verified account and uses only server-held credentials. Users cannot assign their own roles.
 
-For website builds, keep `VITE_API_URL` empty so login requests use the same origin as the page. Reserve that variable for native builds. A live empty-body POST to `/api/auth/login` with `Origin` and `X-MadaTours-Client: 1` should reach input validation (HTTP 400), not the origin rejection (HTTP 403). Do not probe with a real user's password.
+## 5. Verify a deployment
 
-## 5. Configure the existing Vercel project
+Follow [the deployment guide](DEPLOYMENT.md), then run the read-only `supabase:check`. The optional live check creates temporary accounts without sending email:
 
-Open [mada-tours settings](https://vercel.com/ade-kerv-s-projects/mada-tours/settings/environment-variables). Add these variables for **Production**:
+```sh
+npm run test:live -- --run --url https://your-laravel-origin.example
+```
 
-| Variable                   | Value                                                             |
-| -------------------------- | ----------------------------------------------------------------- |
-| `SUPABASE_URL`             | Same project URL as local                                         |
-| `SUPABASE_PUBLISHABLE_KEY` | Same publishable key                                              |
-| `SUPABASE_SECRET_KEY`      | Same server-only secret; mark sensitive                           |
-| `APP_ORIGIN`               | Actual public HTTPS website origin                                |
-| `ALLOWED_ORIGINS`          | `capacitor://localhost,https://localhost` if using native clients |
-
-Leave `VITE_API_URL` empty for web. Remove obsolete runtime database settings after confirming they are no longer used. Do not upload `.env.local` or add `DATABASE_URL` to the web bundle. Use a separate Supabase project for isolated preview data if needed; do not automatically share production secrets with every preview.
-
-Use repository root as Root Directory, Node 24, build command `npm run build`, and output directory `dist/web`. `vercel.json` routes `/api/*` to the Express function and serves `/sw.js` and `/photos/*` as real files. The existing GitHub integration deploys changes pushed to its configured production branch; saving files locally does not update the website. Environment changes require a new deployment. See [Vercel environment variables](https://vercel.com/docs/environment-variables).
-
-## 6. Verify the public release
-
-1. Wait until the new deployment is Ready and check its build logs.
-2. Open the public URL in a private browser, without a Vercel account. If deployment protection blocks it, configure appropriate public access for the class site.
-3. Check `/api/health` and `/api/places`; confirm JSON responses and actual catalogue data.
-4. Check `/sw.js` returns JavaScript and `/photos/balata.jpg` returns an image.
-5. Follow [CLASS-DEMO.md](CLASS-DEMO.md) on two independent devices, including a real emailed code and password recovery.
-
-A static page displaying the bundled guide does not prove the backend is working. Do not mark the release complete until the health endpoint and persistent account actions work remotely.
+The URL must match configured `APP_URL` or `APP_ORIGIN`. The check covers real verification codes, password recovery, session cookies, saved-list persistence, RLS isolation and deletion, then removes its test accounts. It still requires a separate real-inbox delivery check. Existing Vercel URLs do not automatically switch to Laravel; update hosting and native API origins as part of release.

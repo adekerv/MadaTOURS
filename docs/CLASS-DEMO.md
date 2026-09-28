@@ -1,6 +1,6 @@
 # Demonstrate a real remote backend
 
-Use the public Vercel website on a computer and a separate phone/browser. Do not use the test server on port 3100: it deliberately has a fake Auth provider.
+Use the deployed Laravel website on a computer and a separate phone/browser. Do not use the test server on port 3100: it deliberately has a fake Auth provider.
 
 1. Open `/api/health` on the deployed URL. Show `status: ok` and `database: supabase`.
 2. Register an account with an inbox you own, receive its verification code, and enter it in the app.
@@ -15,4 +15,4 @@ Use the public Vercel website on a computer and a separate phone/browser. Do not
 11. Optionally use your admin account to add a clearly labeled demonstration place and delete it afterward. Check it appears in another browser's refreshed catalogue.
 12. Delete your disposable test account using its password and check its saved rows are gone. Keep your real admin account.
 
-Before class: check that Supabase is awake, email delivery works, Vercel is publicly accessible, and the deployed commit includes the latest code. Keep a screenshot of a successful cross-device demonstration as evidence, but do not substitute it for a working live application.
+Before class: check that Supabase is awake, email delivery works, the Laravel site is publicly accessible, and the deployed commit includes the latest code. Keep a screenshot of a successful cross-device demonstration as evidence, but do not substitute it for a working live application.
