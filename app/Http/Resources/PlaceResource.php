@@ -11,6 +11,7 @@ class PlaceResource extends JsonResource
     {
         $p = $this->resource;
         $image = $p['image'] ?? null;
+
         return array_filter([
             'id' => (int) $p['id'], 'name' => $p['name'], 'type' => $p['type'],
             'lat' => (float) $p['lat'], 'lng' => (float) $p['lng'], 'location' => $p['location'],

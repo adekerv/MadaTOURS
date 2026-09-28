@@ -11,7 +11,8 @@ export function offlineShell(): Plugin {
       const styles = Object.keys(bundle).filter((name) => name.endsWith('.css'));
       const shell = readFileSync('index.html', 'utf8').replace(
         '<script type="module" src="/resources/js/main.tsx"></script>',
-        styles.map((name) => `<link rel="stylesheet" href="/build/${name}">`).join('\n') + `<script type="module" src="/build/${entry.fileName}"></script>`,
+        styles.map((name) => `<link rel="stylesheet" href="/build/${name}">`).join('\n') +
+          `<script type="module" src="/build/${entry.fileName}"></script>`,
       );
       this.emitFile({ type: 'asset', fileName: 'offline.html', source: shell });
       const assets = [

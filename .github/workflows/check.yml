@@ -7,22 +7,65 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: madatours_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      MADATOURS_TEST_POSTGRES_URL: postgresql://postgres:test-only@127.0.0.1:5432/madatours_test
     steps:
       - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: curl, mbstring, intl, pdo_pgsql, pdo_sqlite
+          tools: composer:v2
+          coverage: none
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
+      - run: composer validate --strict
+      - run: composer install --prefer-dist --no-interaction
       - run: npm ci
+      - run: composer check
       - run: npm run format:check
       - run: npm run lint
       - run: npm test
+      - run: git diff --exit-code -- supabase/setup.sql
       - run: npm run build
+      - run: npm run build:mobile
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run test:e2e
+      - run: composer audit
       - run: npm audit --omit=dev --audit-level=high
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: browser-test-results
           path: test-results/
+
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t madatours-ci .
+      - name: Check the production Laravel container
+        shell: bash
+        run: |
+          export APP_KEY="base64:$(openssl rand -base64 32)"
+          docker run -d --name madatours-ci -p 8080:10000 -e APP_KEY -e APP_URL=http://127.0.0.1:8080 madatours-ci
+          trap 'docker logs madatours-ci; docker rm -f madatours-ci' EXIT
+          curl --fail --retry 20 --retry-connrefused --retry-delay 1 http://127.0.0.1:8080/up
+          curl --fail http://127.0.0.1:8080/ -o /tmp/madatours-shell.html
+          test -s /tmp/madatours-shell.html

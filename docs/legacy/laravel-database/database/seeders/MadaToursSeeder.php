@@ -6,12 +6,12 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-/** Archived Laravel example. Not used by the MadaTours Node application. */
+/** Archived Laravel example. Not used by the active MadaTours application. */
 class MadaToursSeeder extends Seeder
 {
     public function run(): void
     {
-        // Copy the canonical src/data/places.json to this path in a separate Laravel app.
+        // Copy the canonical database/data/places.json to this path in a separate Laravel app.
         $path = resource_path('data/madatours-places.json');
         if (!is_file($path)) {
             throw new RuntimeException('Copy the MadaTours catalogue to resources/data/madatours-places.json first.');

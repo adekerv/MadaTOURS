@@ -4,7 +4,7 @@ import { readFile, writeFile, mkdir, open, unlink } from 'node:fs/promises';
 import { z } from 'zod';
 import { batchSchema, planImport, type CatalogueRow } from './lib/catalogue-import';
 
-config({ path: ['.env.local', '.env'], quiet: true });
+config({ path: ['.env', '.env.local'], quiet: true });
 const args = process.argv.slice(2);
 if (args.includes('--help')) {
   console.log(
@@ -133,7 +133,7 @@ try {
           fields.filter((field) => row[field] != null).map((field) => [field, row[field]]),
         ),
       );
-      await writeFile('src/data/places.json', JSON.stringify(seed, null, 2) + '\n');
+      await writeFile('database/data/places.json', JSON.stringify(seed, null, 2) + '\n');
     }
     console.log(
       `Verified ${after.filter((row) => row.published).length} public places; ${after.filter((row) => !row.published).length} drafts. No accounts or saved places were modified.`,

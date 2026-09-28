@@ -1,6 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { tripsSchema, tripSchema, moveStop, tripSummary, legDirections } from '../resources/js/lib/trips';
+import {
+  tripsSchema,
+  tripSchema,
+  moveStop,
+  tripSummary,
+  legDirections,
+} from '../resources/js/lib/trips';
 import { normalizePlace } from '../resources/js/lib/places-utils';
 import { translate } from '../resources/js/i18n/core';
 import { french } from '../resources/js/i18n/fr';

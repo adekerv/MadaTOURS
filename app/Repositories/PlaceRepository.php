@@ -19,6 +19,7 @@ class PlaceRepository
             $places = array_merge($places, $page);
             $offset += count($page);
         } while (count($page) === 500);
+
         return $places;
     }
 
@@ -30,6 +31,8 @@ class PlaceRepository
     public function delete(int $id, string $token): void
     {
         $rows = $this->client->request('DELETE', '/rest/v1/mt_places?id=eq.'.$id, token: $token, headers: ['Prefer' => 'return=representation']);
-        if (!$rows) throw new ApiException(404, 'This place could not be found.');
+        if (! $rows) {
+            throw new ApiException(404, 'This place could not be found.');
+        }
     }
 }

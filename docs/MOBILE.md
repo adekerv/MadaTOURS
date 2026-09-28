@@ -1,12 +1,12 @@
 # Native mobile setup and release preparation
 
-MadaTours now includes Capacitor projects in `ios/` and `android/`. They package `dist/web`; the Express API runs on a separately hosted HTTPS server. Server code, databases, and environment secrets are not copied into the native app.
+MadaTours now includes Capacitor projects in `ios/` and `android/`. They package `dist/mobile`; the Laravel API runs on a separately hosted HTTPS server. Server code, databases, and environment secrets are not copied into the native app.
 
 ## Build configuration
 
 1. Install dependencies with `npm ci`.
 2. Set `VITE_API_URL` to your real hosted API origin, without `/api` or a trailing slash. This is public build-time configuration. Changing it requires rebuilding and syncing the app.
-3. Set the hosted API's `APP_ORIGIN` to its HTTPS origin. Add `capacitor://localhost,https://localhost` to `ALLOWED_ORIGINS` if the native client sends an origin header.
+3. Set the hosted Laravel API's `APP_ORIGIN` to its HTTPS origin. Add `capacitor://localhost,https://localhost` to `ALLOWED_ORIGINS` if the native client sends an origin header.
 4. Run `npm run mobile:sync` after each web change.
 5. Open the native project with `npm run mobile:ios` or `npm run mobile:android`.
 

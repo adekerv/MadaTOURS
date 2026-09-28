@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { z } from 'zod';
-config({ path: ['.env.local', '.env'], quiet: true });
+config({ path: ['.env', '.env.local'], quiet: true });
 
 const args = process.argv.slice(2);
 if (args.includes('--help')) {
