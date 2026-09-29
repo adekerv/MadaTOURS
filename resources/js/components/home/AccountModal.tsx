@@ -2,15 +2,18 @@ import { useI18n } from '../../i18n/I18nProvider';
 import { useState, type FormEvent } from 'react';
 import type { User } from '../../types';
 import { api, errorMessage } from '../../lib/api';
+import { EmailVerification } from '../social/EmailVerification';
 import { Modal } from '../ui/Modal';
 export function AccountModal({
   user,
   onClose,
   onDeleted,
+  onVerified,
 }: {
   user: User;
   onClose: () => void;
   onDeleted: () => void;
+  onVerified: (user: User) => void;
 }) {
   const { t } = useI18n();
   const [confirm, setConfirm] = useState(false);
@@ -38,6 +41,7 @@ export function AccountModal({
         <p className="text-sm text-slate-600">
           {t('Your favorites and revisit list are linked to this account.')}
         </p>
+        <EmailVerification user={user} onVerified={onVerified} />
         {confirm ? (
           <form onSubmit={remove} className="space-y-4">
             <p className="text-sm text-red-700">

@@ -1,6 +1,11 @@
 <?php
 
+use App\Services\SubmissionPhotos;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/photos/community/{id}.jpg', function (string $id, SubmissionPhotos $photos) {
+    return response($photos->published($id), 200, ['Content-Type' => 'image/jpeg', 'Cache-Control' => 'no-store', 'X-Content-Type-Options' => 'nosniff']);
+})->whereUuid('id');
 
 Route::get('/sw.js', fn () => response()->file(public_path('build/sw.js'), ['Content-Type' => 'application/javascript', 'Cache-Control' => 'no-cache', 'Service-Worker-Allowed' => '/']));
 // Public policy URLs stay readable without JavaScript for store listings and support.

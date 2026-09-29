@@ -25,6 +25,17 @@ function readInformationRoute(): InformationRoute | null {
     : null;
 }
 
+const PlaceSubmissions = lazy(() =>
+  import('./components/submissions/PlaceSubmissions').then((m) => ({
+    default: m.PlaceSubmissions,
+  })),
+);
+const RouteSuggestion = lazy(() =>
+  import('./components/planner/RouteSuggestion').then((m) => ({ default: m.RouteSuggestion })),
+);
+const SocialHub = lazy(() =>
+  import('./components/social/SocialHub').then((m) => ({ default: m.SocialHub })),
+);
 const DayPlanner = lazy(() =>
   import('./components/planner/DayPlanner').then((m) => ({ default: m.DayPlanner })),
 );
@@ -48,6 +59,9 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [favorites, setFavorites] = useState<Place[]>([]);
   const [revisits, setRevisits] = useState<Place[]>([]);
+  const [submissionOpen, setSubmissionOpen] = useState(false);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [socialOpen, setSocialOpen] = useState(false);
   const [plannerOpen, setPlannerOpen] = useState(false);
   const [offlineOpen, setOfflineOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
@@ -138,11 +152,17 @@ export default function App() {
       setNotice('Your saved places are loading. Please try again in a moment.');
       return;
     }
-    const key = `${collection}:${place.id}`;
+    const key = `${user.id}:${collection}:${place.id}`;
     if (pending.current.has(key)) return;
     pending.current.add(key);
     const exists = (collection === 'favorites' ? favorites : revisits).some(
       (item) => item.id === place.id,
+    );
+    const updateCollection = collection === 'favorites' ? setFavorites : setRevisits;
+    updateCollection((previous) =>
+      exists
+        ? previous.filter((item) => item.id !== place.id)
+        : [...previous.filter((item) => item.id !== place.id), place],
     );
     try {
       await api(`/${collection}${exists ? `?placeId=${place.id}` : ''}`, {
@@ -150,11 +170,6 @@ export default function App() {
         body: exists ? undefined : JSON.stringify({ placeId: place.id }),
       });
       if (currentUser.current?.id !== user.id) return;
-      (collection === 'favorites' ? setFavorites : setRevisits)((previous) =>
-        exists
-          ? previous.filter((item) => item.id !== place.id)
-          : [...previous.filter((item) => item.id !== place.id), place],
-      );
       const stored = readOfflinePlaces();
       const snapshot = stored?.ownerId === user.id ? stored : { favorites, revisits };
       const changed = exists
@@ -181,6 +196,11 @@ export default function App() {
       );
     } catch (error) {
       if (currentUser.current?.id !== user.id) return;
+      updateCollection((previous) =>
+        exists
+          ? [...previous.filter((item) => item.id !== place.id), place]
+          : previous.filter((item) => item.id !== place.id),
+      );
       setNotice(errorMessage(error));
       if (error instanceof ApiError && error.status === 401) {
         setUser(null);
@@ -235,6 +255,7 @@ export default function App() {
       >
         {informationRoute ? (
           <InformationPage
+            onSubmitPlace={() => (user ? setSubmissionOpen(true) : setAuthMode('login'))}
             page={informationRoute}
             signedIn={!!user}
             onAccount={() => (user ? setAccountOpen(true) : setAuthMode('login'))}
@@ -258,6 +279,9 @@ export default function App() {
         ) : (
           <Homepage
             onStart={startExplore}
+            onSubmitPlace={() => (user ? setSubmissionOpen(true) : setAuthMode('login'))}
+            onSuggestTrip={() => (user ? setSuggestOpen(true) : setAuthMode('login'))}
+            onCommunity={() => (user ? setSocialOpen(true) : setAuthMode('login'))}
             onPlanDay={() => setPlannerOpen(true)}
             onSignup={() => setAuthMode('register')}
             onOfflineClick={() => setOfflineOpen(true)}
@@ -274,6 +298,25 @@ export default function App() {
             onLoginClick={() => setAuthMode('login')}
             onLogout={() => void logout()}
             onAdminClick={() => setAdminOpen(true)}
+          />
+        )}
+        {submissionOpen && user && <PlaceSubmissions onClose={() => setSubmissionOpen(false)} />}
+        {suggestOpen && user && (
+          <RouteSuggestion
+            places={places}
+            onClose={() => setSuggestOpen(false)}
+            onSaved={() => {
+              setSuggestOpen(false);
+              setPlannerOpen(true);
+            }}
+          />
+        )}
+        {socialOpen && user && (
+          <SocialHub
+            user={user}
+            places={places}
+            onClose={() => setSocialOpen(false)}
+            onVerified={setUser}
           />
         )}
         {plannerOpen && (
@@ -313,6 +356,7 @@ export default function App() {
       {accountOpen && user && (
         <AccountModal
           user={user}
+          onVerified={setUser}
           onClose={() => setAccountOpen(false)}
           onDeleted={() => {
             setUser(null);

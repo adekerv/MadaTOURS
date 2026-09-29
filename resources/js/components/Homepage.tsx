@@ -1,3 +1,4 @@
+import { MustGo } from './home/MustGo';
 import { useI18n } from '../i18n/I18nProvider';
 import {
   Compass,
@@ -22,6 +23,9 @@ import { SiteFooter } from './ui/SiteFooter';
 import { PlacePhoto, PlaceCardSkeleton } from './ui/PlacePhoto';
 interface Props {
   onPlanDay: () => void;
+  onCommunity: () => void;
+  onSuggestTrip: () => void;
+  onSubmitPlace: () => void;
   onSignup: () => void;
   onOfflineClick: () => void;
   onStart: (params?: ExploreParams) => void;
@@ -70,6 +74,9 @@ const features = [
 ] as const;
 export function Homepage({
   onStart,
+  onCommunity,
+  onSuggestTrip,
+  onSubmitPlace,
   onPlanDay,
   onSignup,
   onOfflineClick,
@@ -145,6 +152,17 @@ export function Homepage({
       </header>
       <main id="main-content" tabIndex={-1}>
         <OnboardingHint onPlan={onPlanDay} />
+        <div className="mt-5 flex flex-wrap justify-end gap-2">
+          <button onClick={onSuggestTrip} className="primary-button">
+            {t('Suggest a trip route')}
+          </button>
+          <button onClick={onSubmitPlace} className="secondary-button">
+            {t('Suggest a place')}
+          </button>
+          <button onClick={onCommunity} className="secondary-button">
+            {t('Community and meet-ups')}
+          </button>
+        </div>
         {user && (
           <p className="mt-6 break-words text-center text-lg font-semibold text-orange-800">
             {t('Welcome, {name}.', { name: user.name })}
@@ -369,6 +387,7 @@ export function Homepage({
           </section>
         )}
       </main>
+      <MustGo places={places} />
       <SiteFooter onSignup={user ? undefined : onSignup} />
     </div>
   );

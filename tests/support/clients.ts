@@ -88,7 +88,11 @@ export function testClients(db: PGlite) {
             verify: '123456',
           };
           await locked(() =>
-            db.query('INSERT INTO auth.users(id,email) VALUES($1,$2)', [user.id, email]),
+            db.query('INSERT INTO auth.users(id,email,raw_user_meta_data) VALUES($1,$2,$3)', [
+              user.id,
+              email,
+              JSON.stringify({ display_name: user.name }),
+            ]),
           );
           accounts.set(user.id, user);
           return success(signIn(user));
@@ -144,18 +148,32 @@ export function testClients(db: PGlite) {
           },
         },
       },
-      rpc: async (name: string, args: { identifier: string; ceiling: number }) => {
-        if (name !== 'mt_check_rate_limit') throw new Error('Unexpected RPC');
+      rpc: async (name: string, args: Record<string, unknown>) => {
+        const functions: Record<string, string[]> = {
+          mt_check_rate_limit: ['identifier', 'ceiling'],
+          mt_place_community: ['target_place', 'page_offset'],
+          mt_community_write: ['action', 'payload'],
+          mt_social_write: ['action', 'payload'],
+          mt_social_dashboard: ['search_text', 'page_offset'],
+          mt_expire_events: [],
+          mt_submission_write: ['action', 'payload'],
+          mt_apply_source_hours: ['target_place', 'periods', 'source_url'],
+          mt_claim_google_request: ['daily_limit'],
+          mt_queue_google_matches: [],
+          mt_refresh_daily_picks: [],
+        };
+        const names = functions[name];
+        if (!names) throw new Error('Unexpected RPC');
         try {
           return {
             data: (
-              await sql<{ allowed: boolean }>(
-                'SELECT public.mt_check_rate_limit($1,$2) AS allowed',
-                [args.identifier, args.ceiling],
-                undefined,
+              await sql<{ result: unknown }>(
+                `SELECT public.${name}(${names.map((_, i) => '$' + (i + 1)).join(',')}) AS result`,
+                names.map((k) => (typeof args[k] === 'object' ? JSON.stringify(args[k]) : args[k])),
+                account()?.id,
                 admin,
               )
-            )[0].allowed,
+            )[0].result,
             error: null,
           };
         } catch (error) {
@@ -163,7 +181,26 @@ export function testClients(db: PGlite) {
         }
       },
       from: (table: string) => {
-        if (!['mt_profiles', 'mt_metadata', 'mt_places', 'mt_saved_places'].includes(table))
+        if (
+          ![
+            'mt_profiles',
+            'mt_metadata',
+            'mt_places',
+            'mt_saved_places',
+            'mt_reviews',
+            'mt_comments',
+            'mt_comment_blocks',
+            'mt_public_profiles',
+            'mt_submissions',
+            'mt_submission_photos',
+            'mt_photo_deletions',
+            'mt_notifications',
+            'mt_source_settings',
+            'mt_source_logs',
+            'mt_google_matches',
+            'mt_daily_picks',
+          ].includes(table)
+        )
           throw new Error('Unexpected table');
         let op = 'select',
           columns = '*',
@@ -173,7 +210,7 @@ export function testClients(db: PGlite) {
           offset = 0,
           limit: number | undefined,
           ignore = false;
-        const filters: [string, unknown][] = [];
+        const filters: [string, unknown, string][] = [];
         const id = (value: string) => {
           if (!/^[a-z_]+$/.test(value)) throw new Error('Invalid identifier');
           return `"${value}"`;
@@ -184,11 +221,18 @@ export function testClients(db: PGlite) {
             return query;
           },
           eq: (column: string, value: unknown) => {
-            filters.push([column, value]);
+            filters.push([column, value, '=']);
             return query;
           },
-          order: (column: string) => {
-            ordering += (ordering ? ',' : '') + id(column);
+          like: (column: string, value: unknown) => {
+            filters.push([column, value, 'LIKE']);
+            return query;
+          },
+          order: (column: string, options?: { ascending?: boolean }) => {
+            ordering +=
+              (ordering ? ',' : '') +
+              id(column) +
+              (options?.ascending === false ? ' DESC' : ' ASC');
             return query;
           },
           range: (from: number, to: number) => {
@@ -202,6 +246,11 @@ export function testClients(db: PGlite) {
           },
           insert: (value: Row) => {
             op = 'insert';
+            body = value;
+            return query;
+          },
+          update: (value: Row) => {
+            op = 'update';
             body = value;
             return query;
           },
@@ -219,9 +268,9 @@ export function testClients(db: PGlite) {
             const run = async () => {
               const args: unknown[] = [];
               const where = filters
-                .map(([col, value]) => {
+                .map(([col, value, operator]) => {
                   args.push(value);
-                  return `${id(col)}=$${args.length}`;
+                  return `${id(col)} ${operator} $${args.length}`;
                 })
                 .join(' AND ');
               let statement = '';
@@ -233,6 +282,12 @@ export function testClients(db: PGlite) {
                     Array.isArray(v) || (v && typeof v === 'object') ? JSON.stringify(v) : v,
                   );
                 statement = `INSERT INTO public.${table} (${entries.map(([k]) => id(k)).join(',')}) VALUES (${args.map((_, i) => `$${i + 1}`).join(',')}) ${ignore ? 'ON CONFLICT DO NOTHING' : ''} RETURNING *`;
+              } else if (op === 'update') {
+                const assignments = Object.entries(body ?? {}).map(([k, v]) => {
+                  args.push(v);
+                  return `${id(k)}=$${args.length}`;
+                });
+                statement = `UPDATE public.${table} SET ${assignments.join(',')}${where ? ' WHERE ' + where : ''} RETURNING *`;
               } else if (op === 'delete')
                 statement = `DELETE FROM public.${table}${where ? ' WHERE ' + where : ''} RETURNING *`;
               else if (columns === 'place:mt_places(*)')

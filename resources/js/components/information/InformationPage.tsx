@@ -10,10 +10,12 @@ export function InformationPage({
   page,
   onAccount,
   signedIn,
+  onSubmitPlace,
 }: {
   page: InformationRoute;
   onAccount: () => void;
   signedIn: boolean;
+  onSubmitPlace: () => void;
 }) {
   const { language, t } = useI18n();
   const content = copy[language][page];
@@ -38,10 +40,20 @@ export function InformationPage({
             </section>
           ))}
         </div>
+        {(page === 'about' || page === 'contact') && (
+          <button className="primary-button mt-7" onClick={onSubmitPlace}>
+            {t('Suggest a place')}
+          </button>
+        )}
         {page === 'about' && (
           <>
             <section className="mt-8 rounded-3xl bg-orange-50 p-5">
               <h2 className="text-xl font-bold">{t('Photo credits')}</h2>
+              <p className="mt-3 text-sm text-slate-600">
+                {t(
+                  'Illustrative images include AI-generated hiking, seafood and terrace scenes; they do not depict the listed venue.',
+                )}
+              </p>
               <ul className="mt-3 space-y-3 text-sm">
                 <li>
                   Jardin de Balata · Box-Off-Dreams, Julie ·{' '}

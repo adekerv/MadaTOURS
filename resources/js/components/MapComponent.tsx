@@ -11,6 +11,7 @@ import {
 } from 'react-leaflet';
 import L from 'leaflet';
 import type { Place, UserLocation } from '../types';
+import { useTheme } from '../hooks/useTheme';
 import { getPlaceTheme } from '../utils/emoji';
 interface Props {
   userLocation: UserLocation;
@@ -67,8 +68,8 @@ function PlaceMarker({ place, onSelect }: { place: Place; onSelect: (place: Plac
     return L.divIcon({
       html: `<span class="place-marker" style="background:${theme.color}">${theme.emoji}</span>`,
       className: 'place-marker-container',
-      iconSize: [44, 44],
-      iconAnchor: [22, 38],
+      iconSize: [56, 56],
+      iconAnchor: [28, 50],
     });
   }, [place]);
   return (
@@ -83,6 +84,7 @@ function PlaceMarker({ place, onSelect }: { place: Place; onSelect: (place: Plac
 }
 export function MapComponent(props: Props) {
   const { t } = useI18n();
+  const { dark } = useTheme();
   const [tileError, setTileError] = useState(false);
   const [tilesLoading, setTilesLoading] = useState(true);
   const userIcon = useMemo(
@@ -105,6 +107,8 @@ export function MapComponent(props: Props) {
         minZoom={3}
       >
         <TileLayer
+          className={dark ? 'map-tiles-dark' : ''}
+          key={dark ? 'dark' : 'light'}
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           eventHandlers={{

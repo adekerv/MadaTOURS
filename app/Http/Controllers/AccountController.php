@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
+use App\Services\SubmissionPhotos;
 use App\Services\Supabase\AuthService;
 use App\Services\Supabase\SupabaseClient;
 use Illuminate\Http\JsonResponse;
@@ -10,7 +11,7 @@ use Illuminate\Http\Request;
 
 class AccountController extends Controller
 {
-    public function destroy(Request $request, AuthService $auth, SupabaseClient $client): JsonResponse
+    public function destroy(Request $request, AuthService $auth, SupabaseClient $client, SubmissionPhotos $photos): JsonResponse
     {
         $input = $request->validate(['password' => ['required', 'string', 'max:128']]);
         $user = $request->user();
@@ -22,6 +23,12 @@ class AccountController extends Controller
         // Revoke refresh sessions first; deletion cascades profiles and saved places.
         $auth->logout('global');
         $client->request('DELETE', '/auth/v1/admin/users/'.$user->id, admin: true);
+
+        try {
+            $photos->cleanup($user->id);
+        } catch (\Throwable) {
+            // Files are private and publication links are already removed; the durable queue retries.
+        }
 
         return response()->json(['success' => true]);
     }

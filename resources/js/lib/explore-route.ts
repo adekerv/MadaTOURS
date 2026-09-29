@@ -14,6 +14,9 @@ export function readExploreRoute(hash: string): ExploreParams | null {
     query: (params.get('q') || '').slice(0, 100),
     town: (params.get('town') || '').slice(0, 100),
     experience: (params.get('experience') || '').slice(0, 40),
+    ...(Number(params.get('minRating')) > 0
+      ? { minRating: Math.min(5, Number(params.get('minRating'))) }
+      : {}),
   };
 }
 
@@ -27,5 +30,6 @@ export function exploreHash(params: ExploreParams): string {
   if (params.query) search.set('q', params.query);
   if (params.town) search.set('town', params.town);
   if (params.experience) search.set('experience', params.experience);
+  if (params.minRating) search.set('minRating', String(params.minRating));
   return `#explore?${search}`;
 }

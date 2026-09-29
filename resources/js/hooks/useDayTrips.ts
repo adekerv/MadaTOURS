@@ -18,8 +18,10 @@ export function useDayTrips() {
     try {
       localStorage.setItem(key, JSON.stringify(data));
       setStorageError(false);
+      return true;
     } catch {
       setStorageError(true);
+      return false;
     }
   };
   return { trips, saveTrips, storageError };

@@ -1,7 +1,10 @@
+import { GooglePlacePanel } from './ui/GooglePlacePanel';
 import { useI18n } from '../i18n/I18nProvider';
 import { Heart, Calendar, ExternalLink, Clock, Star } from 'lucide-react';
 import { PlacePhoto } from './ui/PlacePhoto';
 import type { Place, User } from '../types';
+import { placeholderFor } from '../lib/placeholders';
+import { PlaceCommunity } from './community/PlaceCommunity';
 import { Modal } from './ui/Modal';
 export function PlaceDetailModal({
   place,
@@ -25,6 +28,7 @@ export function PlaceDetailModal({
   googleMapsUrl: string;
 }) {
   const { t, language } = useI18n();
+  const illustrative = placeholderFor(place);
   const venueSearch = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name}, ${place.location}, Martinique`)}`;
   const phone = /Contact:\s*(\+[\d\s-]{8,})/.exec(place.description)?.[1]?.replace(/[\s-]/g, '');
   const contactUrl = phone ? `tel:${phone}` : place.sources?.[0]?.url || venueSearch;
@@ -38,6 +42,7 @@ export function PlaceDetailModal({
         <p className="leading-relaxed text-slate-700">
           {language === 'fr' && place.descriptionFr ? place.descriptionFr : place.description}
         </p>
+        <GooglePlacePanel key={`${place.id}:${language}`} place={place} />
         <dl className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl bg-slate-50 p-4">
             <dt className="flex items-center gap-2 text-sm text-slate-600">
@@ -73,18 +78,58 @@ export function PlaceDetailModal({
               {t('Listed hours')}
             </dt>
             <dd className="mt-1 font-semibold">
-              {place.hours || (
-                <>
-                  <span className="block">{t('Hours unavailable')}</span>
-                  <a
-                    href={contactUrl}
-                    target={phone ? undefined : '_blank'}
-                    rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center text-sm text-orange-800 underline"
-                  >
-                    {t(phone ? 'Call the venue' : 'Venue contact and information')}
-                  </a>
-                </>
+              {place.openingPeriods?.length ? (
+                <div className="space-y-1 text-sm">
+                  {Array.from({ length: 7 }, (_, day) => {
+                    const periods = place.openingPeriods!.filter((p) => p.day === day);
+                    if (!periods.length) return null;
+                    const label = new Intl.DateTimeFormat(language === 'fr' ? 'fr-FR' : 'en-GB', {
+                      weekday: 'short',
+                      timeZone: 'UTC',
+                    }).format(new Date(Date.UTC(2026, 8, 27 + day)));
+                    const clock = (m: number) =>
+                      `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+                    return (
+                      <p key={day}>
+                        {label} ·{' '}
+                        {periods.map((p) => `${clock(p.opens)}–${clock(p.closes)}`).join(', ')}
+                      </p>
+                    );
+                  })}
+                  {place.hoursSource && (
+                    <a
+                      className="inline-flex min-h-11 items-center underline"
+                      href={place.hoursSource}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t('Source hours')}
+                    </a>
+                  )}
+                  {place.hoursUpdatedAt && (
+                    <p className="text-xs font-normal text-slate-500">
+                      {t('Updated: {date}', {
+                        date: new Date(place.hoursUpdatedAt).toLocaleDateString(
+                          language === 'fr' ? 'fr-FR' : 'en-GB',
+                        ),
+                      })}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                place.hours || (
+                  <>
+                    <span className="block">{t('Hours unavailable')}</span>
+                    <a
+                      href={contactUrl}
+                      target={phone ? undefined : '_blank'}
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-11 items-center text-sm text-orange-800 underline"
+                    >
+                      {t(phone ? 'Call the venue' : 'Venue contact and information')}
+                    </a>
+                  </>
+                )
               )}
             </dd>
           </div>
@@ -94,6 +139,12 @@ export function PlaceDetailModal({
             'Check the source for current hours and access. Map points are approximate; confirm the entrance with the venue.',
           )}
         </p>
+        <PlaceCommunity
+          key={`${place.id}:${user?.id || 'guest'}`}
+          placeId={place.id}
+          user={user}
+          onLogin={onLoginClick}
+        />
         {!!place.tags?.length && (
           <ul aria-label={t('Place tags')} className="flex flex-wrap gap-2">
             {[...new Set(place.tags)].map((tag) => (
@@ -174,6 +225,40 @@ export function PlaceDetailModal({
             >
               {place.photoCredit.license}
             </a>{' '}
+            · {t('Displayed cropped to fit.')}
+          </p>
+        )}
+        {!place.image && (
+          <p className="text-xs text-slate-500">
+            {t(illustrative.label)} · {t(illustrative.credit)}
+            {illustrative.source && (
+              <>
+                {' '}
+                ·{' '}
+                <a
+                  className="underline"
+                  href={illustrative.source}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('Photo source')}
+                </a>
+              </>
+            )}
+            {illustrative.license && (
+              <>
+                {' '}
+                ·{' '}
+                <a
+                  className="underline"
+                  href={illustrative.license}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('Photo license')}
+                </a>
+              </>
+            )}{' '}
             · {t('Displayed cropped to fit.')}
           </p>
         )}

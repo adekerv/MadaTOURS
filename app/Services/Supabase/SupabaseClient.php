@@ -30,7 +30,7 @@ class SupabaseClient
         }
         if (! $response->successful()) {
             $code = $response->json('code') ?? $response->json('error_code');
-            if ($response->status() === 429 || str_starts_with($code ?? '', 'over_')) {
+            if ($code === 'P0429' || $response->status() === 429 || str_starts_with($code ?? '', 'over_')) {
                 throw new ApiException(429, 'Too many attempts. Please wait before trying again.');
             }
             if (str_starts_with($path, '/auth/')) {
@@ -56,6 +56,9 @@ class SupabaseClient
             }
             if ($code === '23503') {
                 throw new ApiException(404, 'This place is no longer available.');
+            }
+            if (in_array($code, ['23514', '23502', '22023'], true)) {
+                throw new ApiException(422, 'Please check the required fields and try again.');
             }
             if ($code === '23505') {
                 throw new ApiException(409, 'This record already exists.');

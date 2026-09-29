@@ -19,7 +19,13 @@ class PlaceResource extends JsonResource
             'access' => $p['access'] ?? 'unknown', 'sources' => $p['sources'] ?? [],
             'photoCredit' => $p['photo_credit'] ?? null, 'tags' => $p['tags'] ?? [],
             'rating' => isset($p['rating']) ? (float) $p['rating'] : null, 'hours' => $p['hours'] ?? null,
-            'image' => $image && (str_starts_with($image, 'https://') || preg_match('#^/photos/[a-zA-Z0-9._-]+$#', $image)) ? $image : null,
+            'image' => $image && (str_starts_with($image, 'https://') || preg_match('#^/photos/(community/)?[a-zA-Z0-9._-]+$#', $image)) ? $image : null,
+            'communityRating' => isset($p['community_rating']) ? (float) $p['community_rating'] : null,
+            'communityCount' => (int) ($p['community_count'] ?? 0),
+            'googlePlaceId' => $p['google_place_id'] ?? null,
+            'openingPeriods' => $p['opening_periods'] ?? null,
+            'hoursSource' => $p['hours_source'] ?? null,
+            'hoursUpdatedAt' => $p['hours_updated_at'] ?? null,
             'distance' => $p['distance'] ?? null,
         ], fn ($value) => $value !== null);
     }

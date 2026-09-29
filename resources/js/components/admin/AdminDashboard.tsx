@@ -4,6 +4,9 @@ import { Trash2, Plus, MapPin } from 'lucide-react';
 import type { Place, User } from '../../types';
 import { api, errorMessage } from '../../lib/api';
 import { normalizePlace } from '../../lib/places-utils';
+import { EnrichmentModeration } from './EnrichmentModeration';
+import { SubmissionModeration } from './SubmissionModeration';
+import { CommunityModeration } from './CommunityModeration';
 import { Modal } from '../ui/Modal';
 const emptyForm = {
   name: '',
@@ -118,6 +121,22 @@ export function AdminDashboard({
             {t(notice)}
           </p>
         )}
+        <details>
+          <summary className="font-semibold cursor-pointer">{t('Place submissions')}</summary>
+          <SubmissionModeration onPublished={onRefreshPlaces} />
+        </details>
+        <details>
+          <summary className="font-semibold cursor-pointer">
+            {t('Reviews and comment restrictions')}
+          </summary>
+          <CommunityModeration />
+        </details>
+        <details className="rounded-2xl border border-slate-200 p-4">
+          <summary className="flex min-h-11 cursor-pointer items-center font-semibold">
+            {t('Sources and Google matching')}
+          </summary>
+          <EnrichmentModeration places={places} onChanged={onRefreshPlaces} />
+        </details>
         <section>
           <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">
             <Plus size={21} />

@@ -116,7 +116,7 @@ export function AuthModal({
               />
             </label>
             <p className="text-sm text-slate-600">
-              {t('Start exploring right away. No email verification needed.')}
+              {t('Explore freely. Verify your email when you want to join meet-ups.')}
             </p>
           </>
         )}

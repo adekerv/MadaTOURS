@@ -12,6 +12,8 @@ export default defineConfig({
       async closeBundle() {
         await mkdir('dist/mobile', { recursive: true });
         await cp('public/favicon.svg', 'dist/mobile/favicon.svg');
+        await cp('public/theme.js', 'dist/mobile/theme.js');
+        await cp('public/assets', 'dist/mobile/assets', { recursive: true });
         await cp('public/photos', 'dist/mobile/photos', { recursive: true });
       },
     },

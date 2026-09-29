@@ -83,6 +83,8 @@ const desired: Record<string, string> = {
   site_url: origin.origin,
   mailer_subjects_confirmation: 'MadaTours — Votre code de vérification / Your verification code',
   mailer_templates_confirmation_content: confirmation,
+  mailer_subjects_magic_link: 'MadaTours — Votre code de vérification / Your verification code',
+  mailer_templates_magic_link_content: confirmation,
   mailer_subjects_recovery: 'MadaTours — Votre code de récupération / Your recovery code',
   mailer_templates_recovery_content: recovery,
 };

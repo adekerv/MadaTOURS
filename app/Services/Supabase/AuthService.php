@@ -39,7 +39,7 @@ class AuthService
         }
         // Validate remotely on every protected request; session data never grants a role.
         $user = $this->client->request('GET', '/auth/v1/user', token: $token);
-        $profiles = $this->client->request('GET', '/rest/v1/mt_profiles', ['select' => 'role', 'id' => 'eq.'.$user['id']], $token);
+        $profiles = $this->client->request('GET', '/rest/v1/mt_profiles', ['select' => 'role,email_verified_at', 'id' => 'eq.'.$user['id']], $token);
         if (empty($profiles)) {
             throw new ApiException(503, 'Your account profile is not available.');
         }
@@ -51,6 +51,7 @@ class AuthService
             'id' => $user['id'],
             'name' => mb_substr($name ?: (strtok($user['email'] ?? '', '@') ?: 'Explorer'), 0, 80),
             'email' => $user['email'] ?? '',
+            'emailVerified' => ! empty($profiles[0]['email_verified_at']),
             'role' => $profiles[0]['role'] === 'admin' ? 'admin' : 'user',
         ];
     }

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>Google Maps</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: transparent;
+      }
+      gmp-place-details {
+        display: block;
+        width: 100%;
+        min-width: 250px;
+        max-height: 680px;
+        overflow: auto;
+        border-radius: 16px;
+      }
+      .dark gmp-place-details {
+        color-scheme: dark;
+        --gmp-mat-color-surface: #24211e;
+        --gmp-mat-color-on-surface: #f5eee7;
+        --gmp-mat-color-on-surface-variant: #c8bcb1;
+        --gmp-mat-color-primary: #ffb987;
+      }
+    </style>
+    <script src="/google-places.js" defer></script>
+  </head>
+  <body></body>
+</html>

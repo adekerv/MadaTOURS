@@ -44,6 +44,12 @@ class AuthController extends Controller
         $input = $request->validated();
         $this->auth->limit('verify', $input['email']);
         $this->auth->authenticate('verify', $input + ['type' => 'email']);
+        $user = $this->auth->user();
+        if (strtolower($user['email']) !== strtolower($input['email'])) {
+            $this->auth->clear();
+            throw new ApiException(403, 'The verification does not match this account.');
+        }
+        $this->client->request('PATCH', '/rest/v1/mt_profiles?id=eq.'.rawurlencode($user['id']), ['email_verified_at' => now()->toIso8601String()], admin: true);
 
         return response()->json(['user' => $this->auth->user()]);
     }

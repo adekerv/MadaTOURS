@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="{{ $language }}">
 <head>
+    <script src="/theme.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>{{ $copy['title'] }} — MadaTours</title>
@@ -9,6 +10,9 @@
     <meta name="theme-color" content="#fdfcfb">
     <style>
         * { box-sizing: border-box; }
+        .dark body { background: #191714; color: #f5eee7; }
+        .dark a { color: #ffb987; }
+        .dark nav, .dark footer { border-color: #4b4138; }
         body { margin: 0; background: #fdfcfb; color: #0f172a; font: 17px/1.7 system-ui, sans-serif; }
         main, nav, footer {
             max-width: 800px;

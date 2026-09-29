@@ -18,7 +18,13 @@ export interface Place {
   };
   distance?: number;
   rating?: number;
+  communityRating?: number;
+  communityCount?: number;
+  googlePlaceId?: string;
+  hoursSource?: string;
+  hoursUpdatedAt?: string;
   hours?: string;
+  openingPeriods?: { day: number; opens: number; closes: number }[];
   tags?: string[];
   image?: string;
 }
@@ -27,6 +33,7 @@ export interface User {
   name: string;
   email: string;
   role: 'user' | 'admin';
+  emailVerified?: boolean;
 }
 export interface UserLocation {
   lat: number;
@@ -41,4 +48,5 @@ export interface ExploreParams {
   query?: string;
   town?: string;
   experience?: string;
+  minRating?: number;
 }

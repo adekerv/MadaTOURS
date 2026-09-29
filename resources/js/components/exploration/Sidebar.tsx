@@ -7,6 +7,8 @@ import { experiences } from '../../lib/catalogue';
 import { PlaceCardSkeleton } from '../ui/PlacePhoto';
 import { recentSearches, rememberSearch, clearSearches } from '../../lib/local-preferences';
 interface Props {
+  minRating: number;
+  setMinRating: (value: number) => void;
   filter: 'all' | 'restaurant' | 'activity';
   setFilter: (filter: 'all' | 'restaurant' | 'activity') => void;
   radius: number;
@@ -157,6 +159,21 @@ export function Sidebar(props: Props) {
           </button>
         ))}
       </div>
+      <fieldset className="mb-4">
+        <legend className="mb-2 text-sm font-semibold">{t('Minimum community rating')}</legend>
+        <div className="flex flex-wrap gap-2">
+          {[0, 3, 4, 4.5].map((value) => (
+            <button
+              key={value}
+              aria-pressed={props.minRating === value}
+              onClick={() => props.setMinRating(value)}
+              className={props.minRating === value ? 'primary-button' : 'secondary-button'}
+            >
+              {value ? `${value} ★ +` : t('Any rating')}
+            </button>
+          ))}
+        </div>
+      </fieldset>
       <details className="mb-4 rounded-xl bg-slate-50 p-3">
         <summary className="cursor-pointer py-1 text-sm font-semibold text-slate-700">
           {t('Distance and sorting')} · {radius} km

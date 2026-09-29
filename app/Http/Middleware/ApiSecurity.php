@@ -29,7 +29,7 @@ class ApiSecurity
         if (! $request->isMethodSafe() && $request->header('X-MadaTours-Client') !== '1') {
             return response()->json(['error' => 'Invalid request. Please reload and try again.'], 403, $headers);
         }
-        if (strlen($request->getContent()) > 32768) {
+        if (strlen($request->getContent()) > ($request->is('api/submissions') && $request->isMethod('POST') ? 2900000 : 32768)) {
             return response()->json(['error' => 'Request is too large.'], 413, $headers);
         }
         if ($request->getContent() !== '' && $request->isJson()) {

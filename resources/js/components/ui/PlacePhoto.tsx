@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { placeholderFor } from '../../lib/placeholders';
 import { MapPin } from 'lucide-react';
 import type { Place } from '../../types';
 import { useI18n } from '../../i18n/I18nProvider';
@@ -13,9 +14,14 @@ export function PlacePhoto({
   priority?: boolean;
 }) {
   const { t } = useI18n();
+  const fallback = placeholderFor(place);
+  const [failedOriginal, setFailedOriginal] = useState('');
   const [imageState, setImageState] = useState({ src: '', loaded: false, failed: false });
-  // The fallback is clearly labelled: a licensed island landscape is not a venue photograph.
-  const src = place.image || '/photos/salines.jpg';
+  const illustrative = !place.image || failedOriginal === place.image;
+  const original = place.image?.startsWith('/photos/community/')
+    ? `${(import.meta.env.VITE_API_URL || '').replace(/\/$/, '')}${place.image}`
+    : place.image;
+  const src = illustrative ? fallback.src : original!;
   const loaded = imageState.src === src && imageState.loaded;
   const failed = imageState.src === src && imageState.failed;
   return (
@@ -23,13 +29,16 @@ export function PlacePhoto({
       {!failed ? (
         <img
           src={src}
-          alt={place.image ? place.name : t('Étang des Salines landscape')}
+          alt={illustrative ? t(fallback.label) : place.name}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
           width="960"
           height="640"
           onLoad={() => setImageState({ src, loaded: true, failed: false })}
-          onError={() => setImageState({ src, loaded: false, failed: true })}
+          onError={() => {
+            if (!illustrative) setFailedOriginal(place.image!);
+            else setImageState({ src, loaded: false, failed: true });
+          }}
           className={`h-full w-full object-cover transition-[filter,opacity] duration-300 ${loaded ? 'blur-0 opacity-100' : 'blur-sm opacity-30'}`}
         />
       ) : (
@@ -38,9 +47,10 @@ export function PlacePhoto({
         </div>
       )}
       {!loaded && !failed && <div aria-hidden="true" className="skeleton absolute inset-0" />}
-      {(!place.image || failed) && (
+      {(illustrative || failed) && (
         <span className="absolute inset-x-0 bottom-0 bg-slate-900/80 px-2 py-1 text-[10px] text-white">
-          {t(failed ? 'Photo unavailable' : 'Martinique scenery · illustrative photo')}
+          {t(failed ? 'Photo unavailable' : fallback.label)}
+          <span className="block">{t(fallback.credit)}</span>
         </span>
       )}
     </div>

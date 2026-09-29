@@ -19,6 +19,10 @@ export function offlineShell(): Plugin {
         ...new Set([
           '/build/offline.html',
           '/favicon.svg',
+          '/theme.js',
+          ...['beach', 'hiking', 'seafood', 'restaurant', 'nature', 'culture'].map(
+            (name) => `/assets/placeholders/${name}.jpg`,
+          ),
           ...Object.keys(bundle)
             .filter((name) => !name.endsWith('.map'))
             .map((name) => `/build/${name}`),
@@ -26,6 +30,7 @@ export function offlineShell(): Plugin {
       ];
       const version = createHash('sha256')
         .update(JSON.stringify(assets) + shell)
+        .update(readFileSync('public/theme.js'))
         .digest('hex')
         .slice(0, 12);
       this.emitFile({
@@ -38,7 +43,7 @@ self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).t
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('madatours-shell-') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', event => {
   const request = event.request, url = new URL(request.url);
-  if(request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+  if(request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/') || url.pathname.startsWith('/google-places') || url.pathname.startsWith('/photos/community/')) return;
   if(request.mode === 'navigate') {
     event.respondWith((async () => {
       const controller = new AbortController(); const timer=setTimeout(()=>controller.abort(),4000);

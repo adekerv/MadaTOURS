@@ -115,6 +115,601 @@ CREATE INDEX IF NOT EXISTS mt_places_published_id_idx
 CREATE INDEX IF NOT EXISTS mt_rate_limits_expires_idx
   ON public.mt_rate_limits(expires_at);
 
+-- v2: all mutations are bounded RPCs; direct clients cannot bypass moderation/rate limits.
+CREATE SCHEMA IF NOT EXISTS mt_private;
+REVOKE ALL ON SCHEMA mt_private FROM PUBLIC, anon, authenticated;
+GRANT USAGE ON SCHEMA mt_private TO authenticated;
+ALTER TABLE public.mt_profiles ADD COLUMN IF NOT EXISTS email_verified_at timestamptz;
+CREATE TABLE IF NOT EXISTS public.mt_public_profiles (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  display_name text NOT NULL CHECK (char_length(display_name) BETWEEN 1 AND 80)
+);
+CREATE OR REPLACE FUNCTION public.mt_sync_display_name() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
+BEGIN
+  INSERT INTO public.mt_public_profiles(user_id,display_name)
+  VALUES(NEW.id, left(coalesce(nullif(trim(regexp_replace(NEW.raw_user_meta_data->>'display_name','[<>[:cntrl:]]','','g')),''),'Explorer'),80))
+  ON CONFLICT(user_id) DO UPDATE SET display_name=excluded.display_name;
+  RETURN NEW;
+END; $$;
+REVOKE ALL ON FUNCTION public.mt_sync_display_name() FROM PUBLIC;
+DROP TRIGGER IF EXISTS mt_display_name_changed ON auth.users;
+CREATE TRIGGER mt_display_name_changed AFTER INSERT OR UPDATE OF raw_user_meta_data ON auth.users FOR EACH ROW EXECUTE FUNCTION public.mt_sync_display_name();
+INSERT INTO public.mt_public_profiles(user_id,display_name)
+SELECT id,left(coalesce(nullif(trim(regexp_replace(raw_user_meta_data->>'display_name','[<>[:cntrl:]]','','g')),''),'Explorer'),80) FROM auth.users ON CONFLICT DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS public.mt_comment_blocks (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  reason text NOT NULL CHECK(char_length(reason) BETWEEN 3 AND 500),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS public.mt_reviews (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  place_id bigint NOT NULL REFERENCES public.mt_places(id) ON DELETE CASCADE,
+  rating smallint NOT NULL CHECK(rating BETWEEN 1 AND 5),
+  body text NOT NULL CHECK(char_length(trim(body)) BETWEEN 10 AND 2000),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  moderated boolean NOT NULL DEFAULT false,
+  UNIQUE(user_id,place_id)
+);
+CREATE INDEX IF NOT EXISTS mt_reviews_place_idx ON public.mt_reviews(place_id,created_at DESC);
+CREATE TABLE IF NOT EXISTS public.mt_comments (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  place_id bigint NOT NULL REFERENCES public.mt_places(id) ON DELETE CASCADE,
+  body text NOT NULL CHECK(char_length(trim(body)) BETWEEN 2 AND 1000),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS mt_comments_place_idx ON public.mt_comments(place_id,created_at DESC);
+CREATE INDEX IF NOT EXISTS mt_comments_user_idx ON public.mt_comments(user_id);
+CREATE TABLE IF NOT EXISTS public.mt_checkins (
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  place_id bigint NOT NULL REFERENCES public.mt_places(id) ON DELETE CASCADE,
+  visited_on date NOT NULL DEFAULT ((now() AT TIME ZONE 'America/Martinique')::date),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY(user_id,place_id,visited_on)
+);
+CREATE INDEX IF NOT EXISTS mt_checkins_place_idx ON public.mt_checkins(place_id,user_id,visited_on);
+ALTER TABLE public.mt_places ADD COLUMN IF NOT EXISTS community_rating numeric(3,2);
+ALTER TABLE public.mt_places ADD COLUMN IF NOT EXISTS community_count integer NOT NULL DEFAULT 0;
+CREATE OR REPLACE FUNCTION mt_private.update_community_rating() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
+DECLARE target bigint := coalesce(NEW.place_id,OLD.place_id);
+BEGIN
+  -- Serialize aggregate updates so concurrent reviews cannot overwrite a newer count.
+  PERFORM 1 FROM public.mt_places WHERE id=target FOR UPDATE;
+  UPDATE public.mt_places SET community_rating=(SELECT round(avg(rating),2) FROM public.mt_reviews WHERE place_id=target),
+    community_count=(SELECT count(*) FROM public.mt_reviews WHERE place_id=target) WHERE id=target;
+  RETURN NULL;
+END; $$;
+REVOKE ALL ON FUNCTION mt_private.update_community_rating() FROM PUBLIC;
+DROP TRIGGER IF EXISTS mt_reviews_aggregate ON public.mt_reviews;
+CREATE TRIGGER mt_reviews_aggregate AFTER INSERT OR UPDATE OR DELETE ON public.mt_reviews FOR EACH ROW EXECUTE FUNCTION mt_private.update_community_rating();
+
+CREATE OR REPLACE FUNCTION mt_private.actor(kind text, ceiling integer DEFAULT 10, verified boolean DEFAULT false) RETURNS uuid
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
+DECLARE actor_id uuid := auth.uid(); hits integer; rate_key text;
+BEGIN
+  IF actor_id IS NULL OR NOT EXISTS(SELECT 1 FROM public.mt_profiles WHERE id=actor_id) THEN RAISE EXCEPTION 'Authentication required' USING ERRCODE='42501'; END IF;
+  IF verified AND NOT EXISTS(SELECT 1 FROM public.mt_profiles WHERE id=actor_id AND email_verified_at IS NOT NULL) THEN RAISE EXCEPTION 'Email verification required' USING ERRCODE='42501'; END IF;
+  rate_key := 'v2:'||kind||':'||actor_id;
+  INSERT INTO public.mt_rate_limits(key,hits,expires_at) VALUES(rate_key,1,now()+interval '15 minutes')
+  ON CONFLICT(key) DO UPDATE SET hits=CASE WHEN public.mt_rate_limits.expires_at < now() THEN 1 ELSE public.mt_rate_limits.hits+1 END,
+    expires_at=CASE WHEN public.mt_rate_limits.expires_at < now() THEN now()+interval '15 minutes' ELSE public.mt_rate_limits.expires_at END
+  RETURNING public.mt_rate_limits.hits INTO hits;
+  IF hits > ceiling THEN RAISE EXCEPTION 'Too many attempts' USING ERRCODE='P0429'; END IF;
+  RETURN actor_id;
+END; $$;
+REVOKE ALL ON FUNCTION mt_private.actor(text,integer,boolean) FROM PUBLIC, anon, authenticated;
+
+CREATE OR REPLACE FUNCTION public.mt_community_write(action text, payload jsonb) RETURNS jsonb
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
+DECLARE actor_id uuid; target_place bigint := (payload->>'placeId')::bigint; target_id bigint := (payload->>'id')::bigint; result jsonb;
+BEGIN
+  actor_id := mt_private.actor('community',20);
+  IF action IN ('review','comment','checkin') THEN
+    IF NOT EXISTS(SELECT 1 FROM public.mt_places WHERE id=target_place AND published) THEN RAISE EXCEPTION 'Place unavailable' USING ERRCODE='23503'; END IF;
+    IF action <> 'checkin' AND EXISTS(SELECT 1 FROM public.mt_comment_blocks WHERE user_id=actor_id) THEN RAISE EXCEPTION 'Commenting restricted' USING ERRCODE='42501'; END IF;
+  END IF;
+  CASE action
+    WHEN 'review' THEN
+      INSERT INTO public.mt_reviews(user_id,place_id,rating,body) VALUES(actor_id,target_place,(payload->>'rating')::smallint,trim(payload->>'body'))
+      ON CONFLICT(user_id,place_id) DO UPDATE SET rating=excluded.rating,body=excluded.body,updated_at=now(),moderated=false RETURNING to_jsonb(mt_reviews.*) INTO result;
+    WHEN 'comment' THEN
+      INSERT INTO public.mt_comments(user_id,place_id,body) VALUES(actor_id,target_place,trim(payload->>'body')) RETURNING to_jsonb(mt_comments.*) INTO result;
+    WHEN 'checkin' THEN
+      INSERT INTO public.mt_checkins(user_id,place_id) VALUES(actor_id,target_place) ON CONFLICT DO NOTHING;
+    WHEN 'delete-review' THEN
+      DELETE FROM public.mt_reviews WHERE id=target_id AND (user_id=actor_id OR public.mt_is_admin());
+    WHEN 'delete-comment' THEN
+      DELETE FROM public.mt_comments WHERE id=target_id AND (user_id=actor_id OR public.mt_is_admin());
+    WHEN 'moderate-review' THEN
+      IF NOT public.mt_is_admin() THEN RAISE EXCEPTION 'Administrator required' USING ERRCODE='42501'; END IF;
+      UPDATE public.mt_reviews SET body=trim(payload->>'body'),rating=(payload->>'rating')::smallint,moderated=true,updated_at=now() WHERE id=target_id;
+    WHEN 'block-comments' THEN
+      IF NOT public.mt_is_admin() THEN RAISE EXCEPTION 'Administrator required' USING ERRCODE='42501'; END IF;
+      INSERT INTO public.mt_comment_blocks(user_id,reason) VALUES((payload->>'userId')::uuid,trim(payload->>'reason')) ON CONFLICT(user_id) DO UPDATE SET reason=excluded.reason;
+    WHEN 'unblock-comments' THEN
+      IF NOT public.mt_is_admin() THEN RAISE EXCEPTION 'Administrator required' USING ERRCODE='42501'; END IF;
+      DELETE FROM public.mt_comment_blocks WHERE user_id=(payload->>'userId')::uuid;
+    ELSE RAISE EXCEPTION 'Unknown community action' USING ERRCODE='22023';
+  END CASE;
+  RETURN coalesce(result,'{"success":true}'::jsonb);
+END; $$;
+REVOKE ALL ON FUNCTION public.mt_community_write(text,jsonb) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.mt_community_write(text,jsonb) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.mt_place_community(target_place bigint, page_offset integer DEFAULT 0) RETURNS jsonb
+LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = '' AS $$
+DECLARE result jsonb;
+BEGIN
+  IF page_offset < 0 OR page_offset > 10000 THEN RAISE EXCEPTION 'Invalid page'; END IF;
+  IF NOT EXISTS(SELECT 1 FROM public.mt_places WHERE id=target_place AND published) THEN RETURN '{"reviews":[],"comments":[]}'::jsonb; END IF;
+  SELECT jsonb_build_object(
+    'reviews',coalesce((SELECT jsonb_agg(r) FROM (
+      SELECT r.id,r.user_id,r.rating,r.body,r.created_at,r.updated_at,r.moderated,p.display_name,
+      (SELECT count(*) FROM public.mt_checkins c WHERE c.user_id=r.user_id AND c.place_id=r.place_id AND c.visited_on >= date_trunc('year',now() AT TIME ZONE 'America/Martinique')::date) AS visits
+      FROM public.mt_reviews r JOIN public.mt_public_profiles p ON p.user_id=r.user_id WHERE r.place_id=target_place ORDER BY r.created_at DESC,r.id DESC LIMIT 20 OFFSET page_offset) r),'[]'::jsonb),
+    'comments',coalesce((SELECT jsonb_agg(c) FROM (
+      SELECT c.id,c.user_id,c.body,c.created_at,p.display_name FROM public.mt_comments c JOIN public.mt_public_profiles p ON p.user_id=c.user_id WHERE c.place_id=target_place ORDER BY c.created_at DESC,c.id DESC LIMIT 20 OFFSET page_offset) c),'[]'::jsonb),
+    'rating',(SELECT community_rating FROM public.mt_places WHERE id=target_place),
+    'count',(SELECT community_count FROM public.mt_places WHERE id=target_place)
+  ) INTO result;
+  RETURN result;
+END; $$;
+REVOKE ALL ON FUNCTION public.mt_place_community(bigint,integer) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.mt_place_community(bigint,integer) TO anon, authenticated;
+
+ALTER TABLE public.mt_public_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_checkins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_comment_blocks ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.mt_public_profiles,public.mt_reviews,public.mt_comments,public.mt_checkins,public.mt_comment_blocks FROM anon,authenticated;
+GRANT SELECT ON public.mt_public_profiles,public.mt_reviews,public.mt_comments,public.mt_checkins,public.mt_comment_blocks TO authenticated;
+GRANT ALL ON public.mt_public_profiles,public.mt_reviews,public.mt_comments,public.mt_checkins,public.mt_comment_blocks TO service_role;
+GRANT USAGE ON SEQUENCE public.mt_reviews_id_seq,public.mt_comments_id_seq TO service_role;
+DROP POLICY IF EXISTS mt_profiles_directory ON public.mt_public_profiles;
+CREATE POLICY mt_profiles_directory ON public.mt_public_profiles FOR SELECT TO authenticated USING(true);
+DROP POLICY IF EXISTS mt_reviews_read ON public.mt_reviews;
+CREATE POLICY mt_reviews_read ON public.mt_reviews FOR SELECT TO authenticated USING(user_id=(SELECT auth.uid()) OR (SELECT public.mt_is_admin()));
+DROP POLICY IF EXISTS mt_comments_read ON public.mt_comments;
+CREATE POLICY mt_comments_read ON public.mt_comments FOR SELECT TO authenticated USING(user_id=(SELECT auth.uid()) OR (SELECT public.mt_is_admin()));
+DROP POLICY IF EXISTS mt_checkins_read ON public.mt_checkins;
+CREATE POLICY mt_checkins_read ON public.mt_checkins FOR SELECT TO authenticated USING(user_id=(SELECT auth.uid()));
+DROP POLICY IF EXISTS mt_blocks_admin ON public.mt_comment_blocks;
+CREATE POLICY mt_blocks_admin ON public.mt_comment_blocks FOR SELECT TO authenticated USING((SELECT public.mt_is_admin()));
+
+CREATE TABLE IF NOT EXISTS public.mt_user_blocks (
+  blocker_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  blocked_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY(blocker_id,blocked_id), CHECK(blocker_id<>blocked_id)
+);
+CREATE INDEX IF NOT EXISTS mt_user_blocks_target_idx ON public.mt_user_blocks(blocked_id,blocker_id);
+CREATE TABLE IF NOT EXISTS public.mt_follows (
+  follower_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  following_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  status text NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','accepted','declined')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY(follower_id,following_id), CHECK(follower_id<>following_id)
+);
+CREATE INDEX IF NOT EXISTS mt_follows_target_idx ON public.mt_follows(following_id,status,follower_id);
+CREATE TABLE IF NOT EXISTS public.mt_activity (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  place_id bigint NOT NULL REFERENCES public.mt_places(id) ON DELETE CASCADE,
+  kind text NOT NULL CHECK(kind IN ('checkin','favorite','plan')),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS mt_activity_user_idx ON public.mt_activity(user_id,created_at DESC);
+CREATE INDEX IF NOT EXISTS mt_activity_place_idx ON public.mt_activity(place_id);
+CREATE OR REPLACE FUNCTION mt_private.not_blocked(other_user uuid) RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $$
+  SELECT auth.uid() IS NOT NULL AND NOT EXISTS(SELECT 1 FROM public.mt_user_blocks WHERE (blocker_id=auth.uid() AND blocked_id=other_user) OR (blocker_id=other_user AND blocked_id=auth.uid()));
+$$;
+CREATE OR REPLACE FUNCTION mt_private.email_verified() RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $$
+  SELECT auth.uid() IS NOT NULL AND EXISTS(SELECT 1 FROM public.mt_profiles WHERE id=auth.uid() AND email_verified_at IS NOT NULL);
+$$;
+CREATE OR REPLACE FUNCTION mt_private.can_read_activity(owner_id uuid) RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path='' AS $$
+  SELECT auth.uid() IS NOT NULL AND (owner_id=auth.uid() OR (mt_private.not_blocked(owner_id) AND EXISTS(SELECT 1 FROM public.mt_follows WHERE follower_id=auth.uid() AND following_id=owner_id AND status='accepted')));
+$$;
+REVOKE ALL ON FUNCTION mt_private.not_blocked(uuid),mt_private.email_verified(),mt_private.can_read_activity(uuid) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION mt_private.not_blocked(uuid),mt_private.email_verified(),mt_private.can_read_activity(uuid) TO authenticated;
+CREATE OR REPLACE FUNCTION mt_private.record_activity() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+BEGIN
+  IF TG_TABLE_NAME='mt_checkins' THEN
+    INSERT INTO public.mt_activity(user_id,place_id,kind) VALUES(NEW.user_id,NEW.place_id,'checkin');
+  ELSIF TG_OP='DELETE' AND OLD.kind='favorites' THEN
+    DELETE FROM public.mt_activity WHERE user_id=OLD.user_id AND place_id=OLD.place_id AND kind='favorite';
+  ELSIF TG_OP='INSERT' AND NEW.kind='favorites' THEN
+    INSERT INTO public.mt_activity(user_id,place_id,kind) VALUES(NEW.user_id,NEW.place_id,'favorite');
+  END IF;
+  RETURN NULL;
+END; $$;
+REVOKE ALL ON FUNCTION mt_private.record_activity() FROM PUBLIC;
+DROP TRIGGER IF EXISTS mt_checkin_activity ON public.mt_checkins;
+CREATE TRIGGER mt_checkin_activity AFTER INSERT ON public.mt_checkins FOR EACH ROW EXECUTE FUNCTION mt_private.record_activity();
+DROP TRIGGER IF EXISTS mt_saved_activity ON public.mt_saved_places;
+CREATE TRIGGER mt_saved_activity AFTER INSERT OR DELETE ON public.mt_saved_places FOR EACH ROW EXECUTE FUNCTION mt_private.record_activity();
+
+CREATE TABLE IF NOT EXISTS public.mt_events (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  creator_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title text NOT NULL CHECK(char_length(trim(title)) BETWEEN 3 AND 120),
+  place_id bigint REFERENCES public.mt_places(id) ON DELETE SET NULL,
+  location text NOT NULL CHECK(char_length(trim(location)) BETWEEN 3 AND 200),
+  lat double precision NOT NULL CHECK(lat BETWEEN 14.35 AND 14.95),
+  lng double precision NOT NULL CHECK(lng BETWEEN -61.3 AND -60.75),
+  starts_at timestamptz NOT NULL,
+  price numeric(8,2) NOT NULL DEFAULT 0 CHECK(price BETWEEN 0 AND 10000),
+  capacity integer NOT NULL CHECK(capacity BETWEEN 2 AND 100),
+  description text NOT NULL CHECK(char_length(trim(description)) BETWEEN 20 AND 2000),
+  expires_at timestamptz NOT NULL,
+  status text NOT NULL DEFAULT 'live' CHECK(status IN ('live','expired','cancelled')),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS mt_events_live_idx ON public.mt_events(expires_at,starts_at) WHERE status='live';
+CREATE INDEX IF NOT EXISTS mt_events_creator_idx ON public.mt_events(creator_id);
+CREATE INDEX IF NOT EXISTS mt_events_place_idx ON public.mt_events(place_id);
+CREATE TABLE IF NOT EXISTS public.mt_event_applications (
+  event_id bigint NOT NULL REFERENCES public.mt_events(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  status text NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','accepted','declined')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY(event_id,user_id)
+);
+CREATE INDEX IF NOT EXISTS mt_applications_user_idx ON public.mt_event_applications(user_id,event_id);
+CREATE TABLE IF NOT EXISTS public.mt_event_reports (
+  event_id bigint NOT NULL REFERENCES public.mt_events(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  reason text NOT NULL CHECK(char_length(trim(reason)) BETWEEN 10 AND 1000),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY(event_id,user_id)
+);
+CREATE INDEX IF NOT EXISTS mt_event_reports_user_idx ON public.mt_event_reports(user_id);
+CREATE OR REPLACE FUNCTION public.mt_social_write(action text,payload jsonb) RETURNS jsonb
+LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+DECLARE actor_id uuid; target uuid := (payload->>'userId')::uuid; target_event bigint := (payload->>'eventId')::bigint; event_row public.mt_events; place_row public.mt_places; ttl integer; result jsonb;
+BEGIN
+  actor_id:=mt_private.actor(CASE WHEN action='create-event' THEN 'create-event' ELSE 'social' END,CASE WHEN action='create-event' THEN 3 ELSE 20 END,action IN ('apply','report'));
+  IF target IS NOT NULL AND target=actor_id THEN RAISE EXCEPTION 'Choose another account' USING ERRCODE='22023'; END IF;
+  IF action IN ('follow','accept-follow','decline-follow','approve','decline') AND NOT mt_private.not_blocked(target) THEN RAISE EXCEPTION 'Account unavailable' USING ERRCODE='42501'; END IF;
+  CASE action
+    WHEN 'follow' THEN
+      INSERT INTO public.mt_follows(follower_id,following_id) VALUES(actor_id,target) ON CONFLICT DO NOTHING;
+    WHEN 'accept-follow' THEN UPDATE public.mt_follows SET status='accepted' WHERE follower_id=target AND following_id=actor_id AND status='pending';
+    WHEN 'decline-follow' THEN UPDATE public.mt_follows SET status='declined' WHERE follower_id=target AND following_id=actor_id;
+    WHEN 'unfollow' THEN DELETE FROM public.mt_follows WHERE follower_id=actor_id AND following_id=target;
+    WHEN 'remove-follower' THEN DELETE FROM public.mt_follows WHERE following_id=actor_id AND follower_id=target;
+    WHEN 'block' THEN
+      INSERT INTO public.mt_user_blocks(blocker_id,blocked_id) VALUES(actor_id,target) ON CONFLICT DO NOTHING;
+      DELETE FROM public.mt_follows WHERE (follower_id=actor_id AND following_id=target) OR (follower_id=target AND following_id=actor_id);
+      UPDATE public.mt_event_applications a SET status='declined' FROM public.mt_events e WHERE e.id=a.event_id AND ((e.creator_id=actor_id AND a.user_id=target) OR (e.creator_id=target AND a.user_id=actor_id));
+    WHEN 'unblock' THEN DELETE FROM public.mt_user_blocks WHERE blocker_id=actor_id AND blocked_id=target;
+    WHEN 'share-plan' THEN
+      IF jsonb_typeof(payload->'placeIds')<>'array' OR jsonb_array_length(payload->'placeIds') NOT BETWEEN 1 AND 15 THEN RAISE EXCEPTION 'Invalid route' USING ERRCODE='22023'; END IF;
+      DELETE FROM public.mt_activity WHERE user_id=actor_id AND kind='plan';
+      INSERT INTO public.mt_activity(user_id,place_id,kind) SELECT actor_id,p.id,'plan' FROM public.mt_places p WHERE published AND access<>'restricted' AND p.id IN (SELECT value::bigint FROM jsonb_array_elements_text(payload->'placeIds'));
+    WHEN 'clear-plan' THEN DELETE FROM public.mt_activity WHERE user_id=actor_id AND kind='plan';
+    WHEN 'create-event' THEN
+      ttl:=(payload->>'lifetimeHours')::integer;
+      IF ttl NOT IN (3,6,24,168) OR (payload->>'startsAt')::timestamptz<=now() OR (payload->>'startsAt')::timestamptz>now()+interval '90 days' THEN RAISE EXCEPTION 'Invalid event dates' USING ERRCODE='22023'; END IF;
+      IF payload->>'placeId' IS NOT NULL THEN SELECT * INTO place_row FROM public.mt_places WHERE id=(payload->>'placeId')::bigint AND published AND access<>'restricted'; IF NOT FOUND THEN RAISE EXCEPTION 'Place unavailable' USING ERRCODE='23503'; END IF; END IF;
+      INSERT INTO public.mt_events(creator_id,title,place_id,location,lat,lng,starts_at,price,capacity,description,expires_at)
+      VALUES(actor_id,trim(payload->>'title'),place_row.id,coalesce(place_row.name,trim(payload->>'location')),coalesce(place_row.lat,(payload->>'lat')::float8),coalesce(place_row.lng,(payload->>'lng')::float8),(payload->>'startsAt')::timestamptz,(payload->>'price')::numeric,(payload->>'capacity')::integer,trim(payload->>'description'),now()+make_interval(hours=>ttl)) RETURNING to_jsonb(mt_events.*) INTO result;
+    WHEN 'cancel-event' THEN UPDATE public.mt_events SET status='cancelled' WHERE id=target_event AND (creator_id=actor_id OR public.mt_is_admin());
+    WHEN 'apply','approve','decline','leave-event','report' THEN
+      SELECT * INTO event_row FROM public.mt_events WHERE id=target_event FOR UPDATE;
+      IF NOT FOUND OR NOT mt_private.not_blocked(event_row.creator_id) THEN RAISE EXCEPTION 'Event unavailable' USING ERRCODE='42501'; END IF;
+      IF action='leave-event' THEN DELETE FROM public.mt_event_applications WHERE event_id=target_event AND user_id=actor_id;
+      ELSIF action='report' THEN
+        IF event_row.status<>'live' OR event_row.expires_at<=now() THEN RAISE EXCEPTION 'Event unavailable' USING ERRCODE='42501'; END IF;
+        INSERT INTO public.mt_event_reports(event_id,user_id,reason) VALUES(target_event,actor_id,trim(payload->>'reason')) ON CONFLICT DO NOTHING;
+      ELSE
+        IF event_row.status<>'live' OR event_row.expires_at<=now() OR event_row.starts_at<=now() THEN RAISE EXCEPTION 'Event has ended' USING ERRCODE='22023'; END IF;
+        IF action='apply' THEN
+          IF event_row.creator_id=actor_id THEN RAISE EXCEPTION 'Already hosting' USING ERRCODE='22023'; END IF;
+          INSERT INTO public.mt_event_applications(event_id,user_id) VALUES(target_event,actor_id) ON CONFLICT DO NOTHING;
+        ELSE
+          IF event_row.creator_id<>actor_id THEN RAISE EXCEPTION 'Host required' USING ERRCODE='42501'; END IF;
+          IF action='approve' THEN
+            IF NOT EXISTS(SELECT 1 FROM public.mt_profiles WHERE id=target AND email_verified_at IS NOT NULL) THEN RAISE EXCEPTION 'Applicant must verify email' USING ERRCODE='42501'; END IF;
+            IF (SELECT count(*) FROM public.mt_event_applications WHERE event_id=target_event AND status='accepted' AND user_id<>target)>=event_row.capacity-1 THEN RAISE EXCEPTION 'Event is full' USING ERRCODE='22023'; END IF;
+          END IF;
+          UPDATE public.mt_event_applications SET status=CASE WHEN action='approve' THEN 'accepted' ELSE 'declined' END WHERE event_id=target_event AND user_id=target;
+        END IF;
+      END IF;
+    ELSE RAISE EXCEPTION 'Unknown social action' USING ERRCODE='22023';
+  END CASE;
+  RETURN coalesce(result,'{"success":true}'::jsonb);
+END; $$;
+REVOKE ALL ON FUNCTION public.mt_social_write(text,jsonb) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.mt_social_write(text,jsonb) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.mt_expire_events() RETURNS integer
+LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+DECLARE affected integer;
+BEGIN
+  UPDATE public.mt_events SET status='expired' WHERE status='live' AND (expires_at<=now() OR starts_at+interval '12 hours'<=now());
+  GET DIAGNOSTICS affected=ROW_COUNT;
+  DELETE FROM public.mt_activity WHERE created_at<now()-interval '90 days';
+  RETURN affected;
+END; $$;
+REVOKE ALL ON FUNCTION public.mt_expire_events() FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.mt_expire_events() TO service_role;
+
+ALTER TABLE public.mt_user_blocks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_follows ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_activity ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_event_applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_event_reports ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.mt_user_blocks,public.mt_follows,public.mt_activity,public.mt_events,public.mt_event_applications,public.mt_event_reports FROM anon,authenticated;
+GRANT SELECT ON public.mt_user_blocks,public.mt_follows,public.mt_activity,public.mt_events,public.mt_event_applications,public.mt_event_reports TO authenticated;
+GRANT ALL ON public.mt_user_blocks,public.mt_follows,public.mt_activity,public.mt_events,public.mt_event_applications,public.mt_event_reports TO service_role;
+GRANT USAGE ON SEQUENCE public.mt_activity_id_seq,public.mt_events_id_seq TO service_role;
+DROP POLICY IF EXISTS mt_own_blocks ON public.mt_user_blocks;
+CREATE POLICY mt_own_blocks ON public.mt_user_blocks FOR SELECT TO authenticated USING(blocker_id=(SELECT auth.uid()));
+DROP POLICY IF EXISTS mt_follow_parties ON public.mt_follows;
+CREATE POLICY mt_follow_parties ON public.mt_follows FOR SELECT TO authenticated USING(follower_id=(SELECT auth.uid()) OR following_id=(SELECT auth.uid()));
+DROP POLICY IF EXISTS mt_accepted_activity ON public.mt_activity;
+CREATE POLICY mt_accepted_activity ON public.mt_activity FOR SELECT TO authenticated USING(mt_private.can_read_activity(user_id) AND created_at>now()-interval '90 days');
+DROP POLICY IF EXISTS mt_visible_events ON public.mt_events;
+CREATE POLICY mt_visible_events ON public.mt_events FOR SELECT TO authenticated USING(creator_id=(SELECT auth.uid()) OR (SELECT public.mt_is_admin()) OR ((SELECT mt_private.email_verified()) AND mt_private.not_blocked(creator_id) AND status='live' AND expires_at>now() AND starts_at+interval '12 hours'>now()));
+DROP POLICY IF EXISTS mt_application_visibility ON public.mt_event_applications;
+CREATE POLICY mt_application_visibility ON public.mt_event_applications FOR SELECT TO authenticated USING(user_id=(SELECT auth.uid()) OR EXISTS(SELECT 1 FROM public.mt_events e WHERE e.id=event_id AND (e.creator_id=(SELECT auth.uid()) OR (mt_event_applications.status='accepted' AND (SELECT mt_private.email_verified()) AND mt_private.not_blocked(mt_event_applications.user_id)))));
+DROP POLICY IF EXISTS mt_reports_moderation ON public.mt_event_reports;
+CREATE POLICY mt_reports_moderation ON public.mt_event_reports FOR SELECT TO authenticated USING(user_id=(SELECT auth.uid()) OR (SELECT public.mt_is_admin()));
+
+CREATE OR REPLACE FUNCTION public.mt_social_dashboard(search_text text DEFAULT '',page_offset integer DEFAULT 0) RETURNS jsonb
+LANGUAGE plpgsql STABLE SECURITY INVOKER SET search_path='' AS $$
+BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Authentication required' USING ERRCODE='42501'; END IF;
+  IF page_offset NOT BETWEEN 0 AND 10000 OR char_length(search_text)>80 THEN RAISE EXCEPTION 'Invalid page' USING ERRCODE='22023'; END IF;
+  RETURN jsonb_build_object(
+    'people',coalesce((SELECT jsonb_agg(p) FROM (SELECT user_id,display_name FROM public.mt_public_profiles WHERE char_length(trim(search_text))>=2 AND position(lower(trim(search_text)) in lower(display_name))>0 AND user_id<>auth.uid() AND mt_private.not_blocked(user_id) ORDER BY display_name,user_id LIMIT 20 OFFSET page_offset) p),'[]'::jsonb),
+    'connections',coalesce((SELECT jsonb_agg(f) FROM (SELECT f.*,p.display_name FROM public.mt_follows f JOIN public.mt_public_profiles p ON p.user_id=CASE WHEN f.follower_id=auth.uid() THEN f.following_id ELSE f.follower_id END ORDER BY f.created_at DESC LIMIT 20 OFFSET page_offset) f),'[]'::jsonb),
+    'activity',coalesce((SELECT jsonb_agg(a) FROM (SELECT a.*,p.display_name,l.name AS place_name FROM public.mt_activity a JOIN public.mt_public_profiles p ON p.user_id=a.user_id JOIN public.mt_places l ON l.id=a.place_id WHERE a.user_id<>auth.uid() ORDER BY a.created_at DESC,a.id DESC LIMIT 20 OFFSET page_offset) a),'[]'::jsonb),
+    'blocked',coalesce((SELECT jsonb_agg(b) FROM (SELECT b.blocked_id,p.display_name FROM public.mt_user_blocks b JOIN public.mt_public_profiles p ON p.user_id=b.blocked_id ORDER BY b.created_at DESC LIMIT 20 OFFSET page_offset) b),'[]'::jsonb),
+    'events',coalesce((SELECT jsonb_agg(e) FROM (SELECT e.*,p.display_name,
+      coalesce((SELECT jsonb_agg(a) FROM (SELECT a.user_id,a.status,p.display_name FROM public.mt_event_applications a JOIN public.mt_public_profiles p ON p.user_id=a.user_id WHERE a.event_id=e.id ORDER BY a.created_at LIMIT 100) a),'[]'::jsonb) AS applications
+      FROM public.mt_events e JOIN public.mt_public_profiles p ON p.user_id=e.creator_id ORDER BY e.created_at DESC,e.id DESC LIMIT 20 OFFSET page_offset) e),'[]'::jsonb),
+    'reports',coalesce((SELECT jsonb_agg(r) FROM (SELECT * FROM public.mt_event_reports WHERE public.mt_is_admin() ORDER BY created_at DESC LIMIT 20 OFFSET page_offset) r),'[]'::jsonb)
+  );
+END; $$;
+REVOKE ALL ON FUNCTION public.mt_social_dashboard(text,integer) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.mt_social_dashboard(text,integer) TO authenticated;
+
+CREATE TABLE IF NOT EXISTS public.mt_submission_photos (
+ id uuid PRIMARY KEY,
+ user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+ path text NOT NULL UNIQUE,
+ created_at timestamptz NOT NULL DEFAULT now(),
+ CHECK(path ~ '^[a-f0-9-]{36}/[a-f0-9-]{36}\.jpg$')
+);
+CREATE INDEX IF NOT EXISTS mt_submission_photos_user_idx ON public.mt_submission_photos(user_id);
+CREATE TABLE IF NOT EXISTS public.mt_submissions (
+ id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+ user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+ photo_id uuid NOT NULL UNIQUE REFERENCES public.mt_submission_photos(id) ON DELETE CASCADE,
+ name text NOT NULL CHECK(char_length(trim(name)) BETWEEN 3 AND 160),
+ type text NOT NULL CHECK(type IN ('restaurant','activity','cultural')),
+ lat double precision NOT NULL CHECK(lat BETWEEN 14.35 AND 14.95),
+ lng double precision NOT NULL CHECK(lng BETWEEN -61.3 AND -60.75),
+ address text NOT NULL CHECK(char_length(trim(address)) BETWEEN 5 AND 200),
+ description text NOT NULL CHECK(char_length(trim(description)) BETWEEN 40 AND 3000),
+ language text NOT NULL CHECK(language IN ('en','fr')),
+ source_url text CHECK(source_url IS NULL OR (source_url LIKE 'https://%' AND char_length(source_url)<=1000)),
+ status text NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
+ rejection_reason text,
+ place_id bigint REFERENCES public.mt_places(id) ON DELETE SET NULL,
+ created_at timestamptz NOT NULL DEFAULT now(),
+ decided_at timestamptz
+);
+CREATE INDEX IF NOT EXISTS mt_submissions_owner_idx ON public.mt_submissions(user_id,created_at DESC);
+CREATE INDEX IF NOT EXISTS mt_submissions_queue_idx ON public.mt_submissions(status,created_at);
+CREATE INDEX IF NOT EXISTS mt_submissions_place_idx ON public.mt_submissions(place_id);
+CREATE TABLE IF NOT EXISTS public.mt_notifications (
+ id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+ user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+ kind text NOT NULL CHECK(kind IN ('submission-approved','submission-rejected')),
+ data jsonb NOT NULL,
+ created_at timestamptz NOT NULL DEFAULT now(),
+ read_at timestamptz
+);
+CREATE INDEX IF NOT EXISTS mt_notifications_user_idx ON public.mt_notifications(user_id,created_at DESC);
+CREATE TABLE IF NOT EXISTS public.mt_photo_deletions (
+ path text PRIMARY KEY,
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE public.mt_places ADD COLUMN IF NOT EXISTS submitted_by uuid REFERENCES auth.users(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS mt_places_submitter_idx ON public.mt_places(submitted_by);
+CREATE OR REPLACE FUNCTION mt_private.queue_photo_deletion() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+BEGIN
+ INSERT INTO public.mt_photo_deletions(path) VALUES(OLD.path) ON CONFLICT DO NOTHING;
+ UPDATE public.mt_places SET image=NULL,photo_credit=NULL WHERE image='/photos/community/'||OLD.id||'.jpg';
+ RETURN NULL;
+END; $$;
+REVOKE ALL ON FUNCTION mt_private.queue_photo_deletion() FROM PUBLIC;
+DROP TRIGGER IF EXISTS mt_photo_deleted ON public.mt_submission_photos;
+CREATE TRIGGER mt_photo_deleted AFTER DELETE ON public.mt_submission_photos FOR EACH ROW EXECUTE FUNCTION mt_private.queue_photo_deletion();
+CREATE OR REPLACE FUNCTION public.mt_submission_write(action text,payload jsonb) RETURNS jsonb
+LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+DECLARE actor_id uuid; photo public.mt_submission_photos; submission public.mt_submissions; result jsonb; published_id bigint; author_name text;
+BEGIN
+ actor_id:=mt_private.actor('submissions',CASE WHEN action='create' THEN 3 ELSE 30 END);
+ IF action='create' THEN
+  SELECT * INTO photo FROM public.mt_submission_photos WHERE id=(payload->>'photoId')::uuid AND user_id=actor_id FOR UPDATE;
+  IF NOT FOUND OR coalesce((payload->>'photoRights')::boolean,false)=false THEN RAISE EXCEPTION 'Owned photo required' USING ERRCODE='42501'; END IF;
+  INSERT INTO public.mt_submissions(user_id,photo_id,name,type,lat,lng,address,description,language,source_url)
+  VALUES(actor_id,photo.id,trim(payload->>'name'),payload->>'type',(payload->>'lat')::float8,(payload->>'lng')::float8,trim(payload->>'address'),trim(payload->>'description'),payload->>'language',nullif(payload->>'sourceUrl','')) RETURNING to_jsonb(mt_submissions.*) INTO result;
+ ELSIF action IN ('approve','reject') THEN
+  IF NOT public.mt_is_admin() THEN RAISE EXCEPTION 'Administrator required' USING ERRCODE='42501'; END IF;
+  SELECT * INTO submission FROM public.mt_submissions WHERE id=(payload->>'id')::bigint AND status='pending' FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Submission already reviewed' USING ERRCODE='22023'; END IF;
+  IF action='reject' THEN
+   IF coalesce(char_length(trim(payload->>'reason')),0) NOT BETWEEN 10 AND 1000 THEN RAISE EXCEPTION 'Rejection reason required' USING ERRCODE='22023'; END IF;
+   UPDATE public.mt_submissions SET status='rejected',rejection_reason=trim(payload->>'reason'),decided_at=now() WHERE id=submission.id;
+   INSERT INTO public.mt_notifications(user_id,kind,data) VALUES(submission.user_id,'submission-rejected',jsonb_build_object('submissionId',submission.id,'name',submission.name,'reason',trim(payload->>'reason')));
+  ELSE
+   IF coalesce(char_length(trim(payload->>'description')),0) NOT BETWEEN 40 AND 3000 OR coalesce(char_length(trim(payload->>'descriptionFr')),0) NOT BETWEEN 40 AND 3000 THEN RAISE EXCEPTION 'Both descriptions required' USING ERRCODE='22023'; END IF;
+   SELECT display_name INTO author_name FROM public.mt_public_profiles WHERE user_id=submission.user_id;
+   INSERT INTO public.mt_places(name,type,lat,lng,location,description,description_fr,tags,image,photo_credit,sources,submitted_by)
+   VALUES(submission.name,CASE WHEN submission.type='restaurant' THEN 'restaurant' ELSE 'activity' END,submission.lat,submission.lng,left(submission.address,160),trim(payload->>'description'),trim(payload->>'descriptionFr'),CASE WHEN submission.type='cultural' THEN '["culture"]'::jsonb ELSE '[]'::jsonb END,'/photos/community/'||submission.photo_id||'.jpg',
+    jsonb_build_object('author',author_name,'license','User contribution','sourceUrl',payload->>'origin'||'/photos/community/'||submission.photo_id||'.jpg','licenseUrl',payload->>'origin'||'/terms','caption','Submitted with permission'),
+    CASE WHEN submission.source_url IS NULL THEN '[]'::jsonb ELSE jsonb_build_array(jsonb_build_object('url',submission.source_url,'title','Contributor source','checkedAt',current_date::text,'fields',jsonb_build_array('description','location'))) END,submission.user_id) RETURNING id INTO published_id;
+   UPDATE public.mt_submissions SET status='approved',place_id=published_id,decided_at=now() WHERE id=submission.id;
+   INSERT INTO public.mt_notifications(user_id,kind,data) VALUES(submission.user_id,'submission-approved',jsonb_build_object('submissionId',submission.id,'name',submission.name,'placeId',published_id));
+  END IF;
+ ELSIF action='read-notifications' THEN UPDATE public.mt_notifications SET read_at=now() WHERE user_id=actor_id AND read_at IS NULL;
+ ELSE RAISE EXCEPTION 'Unknown submission action' USING ERRCODE='22023';
+ END IF;
+ RETURN coalesce(result,'{"success":true}'::jsonb);
+END; $$;
+REVOKE ALL ON FUNCTION public.mt_submission_write(text,jsonb) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.mt_submission_write(text,jsonb) TO authenticated;
+ALTER TABLE public.mt_submission_photos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_photo_deletions ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.mt_submission_photos,public.mt_submissions,public.mt_notifications,public.mt_photo_deletions FROM anon,authenticated;
+GRANT SELECT ON public.mt_submission_photos,public.mt_submissions,public.mt_notifications TO authenticated;
+GRANT ALL ON public.mt_submission_photos,public.mt_submissions,public.mt_notifications,public.mt_photo_deletions TO service_role;
+GRANT USAGE ON SEQUENCE public.mt_submissions_id_seq,public.mt_notifications_id_seq TO service_role;
+DROP POLICY IF EXISTS mt_photo_owners ON public.mt_submission_photos;
+CREATE POLICY mt_photo_owners ON public.mt_submission_photos FOR SELECT TO authenticated USING(user_id=(SELECT auth.uid()) OR (SELECT public.mt_is_admin()));
+DROP POLICY IF EXISTS mt_submission_owners ON public.mt_submissions;
+CREATE POLICY mt_submission_owners ON public.mt_submissions FOR SELECT TO authenticated USING(user_id=(SELECT auth.uid()) OR (SELECT public.mt_is_admin()));
+DROP POLICY IF EXISTS mt_notification_owner ON public.mt_notifications;
+CREATE POLICY mt_notification_owner ON public.mt_notifications FOR SELECT TO authenticated USING(user_id=(SELECT auth.uid()));
+-- Supabase Storage is absent from isolated PostgreSQL tests; its API is tested separately.
+DO $$ BEGIN
+ IF to_regclass('storage.buckets') IS NOT NULL THEN
+  INSERT INTO storage.buckets(id,name,public,file_size_limit,allowed_mime_types) VALUES('mt-submissions','mt-submissions',false,2097152,ARRAY['image/jpeg']) ON CONFLICT(id) DO NOTHING;
+ END IF;
+END; $$;
+
+-- Catalogue enrichment stores our own source data and Google Place IDs only.
+ALTER TABLE public.mt_places ADD COLUMN IF NOT EXISTS opening_periods jsonb;
+ALTER TABLE public.mt_places ADD COLUMN IF NOT EXISTS hours_updated_at timestamptz;
+ALTER TABLE public.mt_places ADD COLUMN IF NOT EXISTS hours_source text;
+ALTER TABLE public.mt_places ADD COLUMN IF NOT EXISTS google_place_id text;
+
+CREATE TABLE IF NOT EXISTS public.mt_source_settings (
+  place_id bigint PRIMARY KEY REFERENCES public.mt_places(id) ON DELETE CASCADE,
+  url text NOT NULL CHECK (url LIKE 'https://%' AND length(url) <= 2000),
+  enabled boolean NOT NULL DEFAULT true,
+  checked_at timestamptz,
+  next_check_at timestamptz NOT NULL DEFAULT now(),
+  candidate_photo jsonb,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS mt_sources_due ON public.mt_source_settings(next_check_at) WHERE enabled;
+CREATE TABLE IF NOT EXISTS public.mt_source_logs (
+  id bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  place_id bigint NOT NULL REFERENCES public.mt_places(id) ON DELETE CASCADE,
+  status text NOT NULL CHECK (status IN ('updated','unchanged','robots_denied','unavailable','no_match','photo_approved')),
+  hours_updated boolean NOT NULL DEFAULT false,
+  photo_found boolean NOT NULL DEFAULT false,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS mt_source_logs_place ON public.mt_source_logs(place_id,created_at DESC);
+CREATE TABLE IF NOT EXISTS public.mt_google_matches (
+  place_id bigint PRIMARY KEY REFERENCES public.mt_places(id) ON DELETE CASCADE,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','matched','review','unmatched','error','excluded')),
+  candidate_ids jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(candidate_ids)='array'),
+  checked_at timestamptz,
+  next_check_at timestamptz NOT NULL DEFAULT now(),
+  attempts integer NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS mt_google_matches_due ON public.mt_google_matches(next_check_at) WHERE status IN ('pending','error');
+-- These records contain private moderation state, not a public Google content cache.
+ALTER TABLE public.mt_source_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_source_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mt_google_matches ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.mt_source_settings,public.mt_source_logs,public.mt_google_matches FROM anon,authenticated;
+GRANT SELECT ON public.mt_source_settings,public.mt_source_logs,public.mt_google_matches TO authenticated;
+GRANT ALL ON public.mt_source_settings,public.mt_source_logs,public.mt_google_matches TO service_role;
+GRANT USAGE,SELECT ON SEQUENCE public.mt_source_logs_id_seq TO service_role;
+DROP POLICY IF EXISTS mt_source_settings_admin ON public.mt_source_settings;
+CREATE POLICY mt_source_settings_admin ON public.mt_source_settings FOR SELECT TO authenticated USING ((SELECT public.mt_is_admin()));
+DROP POLICY IF EXISTS mt_source_logs_admin ON public.mt_source_logs;
+CREATE POLICY mt_source_logs_admin ON public.mt_source_logs FOR SELECT TO authenticated USING ((SELECT public.mt_is_admin()));
+DROP POLICY IF EXISTS mt_google_matches_admin ON public.mt_google_matches;
+CREATE POLICY mt_google_matches_admin ON public.mt_google_matches FOR SELECT TO authenticated USING ((SELECT public.mt_is_admin()));
+
+CREATE OR REPLACE FUNCTION public.mt_apply_source_hours(target_place bigint, periods jsonb, source_url text) RETURNS void
+LANGUAGE plpgsql SECURITY INVOKER SET search_path = '' AS $$
+BEGIN
+  IF jsonb_typeof(periods) <> 'array' OR jsonb_array_length(periods) NOT BETWEEN 1 AND 28 OR EXISTS (
+    SELECT 1 FROM jsonb_array_elements(periods) p WHERE (p->>'day')::int NOT BETWEEN 0 AND 6
+      OR (p->>'opens')::int NOT BETWEEN 0 AND 1439 OR (p->>'closes')::int NOT BETWEEN 1 AND 1440
+      OR (p->>'opens')::int >= (p->>'closes')::int
+      OR NOT (p ? 'day' AND p ? 'opens' AND p ? 'closes')
+  ) THEN RAISE EXCEPTION 'Invalid source hours' USING ERRCODE='23514'; END IF;
+  UPDATE public.mt_places SET opening_periods=periods, hours_source=source_url,hours_updated_at=now() WHERE id=target_place;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.mt_apply_source_hours(bigint,jsonb,text) FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.mt_apply_source_hours(bigint,jsonb,text) TO service_role;
+
+CREATE TABLE IF NOT EXISTS public.mt_enrichment_usage (
+  day date PRIMARY KEY DEFAULT current_date,
+  google_requests integer NOT NULL DEFAULT 0
+);
+ALTER TABLE public.mt_enrichment_usage ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.mt_enrichment_usage FROM anon,authenticated;
+GRANT ALL ON public.mt_enrichment_usage TO service_role;
+CREATE OR REPLACE FUNCTION public.mt_claim_google_request(daily_limit integer) RETURNS boolean
+LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
+DECLARE consumed integer;
+BEGIN
+  IF daily_limit NOT BETWEEN 1 AND 100 THEN RETURN false; END IF;
+  INSERT INTO public.mt_enrichment_usage(day,google_requests) VALUES(current_date,1)
+    ON CONFLICT(day) DO UPDATE SET google_requests=public.mt_enrichment_usage.google_requests+1
+    WHERE public.mt_enrichment_usage.google_requests<daily_limit RETURNING google_requests INTO consumed;
+  DELETE FROM public.mt_enrichment_usage WHERE day<current_date-90;
+  RETURN consumed IS NOT NULL;
+END; $$;
+CREATE OR REPLACE FUNCTION public.mt_queue_google_matches() RETURNS void
+LANGUAGE sql SECURITY INVOKER SET search_path='' AS $$
+  INSERT INTO public.mt_google_matches(place_id) SELECT id FROM public.mt_places WHERE published AND google_place_id IS NULL ON CONFLICT DO NOTHING;
+$$;
+REVOKE ALL ON FUNCTION public.mt_claim_google_request(integer),public.mt_queue_google_matches() FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.mt_claim_google_request(integer),public.mt_queue_google_matches() TO service_role;
+
+-- First-party daily ranking: no Google scores or derived Google ranking is stored.
+CREATE TABLE IF NOT EXISTS public.mt_daily_picks (
+  place_id bigint PRIMARY KEY REFERENCES public.mt_places(id) ON DELETE CASCADE,
+  position smallint NOT NULL UNIQUE CHECK(position BETWEEN 1 AND 5),
+  computed_at timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE public.mt_daily_picks ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.mt_daily_picks FROM anon,authenticated;
+GRANT SELECT ON public.mt_daily_picks TO anon,authenticated;
+GRANT ALL ON public.mt_daily_picks TO service_role;
+DROP POLICY IF EXISTS mt_daily_picks_public ON public.mt_daily_picks;
+CREATE POLICY mt_daily_picks_public ON public.mt_daily_picks FOR SELECT TO anon,authenticated USING (EXISTS(SELECT 1 FROM public.mt_places p WHERE p.id=place_id AND p.published AND p.access<>'restricted' AND p.community_count>=3));
+CREATE OR REPLACE FUNCTION public.mt_refresh_daily_picks() RETURNS void
+LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
+BEGIN
+  PERFORM pg_advisory_xact_lock(29092026);
+  DELETE FROM public.mt_daily_picks;
+  INSERT INTO public.mt_daily_picks(place_id,position)
+    SELECT id,row_number() OVER(ORDER BY community_rating DESC,community_count DESC,id)::smallint
+    FROM public.mt_places WHERE published AND access<>'restricted' AND community_count>=3
+    ORDER BY community_rating DESC,community_count DESC,id LIMIT 5;
+END; $$;
+REVOKE ALL ON FUNCTION public.mt_refresh_daily_picks() FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.mt_refresh_daily_picks() TO service_role;
+
 SELECT pg_advisory_xact_lock(23092026);
 DO $seed$
 BEGIN

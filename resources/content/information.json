@@ -10,15 +10,15 @@
         },
         {
           "title": "Our sources",
-          "body": "Place information is curated from Martinique tourism sources, including Martinique Tourisme and Terres du Centre. Each place shows its source links and research date when available. Hours, access and businesses can change: confirm plans with the venue. Homepage picks are editorial suggestions, not a popularity ranking."
+          "body": "Place information is curated from Martinique tourism sources, including Martinique Tourisme and Terres du Centre. Source links and research dates appear where available. Selected official sites may supply structured hours, respecting robots.txt; photo candidates need an administrator’s rights review. Editorial discovery cards are separate from the daily Must go ranking, which uses MadaTours community scores with at least three reviews. Google scores appear separately in a live Google panel and are not stored or blended with community scores."
         },
         {
           "title": "Maps, weather and trip estimates",
-          "body": "Maps use OpenStreetMap and Leaflet. Weather for Fort-de-France comes from Open-Meteo. Distances are straight-line estimates. The planner adds a rough driving allowance; it is not a road-routing or traffic service. Route optimization keeps your first stop and suggests the next nearest stop. Open directions to check the actual route."
+          "body": "Maps use OpenStreetMap and Leaflet; the dark display recolors the same tiles. Weather for Fort-de-France comes from Open-Meteo. Distances are estimates. Trip suggestions require an optional account and use device location, rough driving or walking times and known official-source hours. Unknown hours are labeled. Directions links help you check the actual road route; no traffic data is used."
         },
         {
           "title": "Photos with context",
-          "body": "Venue photographs are labeled through their source credits. Where a venue photo is unavailable, a clearly labeled photograph of the Salines landscape provides island context. It does not depict that venue. Photos are historical and cropped to fit; they do not establish current conditions."
+          "body": "Venue photographs show their source credits. Missing photos use category illustrations: licensed landscape photographs or labeled AI-generated hiking, seafood and terrace scenes. These illustrations do not depict the listed venue. Approved community photographs are credited to their contributors. Google photographs and their attributions are displayed by Google’s Places UI Kit."
         }
       ]
     },
@@ -34,7 +34,7 @@
     },
     "privacy": {
       "title": "Privacy Policy",
-      "intro": "Last updated: September 28, 2026. This policy explains how MadaTours uses information when you browse the website or native app.",
+      "intro": "Last updated: September 29, 2026. This policy explains how MadaTours uses information when you browse the website or native app.",
       "sections": [
         {
           "title": "Who is responsible",
@@ -46,15 +46,23 @@
         },
         {
           "title": "Optional account",
-          "body": "If you sign up, we use your name, email, password credentials and saved places to provide your account. Supabase manages authentication and stores password hashes. New signup does not verify email ownership. We use an essential session cookie to keep you signed in and may send account-related messages. Phone signup is not currently offered."
+          "body": "We use your display name, email, password credentials and account activity to provide the features you request. Supabase manages authentication and password hashes. Email ownership must be verified with a code before browsing or joining meet-ups. Older automatically confirmed accounts must complete this check too. We use an essential session cookie and send account-related messages when email delivery is available. Phone signup is not offered."
+        },
+        {
+          "title": "Reviews, social activity and meet-ups",
+          "body": "Reviews and comments are public under your display name. Reviews show your number of daily check-ins at that place during the current year. Check-ins, favorites and explicitly shared planned stops also create activity visible only to followers you accept. Activity expires after 90 days. Followers cannot see your email or device coordinates. Verified users can browse live meet-ups and accepted attendees; hosts see applications. Blocking removes follow relationships and restricts social visibility. Meet-ups disappear at expiry, while hosts can still see their own records. Moderation reports and commenter restrictions are visible to administrators."
+        },
+        {
+          "title": "Place submissions and photographs",
+          "body": "Submissions, exact place coordinates and photos are private to the contributor and administrators until approval. Approved entries, descriptions, photos and contributor credit are public. We re-encode uploaded images to remove EXIF metadata, including embedded GPS. Rejections include an in-app reason. Source-ingestion logs are retained for 90 days. Account-related records remain until account deletion or moderation; provider backup retention may differ."
         },
         {
           "title": "Data on your device",
-          "body": "Language preference, recent searches, onboarding dismissal, day trips, a cached public catalogue and optional offline saved-place copies are stored on your device. Day trips and recent searches are not synchronized to our database. You can clear recent searches in search controls, delete individual trips in the planner, remove offline copies from Offline places, or clear MadaTours site/app data in your device settings."
+          "body": "Language and appearance preferences, searches, onboarding dismissal, day trips and offline catalogue copies stay on your device. Trip coordinates used to suggest a route stay on the device. If you explicitly share planned stops, their place IDs are saved for accepted followers. Full trip plans and recent searches are not synchronized. Clear local data using the search, planner and Offline places controls or device settings."
         },
         {
           "title": "Service providers and external links",
-          "body": "Supabase processes account and saved-place data. Our hosting provider handles website requests and technical logs. OpenStreetMap receives map requests and Open-Meteo receives requests for Fort-de-France weather; those services may receive your IP address and device request information. Directions and rating links open Google Maps. Their privacy terms apply when you use them. A place suggestion opens your email app and is sent only when you send it there. Providers may process information outside your country under their applicable safeguards."
+          "body": "Supabase processes accounts, reviews, connections, meet-ups, submissions and private photo uploads. Our host processes website requests and technical logs. OpenStreetMap and Open-Meteo receive map and weather requests, including IP address and request information. Google receives requests only when you load its live place panel or open its external links; its privacy policy and terms apply. Venue photo hosts receive image requests. Providers may process information outside your country under their applicable safeguards. The contact form opens your email app and sends nothing until you send the email."
         },
         {
           "title": "Purpose, retention and your choices",
@@ -62,13 +70,13 @@
         },
         {
           "title": "Delete your account",
-          "body": "Sign in, open Your account, choose Delete account and confirm with your password. This removes the account profile and cloud favorites/revisit list and revokes refresh sessions. Locally stored trip plans and recent searches can be cleared separately on your device. If you cannot access your account, email adejkervin@protonmail.com from its address to request deletion; ownership will be checked. You may contact the competent data-protection authority, including the CNIL in France, if a concern remains unresolved."
+          "body": "In Your account, choose Delete account and confirm your password. We revoke refresh sessions and remove your account, reviews, comments, check-ins, connections, meet-ups, applications, reports and submission records. Published community places may remain as guide entries with the submitter link removed; their uploaded photos are withdrawn and queued for storage deletion. Queued files are retried hourly when the scheduler runs. Clear local plans, searches and offline copies separately. For access problems or privacy requests, contact adejkervin@protonmail.com. You may complain to the competent data-protection authority, including France’s CNIL."
         }
       ]
     },
     "terms": {
       "title": "Terms of Use",
-      "intro": "Last updated: September 28, 2026. MadaTours is a discovery and planning guide for Martinique.",
+      "intro": "Last updated: September 29, 2026. MadaTours is a discovery and planning guide for Martinique.",
       "sections": [
         {
           "title": "Using the guide",
@@ -83,6 +91,10 @@
           "body": "Photographs and third-party data remain subject to their stated licenses. Keep attribution when reusing licensed material and obtain permission for other content. Only suggest information you are entitled to share. Suggestions are reviewed and may be edited or declined; they are not published automatically. Reviews written on external services follow those services’ terms."
         },
         {
+          "title": "Community contributions and meet-ups",
+          "body": "Post honest reviews of places you know; record only real visits, at most one per day per place. Do not publish harassment, illegal content, personal data about others or spam. You retain ownership of your contributions and grant MadaTours a non-exclusive license to host, resize, display, moderate and translate them to operate this guide. Upload only photographs you own or have permission to publish, with consent from identifiable people where needed. Administrators may edit or remove reviews, restrict commenting and approve or decline submissions. Meet-ups are arranged by their hosts, not sold or guaranteed by MadaTours; displayed prices are information only and no payment is collected. Verify the plan and use report/block tools when needed. Contact the owner to report content or contest moderation."
+        },
+        {
           "title": "Availability and contact",
           "body": "Some features require connectivity or third-party services. Offline information can be outdated. We may update the guide and these terms as the service changes. Nothing here removes rights you have under applicable law. For support, corrections or a complaint, contact MadaTours at adejkervin@protonmail.com."
         }
@@ -94,7 +106,7 @@
       "sections": [
         {
           "title": "In the app",
-          "body": "Sign in with your email and password. Open Your account using the account icon, choose Delete account, enter your password and confirm Permanently delete my account. Your account profile and cloud favorites/revisit list are removed. Existing refresh sessions are revoked."
+          "body": "Sign in, open Your account, choose Delete account, enter your password and confirm. We remove your profile, saved places, reviews, comments, check-ins, social connections, meet-ups and submission records and revoke refresh sessions. Published guide entries can remain without contributor links; uploaded photos are withdrawn and queued for file deletion."
         },
         {
           "title": "If you cannot sign in",
@@ -118,15 +130,15 @@
         },
         {
           "title": "Nos sources",
-          "body": "Les informations sont sélectionnées à partir de sources touristiques martiniquaises, dont Martinique Tourisme et Terres du Centre. Chaque fiche affiche ses liens sources et sa date de recherche lorsqu’ils sont disponibles. Horaires, accès et établissements peuvent évoluer : confirmez vos projets auprès du lieu. Les suggestions de l’accueil sont éditoriales, pas un classement de popularité."
+          "body": "Les fiches sont sélectionnées à partir de sources touristiques martiniquaises, dont Martinique Tourisme et Terres du Centre. Les liens et dates de recherche sont indiqués lorsqu’ils sont disponibles. Certains sites officiels fournissent des horaires structurés dans le respect de robots.txt ; les droits des photos proposées sont examinés par un administrateur. Les suggestions éditoriales sont distinctes du classement quotidien Les incontournables, fondé sur les notes MadaTours avec au moins trois avis. Les notes Google apparaissent séparément dans un panneau en direct ; elles ne sont ni conservées ni mélangées aux notes de la communauté."
         },
         {
           "title": "Cartes, météo et estimations",
-          "body": "Les cartes utilisent OpenStreetMap et Leaflet. La météo de Fort-de-France provient d’Open-Meteo. Les distances sont estimées à vol d’oiseau. Le planificateur ajoute une estimation approximative du temps de conduite ; ce n’est pas un service de calcul routier ou de trafic. L’optimisation conserve la première étape puis suggère la plus proche. Ouvrez les itinéraires pour vérifier le trajet réel."
+          "body": "Les cartes utilisent OpenStreetMap et Leaflet ; le mode sombre recolore les mêmes tuiles. La météo de Fort-de-France provient d’Open-Meteo. Les distances sont estimatives. Les suggestions de trajet nécessitent un compte facultatif et utilisent la position de l’appareil, des estimations en voiture ou à pied et les horaires connus de sources officielles. Les horaires inconnus sont signalés. Les liens d’itinéraire permettent de vérifier le trajet routier réel ; aucune donnée de trafic n’est utilisée."
         },
         {
           "title": "Des photos avec leur contexte",
-          "body": "Les photos des lieux sont accompagnées de leurs crédits. Lorsqu’une photo du lieu manque, une photographie clairement signalée du paysage des Salines illustre l’île. Elle ne représente pas l’établissement. Les photos sont anciennes et recadrées ; elles ne prouvent pas les conditions actuelles."
+          "body": "Les photos des lieux affichent leurs crédits. Les photos manquantes sont remplacées par des illustrations de catégorie : paysages sous licence ou scènes de randonnée, de fruits de mer et de terrasse générées par IA et signalées comme telles. Elles ne représentent pas le lieu indiqué. Les photos communautaires approuvées mentionnent leur auteur. Les photos Google et leurs crédits sont affichés par Places UI Kit de Google."
         }
       ]
     },
@@ -142,7 +154,7 @@
     },
     "privacy": {
       "title": "Politique de confidentialité",
-      "intro": "Dernière mise à jour : 28 septembre 2026. Cette politique explique l’utilisation des informations sur le site et dans l’application native MadaTours.",
+      "intro": "Dernière mise à jour : 29 septembre 2026. Cette politique explique l’utilisation des informations sur le site et dans l’application native MadaTours.",
       "sections": [
         {
           "title": "Responsable",
@@ -154,15 +166,23 @@
         },
         {
           "title": "Compte facultatif",
-          "body": "Lors de l’inscription, votre nom, email, identifiants de connexion et lieux sauvegardés servent au fonctionnement du compte. Supabase gère l’authentification et conserve des empreintes de mots de passe. L’inscription ne vérifie pas la propriété de l’email. Un cookie de session essentiel maintient votre connexion et des messages liés au compte peuvent être envoyés. L’inscription par téléphone n’est pas proposée actuellement."
+          "body": "Votre nom affiché, email, identifiants et activité servent aux fonctions demandées. Supabase gère l’authentification et les empreintes de mots de passe. L’email doit être vérifié par un code avant de consulter ou rejoindre les rencontres, y compris pour les anciens comptes confirmés automatiquement. Un cookie essentiel maintient votre connexion. Les messages liés au compte sont envoyés lorsque la messagerie est disponible. L’inscription par téléphone n’est pas proposée."
+        },
+        {
+          "title": "Avis, activité sociale et rencontres",
+          "body": "Les avis et commentaires sont publics sous votre nom affiché. Les avis indiquent le nombre de visites quotidiennes enregistrées dans l’année pour ce lieu. Les visites, favoris et étapes partagées explicitement créent aussi une activité visible uniquement par vos abonnés acceptés. Elle expire après 90 jours. Votre email et vos coordonnées d’appareil restent invisibles aux abonnés. Les comptes vérifiés consultent les rencontres actives et participants acceptés ; les organisateurs voient les candidatures. Le blocage retire les relations et limite la visibilité sociale. Les rencontres expirées disparaissent, mais restent consultables par leur organisateur. Les administrateurs voient les signalements et restrictions de commentaires."
+        },
+        {
+          "title": "Propositions de lieux et photographies",
+          "body": "Les propositions, coordonnées exactes du lieu et photos restent privées entre leur auteur et les administrateurs jusqu’à approbation. Les fiches, descriptions, photos et crédits approuvés sont publics. Les images sont réencodées pour retirer les métadonnées EXIF, dont le GPS intégré. Les refus sont motivés dans l’application. Les journaux de sources sont conservés 90 jours. Les données liées au compte restent jusqu’à sa suppression ou une modération ; les durées des sauvegardes des prestataires peuvent différer."
         },
         {
           "title": "Données sur votre appareil",
-          "body": "La langue, les recherches récentes, le masquage de l’introduction, les journées, le catalogue public en cache et les copies hors ligne facultatives sont conservés sur votre appareil. Les journées et recherches ne sont pas synchronisées dans notre base. Effacez l’historique dans les commandes de recherche, supprimez les journées dans le planificateur, retirez les copies dans Lieux hors ligne ou effacez les données du site/de l’application dans les réglages de l’appareil."
+          "body": "La langue, le thème, les recherches, le masquage de l’introduction, les journées et les copies du catalogue restent sur votre appareil. Les coordonnées utilisées pour suggérer un trajet restent sur celui-ci. Si vous partagez explicitement des étapes prévues, leurs identifiants sont conservés pour vos abonnés acceptés. Les journées complètes et recherches ne sont pas synchronisées. Effacez les données locales dans la recherche, le planificateur, Lieux hors ligne ou les réglages de l’appareil."
         },
         {
           "title": "Prestataires et liens externes",
-          "body": "Supabase traite les données de compte et lieux sauvegardés. L’hébergeur traite les requêtes et journaux techniques. OpenStreetMap reçoit les requêtes de carte et Open-Meteo celles de météo pour Fort-de-France ; ces services peuvent recevoir votre adresse IP et des informations de requête. Les itinéraires et avis ouvrent Google Maps, soumis à ses propres règles. Une suggestion ouvre votre application email et n’est envoyée que lorsque vous l’y expédiez. Des prestataires peuvent traiter des informations hors de votre pays selon leurs garanties applicables."
+          "body": "Supabase traite les comptes, avis, relations, rencontres, propositions et photos privées. L’hébergeur traite les requêtes et journaux techniques. OpenStreetMap et Open-Meteo reçoivent les requêtes de carte et météo, avec l’adresse IP et les informations de requête. Google reçoit des requêtes lorsque vous chargez son panneau ou ouvrez ses liens ; sa politique et ses conditions s’appliquent. Les hébergeurs de photos reçoivent les requêtes d’images. Des prestataires peuvent traiter des données hors de votre pays avec leurs garanties applicables. Le formulaire de contact ouvre votre messagerie et n’envoie rien avant votre envoi."
         },
         {
           "title": "Finalités, conservation et choix",
@@ -170,13 +190,13 @@
         },
         {
           "title": "Supprimer votre compte",
-          "body": "Connectez-vous, ouvrez Votre compte, choisissez Supprimer le compte puis confirmez avec votre mot de passe. Le profil, les favoris et revisites dans le cloud sont supprimés et les sessions de renouvellement révoquées. Les journées et recherches locales se suppriment séparément sur votre appareil. Sans accès au compte, écrivez à adejkervin@protonmail.com depuis son adresse pour demander la suppression ; la propriété sera vérifiée. Vous pouvez saisir l’autorité de protection des données compétente, dont la CNIL en France, si votre demande reste sans solution."
+          "body": "Dans Votre compte, choisissez Supprimer le compte et confirmez votre mot de passe. Nous révoquons les sessions de renouvellement et supprimons le compte, avis, commentaires, visites, relations, rencontres, candidatures, signalements et propositions. Les lieux communautaires publiés peuvent rester dans le guide sans lien avec leur auteur ; leurs photos sont retirées et mises en attente de suppression du stockage. Le nettoyage est réessayé chaque heure lorsque le planificateur fonctionne. Effacez séparément les journées, recherches et copies locales. Pour toute demande, contactez adejkervin@protonmail.com. Vous pouvez saisir l’autorité compétente, dont la CNIL en France."
         }
       ]
     },
     "terms": {
       "title": "Conditions d’utilisation",
-      "intro": "Dernière mise à jour : 28 septembre 2026. MadaTours est un guide de découverte et de préparation de journées en Martinique.",
+      "intro": "Dernière mise à jour : 29 septembre 2026. MadaTours est un guide de découverte et de préparation de journées en Martinique.",
       "sections": [
         {
           "title": "Utiliser le guide",
@@ -191,6 +211,10 @@
           "body": "Les photos et données tierces restent soumises à leurs licences. Conservez les crédits lors d’une réutilisation autorisée et obtenez les permissions nécessaires pour les autres contenus. Ne suggérez que des informations que vous pouvez partager. Les suggestions sont examinées, éventuellement modifiées ou refusées, et ne sont pas publiées automatiquement. Les avis externes suivent les règles du service concerné."
         },
         {
+          "title": "Contributions et rencontres",
+          "body": "Rédigez des avis sincères sur des lieux connus et n’enregistrez que des visites réelles, au plus une par jour et par lieu. Ne publiez ni harcèlement, contenu illégal, données personnelles d’autrui ni spam. Vous conservez vos droits et accordez à MadaTours une licence non exclusive pour héberger, redimensionner, afficher, modérer et traduire vos contributions afin de faire fonctionner le guide. Ne déposez que des photos vous appartenant ou autorisées, avec le consentement des personnes identifiables si nécessaire. Les administrateurs peuvent modifier ou retirer les avis, limiter les commentaires et accepter ou refuser les propositions. Les rencontres sont organisées par leurs hôtes, sans vente ni garantie de MadaTours ; les prix sont indicatifs et aucun paiement n’est encaissé. Vérifiez l’organisation et utilisez les outils de signalement et de blocage. Contactez le responsable pour signaler un contenu ou contester une modération."
+        },
+        {
           "title": "Disponibilité et contact",
           "body": "Certaines fonctions nécessitent une connexion ou un service tiers. Les informations hors ligne peuvent être anciennes. Le guide et ces conditions peuvent évoluer. Aucune disposition ne supprime vos droits prévus par la loi applicable. Pour l’assistance, une correction ou une réclamation, contactez MadaTours à adejkervin@protonmail.com."
         }
@@ -202,7 +226,7 @@
       "sections": [
         {
           "title": "Dans l’application",
-          "body": "Connectez-vous avec votre email et mot de passe. Ouvrez Votre compte via l’icône de compte, choisissez Supprimer le compte, saisissez votre mot de passe puis confirmez Supprimer définitivement mon compte. Le profil, les favoris et revisites dans le cloud sont retirés. Les sessions de renouvellement sont révoquées."
+          "body": "Connectez-vous, ouvrez Votre compte, choisissez Supprimer le compte et confirmez avec votre mot de passe. Le profil, les lieux sauvegardés, avis, commentaires, visites, relations, rencontres et propositions sont supprimés ; les sessions de renouvellement sont révoquées. Les lieux publiés peuvent rester sans lien avec leur auteur ; les photos sont retirées et leur suppression du stockage est programmée."
         },
         {
           "title": "Si vous ne pouvez pas vous connecter",

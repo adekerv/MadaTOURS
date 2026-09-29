@@ -39,6 +39,14 @@ export function PlaceCard({
         <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-600">
           {language === 'fr' && place.descriptionFr ? place.descriptionFr : place.description}
         </p>
+        {!!place.communityCount && (
+          <p className="mt-2 text-xs font-semibold text-orange-800">
+            {t('Community: {rating} / 5 ({count})', {
+              rating: (place.communityRating || 0).toFixed(1),
+              count: place.communityCount,
+            })}
+          </p>
+        )}
         <div className="mt-3 grid grid-cols-2 gap-2">
           <button
             onClick={() => onSelect(place)}

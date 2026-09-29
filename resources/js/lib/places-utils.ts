@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { sourceSchema, photoCreditSchema } from './content.js';
 import type { Place } from '../types';
 export const deg2rad = (degrees: number) => (degrees * Math.PI) / 180;
@@ -51,10 +52,36 @@ export function normalizePlace(value: unknown): Place {
     photoCredit: photoCreditSchema.safeParse(p.photo_credit ?? p.photoCredit).data,
     tags: Array.isArray(tags) ? tags.filter((tag): tag is string => typeof tag === 'string') : [],
     rating: p.rating != null && Number.isFinite(Number(p.rating)) ? Number(p.rating) : undefined,
+    communityRating:
+      Number(p.communityRating ?? p.community_rating) > 0
+        ? Number(p.communityRating ?? p.community_rating)
+        : undefined,
+    communityCount: Number(p.communityCount ?? p.community_count) || 0,
+    googlePlaceId: z
+      .string()
+      .regex(/^[A-Za-z0-9_-]{10,255}$/)
+      .safeParse(p.googlePlaceId ?? p.google_place_id).data,
+    openingPeriods: z
+      .array(
+        z
+          .object({
+            day: z.number().int().min(0).max(6),
+            opens: z.number().int().min(0).max(1439),
+            closes: z.number().int().min(1).max(1440),
+          })
+          .refine((p) => p.opens < p.closes),
+      )
+      .max(28)
+      .safeParse(p.openingPeriods ?? p.opening_periods).data,
+    hoursSource: z
+      .url()
+      .startsWith('https://')
+      .safeParse(p.hoursSource ?? p.hours_source).data,
+    hoursUpdatedAt: z.string().safeParse(p.hoursUpdatedAt ?? p.hours_updated_at).data,
     hours: typeof p.hours === 'string' ? p.hours : undefined,
     image:
       typeof p.image === 'string' &&
-      (p.image.startsWith('https://') || /^\/photos\/[a-zA-Z0-9._-]+$/.test(p.image))
+      (p.image.startsWith('https://') || /^\/photos\/(community\/)?[a-zA-Z0-9._-]+$/.test(p.image))
         ? p.image
         : undefined,
     distance:

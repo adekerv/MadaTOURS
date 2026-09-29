@@ -63,6 +63,7 @@ export function ExplorationPage({
   );
   const [query, setQuery] = useState(initialParams.query ?? '');
   const [town, setTown] = useState(initialParams.town ?? '');
+  const [minRating, setMinRating] = useState(initialParams.minRating ?? 0);
   const [experience, setExperience] = useState(initialParams.experience ?? '');
   useEffect(() => {
     // Preserve browser Back while making the current filters and selection copyable.
@@ -75,10 +76,11 @@ export function ExplorationPage({
       query,
       town,
       experience,
+      minRating,
     });
     if (location.hash.startsWith('#explore') && location.hash !== hash)
       history.replaceState(history.state, '', hash);
-  }, [filter, radius, sortBy, selectedId, query, town, experience]);
+  }, [filter, radius, sortBy, selectedId, query, town, experience, minRating]);
   const towns = useMemo(
     () =>
       [...new Set(places.map((place) => catalogueTown(place.location)))].sort((a, b) =>
@@ -117,14 +119,15 @@ export function ExplorationPage({
             (!town || catalogueTown(place.location) === town) &&
             matchesExperience(place, experience) &&
             matchesInterest(place, sortBy) &&
-            matchesSearch(place, query),
+            matchesSearch(place, query) &&
+            (place.communityRating ?? 0) >= minRating,
         )
         .sort((a, b) =>
           sortBy === 'rating'
             ? (b.rating ?? -1) - (a.rating ?? -1) || a.distance - b.distance
             : a.distance - b.distance,
         ),
-    [places, center, radius, filter, sortBy, query, town, experience],
+    [places, center, radius, filter, sortBy, query, town, experience, minRating],
   );
   function selectPlace(place: Place) {
     setSelectedId(place.id);
@@ -138,6 +141,7 @@ export function ExplorationPage({
     setQuery('');
     setTown('');
     setExperience('');
+    setMinRating(0);
     setFilter('all');
     setSortBy('default');
     setSelectedId(null);
@@ -200,6 +204,8 @@ export function ExplorationPage({
       <main id="main-content" className="relative flex min-h-0 flex-1" tabIndex={-1}>
         <div className={`explore-list ${mobileView === 'list' ? 'mobile-active' : ''}`}>
           <Sidebar
+            minRating={minRating}
+            setMinRating={setMinRating}
             filter={filter}
             setFilter={(value) => {
               setFilter(value);
