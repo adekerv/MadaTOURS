@@ -293,6 +293,7 @@ export function DayPlanner({
               <div className="space-y-2">
                 <button
                   className="secondary-button flex items-center gap-2"
+                  disabled={summary?.missing}
                   onClick={() => {
                     const next = optimizeTrip(trip, places);
                     update(next);

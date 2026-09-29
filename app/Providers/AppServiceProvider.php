@@ -6,6 +6,7 @@ use App\Services\Supabase\AuthService;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,6 +18,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->environment('testing')) {
+            // Browser tests must use the built assets, even while a developer runs Vite.
+            // Do not delete or modify their shared public/hot file.
+            Vite::useHotFile(storage_path('framework/testing-vite.hot'));
+        }
+
         Auth::viaRequest('supabase', function () {
             $auth = app(AuthService::class);
 

@@ -13,10 +13,11 @@ export function PlacePhoto({
   priority?: boolean;
 }) {
   const { t } = useI18n();
-  const [loaded, setLoaded] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [imageState, setImageState] = useState({ src: '', loaded: false, failed: false });
   // The fallback is clearly labelled: a licensed island landscape is not a venue photograph.
   const src = place.image || '/photos/salines.jpg';
+  const loaded = imageState.src === src && imageState.loaded;
+  const failed = imageState.src === src && imageState.failed;
   return (
     <div className={`relative overflow-hidden bg-orange-100 ${className}`}>
       {!failed ? (
@@ -27,8 +28,8 @@ export function PlacePhoto({
           decoding="async"
           width="960"
           height="640"
-          onLoad={() => setLoaded(true)}
-          onError={() => setFailed(true)}
+          onLoad={() => setImageState({ src, loaded: true, failed: false })}
+          onError={() => setImageState({ src, loaded: false, failed: true })}
           className={`h-full w-full object-cover transition-[filter,opacity] duration-300 ${loaded ? 'blur-0 opacity-100' : 'blur-sm opacity-30'}`}
         />
       ) : (

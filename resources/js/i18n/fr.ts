@@ -1,5 +1,7 @@
 // English is the source language. Keep placeholders identical in both languages.
 export const french: Record<string, string> = {
+  'Having trouble receiving a code?': 'Vous ne recevez pas le code ?',
+  'Contact support': 'Contacter l’assistance',
   "You're offline or the connection is unavailable. Browse the saved guide; updates need a connection.":
     'Vous êtes hors ligne ou la connexion est indisponible. Consultez le guide sauvegardé ; les mises à jour nécessitent une connexion.',
   'Find your next stop nearby': 'Trouvez votre prochaine étape à proximité',

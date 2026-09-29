@@ -28,7 +28,7 @@
       "sections": [
         {
           "title": "Contact the project owner",
-          "body": "MadaTours is maintained by Kervin Adé. Email adejkervin@protonmail.com for support, corrections, privacy requests or photo-credit questions. Suggestions are reviewed before publication; sending a suggestion does not automatically add a public listing."
+          "body": "Email adejkervin@protonmail.com for support, corrections, privacy requests or photo-credit questions. Suggestions are reviewed before publication; sending a suggestion does not automatically add a public listing."
         }
       ]
     },
@@ -38,7 +38,7 @@
       "sections": [
         {
           "title": "Who is responsible",
-          "body": "MadaTours is maintained by Kervin Adé. Contact adejkervin@protonmail.com about access, correction, deletion or other privacy questions."
+          "body": "Contact adejkervin@protonmail.com about access, correction, deletion or other privacy questions."
         },
         {
           "title": "Browsing and location",
@@ -46,7 +46,7 @@
         },
         {
           "title": "Optional account",
-          "body": "If you sign up, we use your name, email, password credentials and saved places to provide your account. Supabase manages authentication and stores password hashes. New signup does not verify email ownership. We use an essential session cookie to keep you signed in and may send account-related messages. Phone signup is not currently offered. We do not use your profile name to grant administrator access."
+          "body": "If you sign up, we use your name, email, password credentials and saved places to provide your account. Supabase manages authentication and stores password hashes. New signup does not verify email ownership. We use an essential session cookie to keep you signed in and may send account-related messages. Phone signup is not currently offered."
         },
         {
           "title": "Data on your device",
@@ -84,7 +84,7 @@
         },
         {
           "title": "Availability and contact",
-          "body": "Some features require connectivity or third-party services. Offline information can be outdated. We may update the guide and these terms as the service changes. Nothing here removes rights you have under applicable law. For support, corrections or a complaint, contact Kervin Adé at adejkervin@protonmail.com."
+          "body": "Some features require connectivity or third-party services. Offline information can be outdated. We may update the guide and these terms as the service changes. Nothing here removes rights you have under applicable law. For support, corrections or a complaint, contact MadaTours at adejkervin@protonmail.com."
         }
       ]
     },
@@ -136,7 +136,7 @@
       "sections": [
         {
           "title": "Contacter le responsable du projet",
-          "body": "MadaTours est maintenu par Kervin Adé. Écrivez à adejkervin@protonmail.com pour l’assistance, les corrections, les demandes liées aux données personnelles ou les crédits photo. Les suggestions sont examinées avant publication ; leur envoi n’ajoute pas automatiquement une fiche publique."
+          "body": "Écrivez à adejkervin@protonmail.com pour l’assistance, les corrections, les demandes liées aux données personnelles ou les crédits photo. Les suggestions sont examinées avant publication ; leur envoi n’ajoute pas automatiquement une fiche publique."
         }
       ]
     },
@@ -146,7 +146,7 @@
       "sections": [
         {
           "title": "Responsable",
-          "body": "MadaTours est maintenu par Kervin Adé. Contactez adejkervin@protonmail.com pour toute demande d’accès, de correction, de suppression ou toute question sur vos données."
+          "body": "Contactez adejkervin@protonmail.com pour toute demande d’accès, de correction, de suppression ou toute question sur vos données."
         },
         {
           "title": "Navigation et localisation",
@@ -154,7 +154,7 @@
         },
         {
           "title": "Compte facultatif",
-          "body": "Lors de l’inscription, votre nom, email, identifiants de connexion et lieux sauvegardés servent au fonctionnement du compte. Supabase gère l’authentification et conserve des empreintes de mots de passe. L’inscription ne vérifie pas la propriété de l’email. Un cookie de session essentiel maintient votre connexion et des messages liés au compte peuvent être envoyés. L’inscription par téléphone n’est pas proposée actuellement. Le nom du profil ne donne aucun droit administrateur."
+          "body": "Lors de l’inscription, votre nom, email, identifiants de connexion et lieux sauvegardés servent au fonctionnement du compte. Supabase gère l’authentification et conserve des empreintes de mots de passe. L’inscription ne vérifie pas la propriété de l’email. Un cookie de session essentiel maintient votre connexion et des messages liés au compte peuvent être envoyés. L’inscription par téléphone n’est pas proposée actuellement."
         },
         {
           "title": "Données sur votre appareil",
@@ -192,7 +192,7 @@
         },
         {
           "title": "Disponibilité et contact",
-          "body": "Certaines fonctions nécessitent une connexion ou un service tiers. Les informations hors ligne peuvent être anciennes. Le guide et ces conditions peuvent évoluer. Aucune disposition ne supprime vos droits prévus par la loi applicable. Pour l’assistance, une correction ou une réclamation, contactez Kervin Adé à adejkervin@protonmail.com."
+          "body": "Certaines fonctions nécessitent une connexion ou un service tiers. Les informations hors ligne peuvent être anciennes. Le guide et ces conditions peuvent évoluer. Aucune disposition ne supprime vos droits prévus par la loi applicable. Pour l’assistance, une correction ou une réclamation, contactez MadaTours à adejkervin@protonmail.com."
         }
       ]
     },

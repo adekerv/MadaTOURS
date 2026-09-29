@@ -178,8 +178,7 @@ test('register, save, restore session, remove, and delete account from the UI', 
 }) => {
   const email = `e2e-${Date.now()}-${test.info().project.name}@example.test`;
   await page.goto('/');
-  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await page.getByRole('button', { name: 'New here? Create an account' }).click();
+  await page.getByRole('button', { name: 'Create an account', exact: true }).first().click();
   await page.getByLabel('Your name', { exact: true }).fill('Camille');
   await page.getByLabel('Email', { exact: true }).fill(email);
   await page.getByLabel('Password', { exact: true }).fill('Browser test password 42');
@@ -263,6 +262,14 @@ test('home, exploration, and authentication have no serious accessibility violat
 }) => {
   await page.goto('/');
   const scan = async () => {
+    await page.evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          .filter((animation) => animation.effect?.getTiming().iterations !== Infinity)
+          .map((animation) => animation.finished.catch(() => undefined)),
+      ),
+    );
     const result = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
       .analyze();

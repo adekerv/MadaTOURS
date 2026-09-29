@@ -22,9 +22,12 @@ if (
   !Capacitor.isNativePlatform() &&
   (location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname))
 ) {
-  window.addEventListener('load', () => {
+  const registerOfflineShell = () => {
     void navigator.serviceWorker.register('/sw.js').catch(() => {
       /* App remains usable online. */
     });
-  });
+  };
+  // A deferred/cached module can execute after the page load event.
+  if (document.readyState === 'complete') registerOfflineShell();
+  else window.addEventListener('load', registerOfflineShell, { once: true });
 }

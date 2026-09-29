@@ -138,6 +138,7 @@ test('recent search, empty-state suggestions, location consent and cached catalo
   await page.goto('/');
   const search = page.getByRole('combobox', { name: 'Search places' });
   await search.fill('Balata');
+  await expect(page.getByRole('option', { name: /Jardin de Balata/ })).toBeVisible();
   await search.press('ArrowDown');
   await search.press('Enter');
   await page.getByRole('button', { name: 'Back to home' }).click();

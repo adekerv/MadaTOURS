@@ -239,6 +239,17 @@ export function AuthModal({
             {t('Resend verification code')}
           </button>
         )}
+        {(mode === 'forgot' || mode === 'reset' || mode === 'verify') && (
+          <p className="text-sm text-slate-600">
+            {t('Having trouble receiving a code?')}{' '}
+            <a
+              href="mailto:adejkervin@protonmail.com"
+              className="font-semibold text-orange-800 underline"
+            >
+              {t('Contact support')}
+            </a>
+          </p>
+        )}
         {mode !== 'login' && (
           <button
             type="button"
