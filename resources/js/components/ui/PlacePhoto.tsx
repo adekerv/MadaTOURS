@@ -8,10 +8,12 @@ export function PlacePhoto({
   place,
   className = 'h-36',
   priority = false,
+  onOriginalError,
 }: {
   place: Place;
   className?: string;
   priority?: boolean;
+  onOriginalError?: () => void;
 }) {
   const { t } = useI18n();
   const fallback = placeholderFor(place);
@@ -36,7 +38,10 @@ export function PlacePhoto({
           height="640"
           onLoad={() => setImageState({ src, loaded: true, failed: false })}
           onError={() => {
-            if (!illustrative) setFailedOriginal(place.image!);
+            if (!illustrative) {
+              setFailedOriginal(place.image!);
+              onOriginalError?.();
+            }
             else setImageState({ src, loaded: false, failed: true });
           }}
           className={`h-full w-full object-cover transition-[filter,opacity] duration-300 ${loaded ? 'blur-0 opacity-100' : 'blur-sm opacity-30'}`}

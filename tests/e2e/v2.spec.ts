@@ -61,7 +61,7 @@ for (const language of ['en', 'fr'] as const)
         dialog.getByRole('heading', { name: t('MadaTours community'), exact: true }),
       ).toBeVisible();
       await dialog
-        .getByLabel(t('Your review'), { exact: true })
+        .getByRole('textbox', {name: t('Your review'), exact: true })
         .fill('A lovely afternoon here, with beautiful views.');
       await dialog.getByRole('combobox', { name: t('Your rating'), exact: true }).selectOption('4');
       await dialog.getByRole('button', { name: t('Publish or update review') }).click();
@@ -73,7 +73,7 @@ for (const language of ['en', 'fr'] as const)
         dialog.getByText(translate(language, 'Visited {count} times this year', { count: 1 })),
       ).toBeVisible();
       await dialog
-        .getByLabel(t('Your review'), { exact: true })
+        .getByRole('textbox', {name: t('Your review'), exact: true })
         .fill('Updated review after another pleasant visit.');
       await dialog.getByRole('button', { name: t('Publish or update review') }).click();
       await expect(
@@ -176,10 +176,10 @@ for (const language of ['en', 'fr'] as Language[])
     await expect(article.locator('img')).toBeVisible();
     await article.getByRole('button', { name: t('Review submission') }).click();
     await page
-      .getByLabel(t('English description'), { exact: true })
+      .getByRole('textbox', {name: t('English description'), exact: true })
       .fill('A community cultural place by the sea, with a small exhibition and a shaded terrace.');
     await page
-      .getByLabel(t('French description'), { exact: true })
+      .getByRole('textbox', {name: t('French description'), exact: true })
       .fill(
         'Un lieu culturel communautaire au bord de la mer, avec une petite exposition et une terrasse ombragée.',
       );

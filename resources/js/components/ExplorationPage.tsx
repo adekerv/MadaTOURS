@@ -348,6 +348,7 @@ export function ExplorationPage({
       {selectedPlace && detailOpen && (
         <PlaceDetailModal
           place={selectedPlace}
+          onRatingChanged={onRefreshPlaces}
           onClose={() => setDetailOpen(false)}
           isFavorite={favorites.some((place) => place.id === selectedId)}
           onToggleFavorite={onToggleFavorite}

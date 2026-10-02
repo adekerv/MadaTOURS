@@ -45,7 +45,10 @@ class EnrichmentController extends Controller
         $id = (int) $input['placeId'];
         if ($action === 'source') {
             try {
-                $http->validate($input['url']);
+                // Pausing an unavailable source must not depend on that source's DNS.
+                if ($input['enabled']) {
+                    $http->validate($input['url']);
+                }
             } catch (RuntimeException) {
                 throw ValidationException::withMessages(['url' => 'Use a public HTTPS official source. Google Maps pages cannot be ingested.']);
             }

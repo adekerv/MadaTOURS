@@ -1,5 +1,9 @@
 // English is the source language. Keep placeholders identical in both languages.
 export const french: Record<string, string> = {
+  'Community favorites are temporarily unavailable. You can still explore the guide.': 'Les favoris de la communauté sont temporairement indisponibles. Vous pouvez toujours explorer le guide.',
+  'Loading community favorites…': 'Chargement des favoris de la communauté…',
+  'Photo processing is temporarily unavailable. Please try again later.': 'Le traitement des photos est temporairement indisponible. Réessayez plus tard.',
+  'The verification could not be completed. Please request a new code.': 'La vérification n’a pas abouti. Demandez un nouveau code.',
   'Hiking · AI illustration': 'Randonnée · illustration IA',
   'Seafood · AI illustration': 'Poisson · illustration IA',
   'Restaurant · AI illustration': 'Restaurant · illustration IA',

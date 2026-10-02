@@ -24,7 +24,10 @@ class EmailVerificationController extends Controller
         $input = $request->validate(['token' => 'required|string|regex:/^[0-9]{6,8}$/']);
         $original = $request->user();
         $auth->limit('email-ownership-verify', $original->email);
-        $auth->authenticate('verify', ['email' => $original->email, 'token' => $input['token'], 'type' => 'email']);
+        $verified = $auth->authenticate('verify', ['email' => $original->email, 'token' => $input['token'], 'type' => 'email']);
+        if (empty($verified['access_token']) || empty($verified['refresh_token'])) {
+            throw new ApiException(502, 'The verification could not be completed. Please request a new code.');
+        }
         $user = $auth->user();
         if ($user['id'] !== $original->id || $user['email'] !== $original->email) {
             $auth->clear();

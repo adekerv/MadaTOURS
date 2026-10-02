@@ -97,4 +97,40 @@ class EnrichmentTest extends TestCase
         Http::assertNotSent(fn ($r) => $r->url() === 'https://example.org/venue');
         Http::assertSent(fn ($r) => str_ends_with($r->url(), '/mt_source_logs') && $r['status'] === 'robots_denied');
     }
+
+    public function test_official_hours_update_but_photo_requires_moderation(): void
+    {
+        config(['supabase.url' => 'https://project.supabase.co', 'supabase.publishable_key' => 'public', 'supabase.secret_key' => 'secret']);
+        Http::preventStrayRequests();
+        $http = new class extends PublicSourceClient
+        {
+            public function addresses(string $host): array { return ['93.184.215.14']; }
+        };
+        $html = '<script type="application/ld+json">'.json_encode(['@type' => 'Restaurant', 'name' => 'Chez Camille', 'openingHoursSpecification' => ['dayOfWeek' => 'Monday', 'opens' => '09:00', 'closes' => '17:00'], 'image' => ['contentUrl' => 'https://example.org/photo.jpg', 'creator' => 'Camille', 'license' => 'https://creativecommons.org/licenses/by/4.0/']]).'</script>';
+        Http::fake([
+            'https://example.org/robots.txt' => Http::response('', 404),
+            'https://example.org/venue' => Http::response($html, 200, ['Content-Type' => 'text/html; charset=utf-8']),
+            '*/mt_places*' => Http::response([['name' => 'Chez Camille']]),
+            'https://project.supabase.co/*' => Http::response([]),
+        ]);
+        (new SourceIngestion(app(SupabaseClient::class), $http, new RobotsPolicy, new StructuredPlaceData))->ingest(['place_id' => 1, 'url' => 'https://example.org/venue']);
+        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/rpc/mt_apply_source_hours') && $r['periods'] === [['day' => 1, 'opens' => 540, 'closes' => 1020]]);
+        Http::assertSent(fn ($r) => str_contains($r->url(), '/mt_source_settings?') && $r['candidate_photo']['author'] === 'Camille');
+        Http::assertNotSent(fn ($r) => $r->method() === 'PATCH' && str_contains($r->url(), '/mt_places?'));
+        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/mt_source_logs') && $r['hours_updated'] && $r['photo_found']);
+    }
+
+    public function test_unavailable_robots_is_not_treated_as_permission(): void
+    {
+        config(['supabase.url' => 'https://project.supabase.co', 'supabase.publishable_key' => 'public', 'supabase.secret_key' => 'secret']);
+        Http::preventStrayRequests();
+        $http = new class extends PublicSourceClient
+        {
+            public function addresses(string $host): array { return ['93.184.215.14']; }
+        };
+        Http::fake(['https://example.org/robots.txt' => Http::response('', 503), 'https://project.supabase.co/*' => Http::response([])]);
+        (new SourceIngestion(app(SupabaseClient::class), $http, new RobotsPolicy, new StructuredPlaceData))->ingest(['place_id' => 1, 'url' => 'https://example.org/venue']);
+        Http::assertNotSent(fn ($r) => $r->url() === 'https://example.org/venue');
+        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/mt_source_logs') && $r['status'] === 'robots_denied');
+    }
 }

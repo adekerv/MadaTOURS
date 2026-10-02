@@ -153,13 +153,13 @@ export function Homepage({
       <main id="main-content" tabIndex={-1}>
         <OnboardingHint onPlan={onPlanDay} />
         <div className="mt-5 flex flex-wrap justify-end gap-2">
-          <button onClick={onSuggestTrip} className="primary-button">
+          <button disabled={sessionLoading} onClick={onSuggestTrip} className="primary-button">
             {t('Suggest a trip route')}
           </button>
-          <button onClick={onSubmitPlace} className="secondary-button">
+          <button disabled={sessionLoading} onClick={onSubmitPlace} className="secondary-button">
             {t('Suggest a place')}
           </button>
-          <button onClick={onCommunity} className="secondary-button">
+          <button disabled={sessionLoading} onClick={onCommunity} className="secondary-button">
             {t('Community and meet-ups')}
           </button>
         </div>
@@ -387,7 +387,7 @@ export function Homepage({
           </section>
         )}
       </main>
-      <MustGo places={places} />
+      <MustGo places={places} catalogueLoading={catalogueLoading} />
       <SiteFooter onSignup={user ? undefined : onSignup} />
     </div>
   );

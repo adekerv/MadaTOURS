@@ -1,4 +1,5 @@
 import { GooglePlacePanel } from './ui/GooglePlacePanel';
+import { useState } from 'react';
 import { useI18n } from '../i18n/I18nProvider';
 import { Heart, Calendar, ExternalLink, Clock, Star } from 'lucide-react';
 import { PlacePhoto } from './ui/PlacePhoto';
@@ -16,6 +17,7 @@ export function PlaceDetailModal({
   user,
   onLoginClick,
   googleMapsUrl,
+  onRatingChanged,
 }: {
   place: Place;
   onClose: () => void;
@@ -26,15 +28,18 @@ export function PlaceDetailModal({
   user: User | null;
   onLoginClick: () => void;
   googleMapsUrl: string;
+  onRatingChanged: () => void;
 }) {
   const { t, language } = useI18n();
+  const [failedPhoto, setFailedPhoto] = useState('');
+  const showingPlaceholder = !place.image || failedPhoto === place.image;
   const illustrative = placeholderFor(place);
   const venueSearch = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name}, ${place.location}, Martinique`)}`;
   const phone = /Contact:\s*(\+[\d\s-]{8,})/.exec(place.description)?.[1]?.replace(/[\s-]/g, '');
   const contactUrl = phone ? `tel:${phone}` : place.sources?.[0]?.url || venueSearch;
   return (
     <Modal title={place.name} onClose={onClose} wide>
-      <PlacePhoto place={place} className="h-44 sm:h-64" />
+      <PlacePhoto place={place} className="h-44 sm:h-64" onOriginalError={() => setFailedPhoto(place.image || '')} />
       <div className="space-y-5 p-5 sm:p-7">
         <p className="text-sm font-semibold text-orange-700">
           {place.type === 'restaurant' ? t('Restaurant') : t('Activity')} · {place.location}
@@ -144,6 +149,7 @@ export function PlaceDetailModal({
           placeId={place.id}
           user={user}
           onLogin={onLoginClick}
+          onRatingChanged={onRatingChanged}
         />
         {!!place.tags?.length && (
           <ul aria-label={t('Place tags')} className="flex flex-wrap gap-2">
@@ -205,7 +211,7 @@ export function PlaceDetailModal({
         ) : (
           <p className="text-sm text-amber-800">{t('Venue details still need verification.')}</p>
         )}
-        {place.photoCredit && (
+        {place.photoCredit && !showingPlaceholder && (
           <p className="text-xs leading-relaxed text-slate-500">
             {t('Photo')}:{' '}
             <a
@@ -228,7 +234,7 @@ export function PlaceDetailModal({
             · {t('Displayed cropped to fit.')}
           </p>
         )}
-        {!place.image && (
+        {showingPlaceholder && (
           <p className="text-xs text-slate-500">
             {t(illustrative.label)} · {t(illustrative.credit)}
             {illustrative.source && (

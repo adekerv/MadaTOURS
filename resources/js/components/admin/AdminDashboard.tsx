@@ -129,7 +129,7 @@ export function AdminDashboard({
           <summary className="font-semibold cursor-pointer">
             {t('Reviews and comment restrictions')}
           </summary>
-          <CommunityModeration />
+          <CommunityModeration onRatingChanged={onRefreshPlaces} />
         </details>
         <details className="rounded-2xl border border-slate-200 p-4">
           <summary className="flex min-h-11 cursor-pointer items-center font-semibold">

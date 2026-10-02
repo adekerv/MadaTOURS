@@ -43,7 +43,10 @@ class AuthController extends Controller
     {
         $input = $request->validated();
         $this->auth->limit('verify', $input['email']);
-        $this->auth->authenticate('verify', $input + ['type' => 'email']);
+        $verified = $this->auth->authenticate('verify', $input + ['type' => 'email']);
+        if (empty($verified['access_token']) || empty($verified['refresh_token'])) {
+            throw new ApiException(502, 'The verification could not be completed. Please request a new code.');
+        }
         $user = $this->auth->user();
         if (strtolower($user['email']) !== strtolower($input['email'])) {
             $this->auth->clear();

@@ -28,6 +28,9 @@ class SubmissionPhotos
 
     public function sanitize(string $base64): string
     {
+        if (! function_exists('imagecreatefromstring') || ! function_exists('imagejpeg')) {
+            throw new ApiException(503, 'Photo processing is temporarily unavailable. Please try again later.');
+        }
         $bytes = base64_decode($base64, true);
         $size = $bytes === false ? false : @getimagesizefromstring($bytes);
         if (! $bytes || strlen($bytes) > 2097152 || ! $size || $size[0] * $size[1] > 9000000 || max($size[0], $size[1]) > 10000 || ! in_array($size['mime'], ['image/jpeg', 'image/png', 'image/webp'], true)) {
@@ -73,21 +76,6 @@ class SubmissionPhotos
         }
 
         return ['id' => $id, 'path' => $path];
-    }
-
-    public function signedUrl(string $path): ?string
-    {
-        try {
-            $response = $this->storage()->post('/object/sign/mt-submissions/'.$path, ['expiresIn' => 300]);
-            $signed = $response->json('signedURL');
-            if ($response->successful() && is_string($signed) && str_starts_with($signed, '/object/sign/mt-submissions/')) {
-                return config('supabase.url').'/storage/v1'.$signed;
-            }
-        } catch (ConnectionException) {
-            // The moderation list remains usable when an image service is temporarily unavailable.
-        }
-
-        return null;
     }
 
     public function signedUrls(array $paths): array

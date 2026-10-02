@@ -12,14 +12,15 @@ const icon = L.divIcon({
 });
 function Picker({ point, onChange }: { point: Point | null; onChange: (point: Point) => void }) {
   const map = useMap();
+  const valid = point && point.lat >= 14.35 && point.lat <= 14.95 && point.lng >= -61.3 && point.lng <= -60.75;
   useMapEvents({
     click: (e) =>
       onChange({ lat: Number(e.latlng.lat.toFixed(6)), lng: Number(e.latlng.lng.toFixed(6)) }),
   });
   useEffect(() => {
-    if (point) map.panTo(point, { animate: false });
-  }, [map, point]);
-  return point ? (
+    if (valid) map.panTo(point, { animate: false });
+  }, [map, point, valid]);
+  return valid ? (
     <Marker icon={icon} position={point} interactive={false} keyboard={false} />
   ) : null;
 }

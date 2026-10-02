@@ -9,7 +9,7 @@ type Item = {
   rating?: number;
   reason?: string;
 };
-export function CommunityModeration() {
+export function CommunityModeration({ onRatingChanged }: { onRatingChanged: () => void }) {
   const { t } = useI18n();
   const [data, setData] = useState<{ reviews: Item[]; comments: Item[]; blocked: Item[] }>();
   const [offset, setOffset] = useState(0);
@@ -36,6 +36,7 @@ export function CommunityModeration() {
       setEditing(null);
       setBlocking(null);
       setRevision((v) => v + 1);
+      if (action === 'moderate-review' || action === 'delete-review') onRatingChanged();
     } catch (e) {
       setError(errorMessage(e));
     } finally {

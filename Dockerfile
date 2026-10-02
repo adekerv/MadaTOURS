@@ -6,8 +6,9 @@ COPY . .
 RUN npm run build:web
 
 FROM php:8.5-apache-bookworm
-RUN apt-get update && apt-get install -y --no-install-recommends libpq-dev libicu-dev libzip-dev unzip \
-    && docker-php-ext-install pdo_pgsql intl zip \
+RUN apt-get update && apt-get install -y --no-install-recommends libpq-dev libicu-dev libzip-dev libpng-dev libjpeg62-turbo-dev libwebp-dev unzip \
+    && docker-php-ext-configure gd --with-jpeg --with-webp \
+    && docker-php-ext-install pdo_pgsql intl zip gd \
     && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*

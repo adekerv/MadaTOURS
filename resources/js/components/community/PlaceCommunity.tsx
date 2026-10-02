@@ -18,12 +18,17 @@ export function PlaceCommunity({
   placeId,
   user,
   onLogin,
+  onRatingChanged,
 }: {
   placeId: number;
   user: User | null;
   onLogin: () => void;
+  onRatingChanged: () => void;
 }) {
   const { t } = useI18n();
+  const userId = user?.id;
+  const [ownRetry, setOwnRetry] = useState(0);
+  const [ownLoaded, setOwnLoaded] = useState(!userId);
   const [feed, setFeed] = useState<Feed | null>(null);
   const [offset, setOffset] = useState(0);
   const [revision, setRevision] = useState(0);
@@ -44,18 +49,20 @@ export function PlaceCommunity({
     return () => controller.abort();
   }, [placeId, offset, revision]);
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
+    setOwnLoaded(false);
     const controller = new AbortController();
     api<{ review: Review | null }>(`/places/${placeId}/my-review`, { signal: controller.signal })
       .then(({ review }) => {
         setBody(review?.body || '');
         setRating(review?.rating || 5);
+        setOwnLoaded(true);
       })
       .catch((e) => {
         if (!controller.signal.aborted) setError(errorMessage(e));
       });
     return () => controller.abort();
-  }, [user, placeId]);
+  }, [userId, placeId, ownRetry]);
   async function write(action: string, data: object, success: string) {
     if (!user) {
       onLogin();
@@ -72,6 +79,11 @@ export function PlaceCommunity({
       });
       setNotice(success);
       setRevision((v) => v + 1);
+      if (action === 'review' || action === 'delete-review') onRatingChanged();
+      if (action === 'delete-review') {
+        setBody('');
+        setRating(5);
+      }
       if (action === 'comment') setComment('');
     } catch (e) {
       setError(errorMessage(e));
@@ -114,7 +126,7 @@ export function PlaceCommunity({
       {error && (
         <div role="alert" className="error-message">
           {t(error)}{' '}
-          <button className="underline" onClick={() => setRevision((v) => v + 1)}>
+          <button className="underline" onClick={() => { setRevision((v) => v + 1); setOwnRetry(v=>v+1); }}>
             {t('Retry')}
           </button>
         </div>
@@ -131,6 +143,7 @@ export function PlaceCommunity({
             );
           }}
         >
+          <fieldset disabled={!ownLoaded || busy} className="space-y-3">
           <label className="field-label">
             {t('Your rating')}
             <select
@@ -160,6 +173,7 @@ export function PlaceCommunity({
           <button className="primary-button" disabled={busy}>
             {t('Publish or update review')}
           </button>
+          </fieldset>
         </form>
       ) : (
         <button className="primary-button" onClick={onLogin}>
