@@ -92,9 +92,27 @@ export default function App() {
     } catch {
       /* Storage can be disabled. */
     }
+    // Google sign-in returns here with a one-time status flag; read it once, then tidy the address bar.
+    const params = new URLSearchParams(location.search);
+    const authError = params.get('auth_error');
+    const googleReturn = params.has('signed_in') || authError !== null;
+    if (googleReturn) {
+      params.delete('signed_in');
+      params.delete('auth_error');
+      const query = params.toString();
+      const search = query ? `?${query}` : '';
+      history.replaceState(null, '', `${location.pathname}${search}${location.hash}`);
+    }
     api<{ user: User | null }>('/auth/session')
       .then((data) => {
-        if (active) setUser(data.user);
+        if (!active) return;
+        setUser(data.user);
+        if (authError === 'cancelled') setNotice('Google sign-in was cancelled.');
+        else if (authError === 'rate_limited')
+          setNotice('Too many attempts. Please try again in 15 minutes.');
+        else if (authError !== null || (googleReturn && !data.user))
+          setNotice('Google sign-in could not be completed. Please try again.');
+        else if (googleReturn && data.user) setNotice('You are signed in with Google.');
       })
       .catch(() => {
         if (active) setNotice('Could not check your session. You can still explore places.');

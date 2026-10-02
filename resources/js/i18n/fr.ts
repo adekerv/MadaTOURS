@@ -488,6 +488,12 @@ export const french: Record<string, string> = {
   'Send recovery code': 'Envoyer le code de récupération',
   'Update password': 'Modifier le mot de passe',
   'Forgot password?': 'Mot de passe oublié ?',
+  'Continue with Google': 'Continuer avec Google',
+  'or use your email': 'ou utilisez votre e-mail',
+  'Google sign-in was cancelled.': 'La connexion avec Google a été annulée.',
+  'Google sign-in could not be completed. Please try again.':
+    'La connexion avec Google n’a pas pu aboutir. Veuillez réessayer.',
+  'You are signed in with Google.': 'Vous êtes connecté avec Google.',
   'Already have a verification code?': 'Vous avez déjà un code de vérification ?',
   'Resend verification code': 'Renvoyer le code de vérification',
   'Back to sign in': 'Retour à la connexion',

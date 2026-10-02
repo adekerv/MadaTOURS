@@ -271,6 +271,12 @@ export const english: Record<string, string> = {
   'Food and drinks': 'Food and drinks',
   Forest: 'Forest',
   'Forgot password?': 'Forgot password?',
+  'Continue with Google': 'Continue with Google',
+  'or use your email': 'or use your email',
+  'Google sign-in was cancelled.': 'Google sign-in was cancelled.',
+  'Google sign-in could not be completed. Please try again.':
+    'Google sign-in could not be completed. Please try again.',
+  'You are signed in with Google.': 'You are signed in with Google.',
   'Fort-de-France weather': 'Fort-de-France weather',
   Freediving: 'Freediving',
   French: 'French',

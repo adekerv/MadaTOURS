@@ -12,5 +12,6 @@ return [
         env('VERCEL_URL') ? 'https://'.env('VERCEL_URL') : null,
         env('VERCEL_BRANCH_URL') ? 'https://'.env('VERCEL_BRANCH_URL') : null,
     ])),
-    'app_origin' => env('APP_ORIGIN', env('APP_URL', 'http://localhost:8000')),
+    // Trimmed: dashboard values can carry a stray newline that would break redirects.
+    'app_origin' => trim((string) env('APP_ORIGIN', env('APP_URL', 'http://localhost:8000'))),
 ];

@@ -29,6 +29,8 @@ Route::withoutMiddleware([EncryptCookies::class, AddQueuedCookiesToResponse::cla
 // Allow enough lock time for the bounded, sequential provider calls in auth flows.
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
     Route::get('session', 'session')->block(90, 15);
+    Route::get('google', 'google')->block(90, 15);
+    Route::get('google/callback', 'googleCallback')->block(90, 15);
     foreach (['register', 'login', 'verify', 'resend', 'logout', 'forgot-password' => 'forgotPassword', 'reset-password' => 'resetPassword'] as $path => $method) {
         Route::post(is_int($path) ? $method : $path, $method)->block(90, 15);
     }
