@@ -60,7 +60,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker build -t madatours-ci .
-      - run: docker run --rm madatours-ci php -r 'exit(extension_loaded("gd") && function_exists("imagejpeg") && function_exists("imagecreatefromwebp") ? 0 : 1);'
+      - name: Check image extensions in the container
+        run: |
+          docker run --rm madatours-ci php -r 'exit(extension_loaded("gd") && function_exists("imagejpeg") && function_exists("imagecreatefromwebp") ? 0 : 1);'
       - name: Check the production Laravel container
         shell: bash
         run: |

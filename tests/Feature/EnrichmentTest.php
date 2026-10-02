@@ -104,7 +104,10 @@ class EnrichmentTest extends TestCase
         Http::preventStrayRequests();
         $http = new class extends PublicSourceClient
         {
-            public function addresses(string $host): array { return ['93.184.215.14']; }
+            public function addresses(string $host): array
+            {
+                return ['93.184.215.14'];
+            }
         };
         $html = '<script type="application/ld+json">'.json_encode(['@type' => 'Restaurant', 'name' => 'Chez Camille', 'openingHoursSpecification' => ['dayOfWeek' => 'Monday', 'opens' => '09:00', 'closes' => '17:00'], 'image' => ['contentUrl' => 'https://example.org/photo.jpg', 'creator' => 'Camille', 'license' => 'https://creativecommons.org/licenses/by/4.0/']]).'</script>';
         Http::fake([
@@ -126,7 +129,10 @@ class EnrichmentTest extends TestCase
         Http::preventStrayRequests();
         $http = new class extends PublicSourceClient
         {
-            public function addresses(string $host): array { return ['93.184.215.14']; }
+            public function addresses(string $host): array
+            {
+                return ['93.184.215.14'];
+            }
         };
         Http::fake(['https://example.org/robots.txt' => Http::response('', 503), 'https://project.supabase.co/*' => Http::response([])]);
         (new SourceIngestion(app(SupabaseClient::class), $http, new RobotsPolicy, new StructuredPlaceData))->ingest(['place_id' => 1, 'url' => 'https://example.org/venue']);

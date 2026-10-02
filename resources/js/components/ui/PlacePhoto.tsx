@@ -41,8 +41,7 @@ export function PlacePhoto({
             if (!illustrative) {
               setFailedOriginal(place.image!);
               onOriginalError?.();
-            }
-            else setImageState({ src, loaded: false, failed: true });
+            } else setImageState({ src, loaded: false, failed: true });
           }}
           className={`h-full w-full object-cover transition-[filter,opacity] duration-300 ${loaded ? 'blur-0 opacity-100' : 'blur-sm opacity-30'}`}
         />

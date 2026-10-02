@@ -126,7 +126,13 @@ export function PlaceCommunity({
       {error && (
         <div role="alert" className="error-message">
           {t(error)}{' '}
-          <button className="underline" onClick={() => { setRevision((v) => v + 1); setOwnRetry(v=>v+1); }}>
+          <button
+            className="underline"
+            onClick={() => {
+              setRevision((v) => v + 1);
+              setOwnRetry((v) => v + 1);
+            }}
+          >
             {t('Retry')}
           </button>
         </div>
@@ -144,35 +150,35 @@ export function PlaceCommunity({
           }}
         >
           <fieldset disabled={!ownLoaded || busy} className="space-y-3">
-          <label className="field-label">
-            {t('Your rating')}
-            <select
-              className="field-input"
-              value={rating}
-              onChange={(e) => setRating(Number(e.target.value))}
-            >
-              {[5, 4, 3, 2, 1].map((n) => (
-                <option value={n} key={n}>
-                  {t('{count} stars', { count: n })}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field-label">
-            {t('Your review')}
-            <textarea
-              className="field-input"
-              required
-              minLength={10}
-              maxLength={2000}
-              rows={3}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-            />
-          </label>
-          <button className="primary-button" disabled={busy}>
-            {t('Publish or update review')}
-          </button>
+            <label className="field-label">
+              {t('Your rating')}
+              <select
+                className="field-input"
+                value={rating}
+                onChange={(e) => setRating(Number(e.target.value))}
+              >
+                {[5, 4, 3, 2, 1].map((n) => (
+                  <option value={n} key={n}>
+                    {t('{count} stars', { count: n })}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field-label">
+              {t('Your review')}
+              <textarea
+                className="field-input"
+                required
+                minLength={10}
+                maxLength={2000}
+                rows={3}
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+              />
+            </label>
+            <button className="primary-button" disabled={busy}>
+              {t('Publish or update review')}
+            </button>
           </fieldset>
         </form>
       ) : (

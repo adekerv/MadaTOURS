@@ -19,15 +19,27 @@ class EmailVerificationTest extends TestCase
     {
         $verified = false;
         Http::fake(function ($request) use ($verification, $status, $differentAccount, &$verified) {
-            if (str_ends_with($request->url(), '/rpc/mt_check_rate_limit')) return Http::response('true');
-            if (str_ends_with($request->url(), '/auth/v1/verify')) return Http::response($verification, $status);
-            if (str_ends_with($request->url(), '/auth/v1/otp')) return Http::response([]);
+            if (str_ends_with($request->url(), '/rpc/mt_check_rate_limit')) {
+                return Http::response('true');
+            }
+            if (str_ends_with($request->url(), '/auth/v1/verify')) {
+                return Http::response($verification, $status);
+            }
+            if (str_ends_with($request->url(), '/auth/v1/otp')) {
+                return Http::response([]);
+            }
             if (str_ends_with($request->url(), '/auth/v1/user')) {
                 $other = $differentAccount && $request->hasHeader('Authorization', 'Bearer verified-access');
+
                 return Http::response(['id' => $other ? 'another-user' : 'original-user', 'email' => $other ? 'other@example.test' : 'camille@example.test', 'email_confirmed_at' => '2026-01-01T00:00:00Z']);
             }
             if (str_contains($request->url(), '/mt_profiles')) {
-                if ($request->method() === 'PATCH') { $verified = true; return Http::response([]); }
+                if ($request->method() === 'PATCH') {
+                    $verified = true;
+
+                    return Http::response([]);
+                }
+
                 return Http::response([['role' => 'user', 'email_verified_at' => $verified ? '2026-10-01T00:00:00Z' : null]]);
             }
             $this->fail('Unexpected provider request');

@@ -3,7 +3,13 @@ import { useI18n } from '../../i18n/I18nProvider';
 import { api } from '../../lib/api';
 import { PlacePhoto, PlaceCardSkeleton } from '../ui/PlacePhoto';
 import type { Place } from '../../types';
-export function MustGo({ places, catalogueLoading }: { places: Place[]; catalogueLoading: boolean }) {
+export function MustGo({
+  places,
+  catalogueLoading,
+}: {
+  places: Place[];
+  catalogueLoading: boolean;
+}) {
   const { t } = useI18n();
   const [ids, setIds] = useState<number[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
@@ -17,7 +23,9 @@ export function MustGo({ places, catalogueLoading }: { places: Place[]; catalogu
         setIds(data.picks.map((p) => p.place_id));
         setStatus('ready');
       })
-      .catch(() => { if (!controller.signal.aborted) setStatus('error'); });
+      .catch(() => {
+        if (!controller.signal.aborted) setStatus('error');
+      });
     return () => controller.abort();
   }, [revision]);
   const picks = ids
@@ -38,14 +46,25 @@ export function MustGo({ places, catalogueLoading }: { places: Place[]; catalogu
       </p>
       {status === 'error' ? (
         <div role="status" className="mt-5 rounded-2xl bg-orange-50 p-5">
-          <p className="text-sm text-slate-700">{t('Community favorites are temporarily unavailable. You can still explore the guide.')}</p>
-          <button className="secondary-button mt-3" onClick={() => setRevision((value) => value + 1)}>{t('Retry')}</button>
-          <a href="#explore" className="secondary-button ml-3 mt-3 inline-flex items-center">{t('Explore places')}</a>
+          <p className="text-sm text-slate-700">
+            {t('Community favorites are temporarily unavailable. You can still explore the guide.')}
+          </p>
+          <button
+            className="secondary-button mt-3"
+            onClick={() => setRevision((value) => value + 1)}
+          >
+            {t('Retry')}
+          </button>
+          <a href="#explore" className="secondary-button ml-3 mt-3 inline-flex items-center">
+            {t('Explore places')}
+          </a>
         </div>
       ) : status === 'loading' || (catalogueLoading && !places.length) ? (
         <div role="status" className="mt-5 grid gap-4 sm:grid-cols-3">
           <span className="sr-only">{t('Loading community favorites…')}</span>
-          {[0, 1, 2].map((id) => <PlaceCardSkeleton key={id} />)}
+          {[0, 1, 2].map((id) => (
+            <PlaceCardSkeleton key={id} />
+          ))}
         </div>
       ) : picks.length ? (
         <div className="home-entrance mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

@@ -39,7 +39,11 @@ export function PlaceDetailModal({
   const contactUrl = phone ? `tel:${phone}` : place.sources?.[0]?.url || venueSearch;
   return (
     <Modal title={place.name} onClose={onClose} wide>
-      <PlacePhoto place={place} className="h-44 sm:h-64" onOriginalError={() => setFailedPhoto(place.image || '')} />
+      <PlacePhoto
+        place={place}
+        className="h-44 sm:h-64"
+        onOriginalError={() => setFailedPhoto(place.image || '')}
+      />
       <div className="space-y-5 p-5 sm:p-7">
         <p className="text-sm font-semibold text-orange-700">
           {place.type === 'restaurant' ? t('Restaurant') : t('Activity')} · {place.location}

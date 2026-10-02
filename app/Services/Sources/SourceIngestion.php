@@ -42,7 +42,9 @@ class SourceIngestion
             if ($robots->status() !== 404 && (! $robots->successful() || ! $this->robots->allows($robots->body(), $path) || $delay > 30)) {
                 $status = 'robots_denied';
             } else {
-                if ($delay > 0) { usleep((int) ceil($delay * 1000000)); }
+                if ($delay > 0) {
+                    usleep((int) ceil($delay * 1000000));
+                }
                 $response = $this->http->get($url);
                 if ($response->successful() && strlen($response->body()) <= 1048576 && str_contains(strtolower($response->header('Content-Type')), 'text/html')) {
                     $places = $this->db->request('GET', '/rest/v1/mt_places', ['id' => 'eq.'.$source['place_id'], 'select' => 'name', 'limit' => 1], admin: true);

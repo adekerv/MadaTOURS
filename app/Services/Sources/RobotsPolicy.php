@@ -8,6 +8,7 @@ class RobotsPolicy
     {
         // Honor even non-standard crawl-delay directives conservatively across groups.
         preg_match_all('/^\s*crawl-delay\s*:\s*([0-9.]+)/mi', $text, $matches);
+
         return $matches[1] ? max(array_map('floatval', $matches[1])) : 0;
     }
 

@@ -44,6 +44,9 @@ for (const language of ['en', 'fr'] as const)
       test.setTimeout(45000);
       const t = (s: string) => translate(language, s);
       const user = await register(page);
+      // Runs share one database and place, so scope review assertions to this user.
+      const firstReview = `A lovely afternoon here, with beautiful views. ${user.name}`;
+      const updatedReview = `Updated review after another pleasant visit. ${user.name}`;
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`/?lang=${language}`);
       await page.getByRole('combobox', { name: t('Appearance'), exact: true }).selectOption('dark');
@@ -55,30 +58,25 @@ for (const language of ['en', 'fr'] as const)
         await fits(page);
       }
       await page.goto(`/?lang=${language}#explore?filter=activity&radius=50&place=6`);
-      await page.getByRole('button', {name:t('View details'),exact:true}).click();
+      await page.getByRole('button', { name: t('View details'), exact: true }).click();
       const dialog = page.getByRole('dialog');
+      const myReview = () => dialog.locator('article').filter({ hasText: user.name });
       await expect(
         dialog.getByRole('heading', { name: t('MadaTours community'), exact: true }),
       ).toBeVisible();
-      await dialog
-        .getByRole('textbox', {name: t('Your review'), exact: true })
-        .fill('A lovely afternoon here, with beautiful views.');
+      await dialog.getByRole('textbox', { name: t('Your review'), exact: true }).fill(firstReview);
       await dialog.getByRole('combobox', { name: t('Your rating'), exact: true }).selectOption('4');
       await dialog.getByRole('button', { name: t('Publish or update review') }).click();
-      await expect(
-        dialog.getByText('A lovely afternoon here, with beautiful views.', { exact: true }),
-      ).toBeVisible();
+      await expect(myReview().getByText(firstReview, { exact: true })).toBeVisible();
       await dialog.getByRole('button', { name: t("I've been here"), exact: true }).click();
       await expect(
-        dialog.getByText(translate(language, 'Visited {count} times this year', { count: 1 })),
+        myReview().getByText(translate(language, 'Visited {count} times this year', { count: 1 })),
       ).toBeVisible();
       await dialog
-        .getByRole('textbox', {name: t('Your review'), exact: true })
-        .fill('Updated review after another pleasant visit.');
+        .getByRole('textbox', { name: t('Your review'), exact: true })
+        .fill(updatedReview);
       await dialog.getByRole('button', { name: t('Publish or update review') }).click();
-      await expect(
-        dialog.getByText('Updated review after another pleasant visit.', { exact: true }),
-      ).toBeVisible();
+      await expect(myReview().getByText(updatedReview, { exact: true })).toBeVisible();
       await fits(page);
       await page.screenshot({
         path: `test-results/v2-${test.info().project.name}-${language}-${width}-review-dark.png`,
@@ -176,10 +174,10 @@ for (const language of ['en', 'fr'] as Language[])
     await expect(article.locator('img')).toBeVisible();
     await article.getByRole('button', { name: t('Review submission') }).click();
     await page
-      .getByRole('textbox', {name: t('English description'), exact: true })
+      .getByRole('textbox', { name: t('English description'), exact: true })
       .fill('A community cultural place by the sea, with a small exhibition and a shaded terrace.');
     await page
-      .getByRole('textbox', {name: t('French description'), exact: true })
+      .getByRole('textbox', { name: t('French description'), exact: true })
       .fill(
         'Un lieu culturel communautaire au bord de la mer, avec une petite exposition et une terrasse ombragée.',
       );
@@ -194,7 +192,7 @@ for (const language of ['en', 'fr'] as Language[])
     expect(photo.headers()['content-type']).toContain('image/jpeg');
     await page.keyboard.press('Escape');
     await page.goto(`/?lang=${language}#explore?filter=activity&radius=100&place=${published.id}`);
-    await page.getByRole('button', {name:t('View details'),exact:true}).click();
+    await page.getByRole('button', { name: t('View details'), exact: true }).click();
     await expect(page.getByRole('dialog')).toContainText(name);
     await fits(page);
     await page.screenshot({
