@@ -27,6 +27,16 @@ Run database migrations once in a controlled release step, after a backup. Conta
 
 `/up` checks application liveness. `/api/health` checks the database schema through the public Data API. After release, verify immediate signup and the welcome message, login, saved lists in another browser, recovery and admin changes. Existing Express cookies are replaced by Laravel sessions, so users sign in again.
 
+## Recurring tasks
+
+Event expiry, photo cleanup, official-source refresh, Google Place ID matching and the daily MUST GO ranking are listed with their intervals in `config/tasks.php`. Each runs at most once per interval, whatever triggers it.
+
+- The container runs `php artisan tasks:run-due` every minute in the background. Set `RUN_SCHEDULER=false` to turn this off.
+- Hosts that sleep when idle, such as the free Render plan, also need the external trigger. Set `RECURRING_TASKS_SECRET` to a random value of at least 32 characters, for example `openssl rand -hex 32`. Then add the repository secrets `MADATOURS_TASKS_URL` (the API origin, no trailing slash) and `MADATOURS_TASKS_SECRET` (the same value). The `Recurring tasks` GitHub workflow calls `POST /api/internal/tasks` every 15 minutes.
+- Without a secret the endpoint returns 404. Traditional servers can instead run `php artisan schedule:run` from cron every minute.
+
+Google matching spend is capped per day in the database by `GOOGLE_MATCH_DAILY_LIMIT` (default 10, maximum 100).
+
 ## Sessions, cache and scaling
 
 The default encrypted file sessions and file locks support one application instance. Mount persistent storage for `storage/` to retain sessions across restarts. An ephemeral host can run with file sessions, but restarts/deployments sign everyone out. The included free Render blueprint has this limitation.

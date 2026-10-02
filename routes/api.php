@@ -7,6 +7,7 @@ use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\EnrichmentController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\PlaceController;
+use App\Http\Controllers\RecurringTaskController;
 use App\Http\Controllers\SavedPlaceController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\SubmissionController;
@@ -21,6 +22,7 @@ Route::withoutMiddleware([EncryptCookies::class, AddQueuedCookiesToResponse::cla
     Route::get('places', [PlaceController::class, 'index']);
     Route::get('daily-picks', [EnrichmentController::class, 'picks']);
     Route::get('places/{place}/community', [CommunityController::class, 'show']);
+    Route::post('internal/tasks', RecurringTaskController::class);
 });
 
 // Allow enough lock time for the bounded, sequential provider calls in auth flows.

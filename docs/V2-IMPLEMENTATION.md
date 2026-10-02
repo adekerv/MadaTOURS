@@ -8,20 +8,37 @@ Keep Laravel 13, React/TypeScript, Supabase Auth/Postgres/RLS, Capacitor, hash r
 
 ## Work tracking
 
-- [ ] WP1 Google key validation, matching/enrichment and compliant attribution.
-- [ ] WP2 Local category-specific illustrative fallbacks.
-- [ ] WP3 Account-owned reviews, comments, check-ins, moderation and rating filters.
-- [ ] WP4 Separate Google and community ratings and sorting.
-- [ ] WP5 Larger category-colored emoji pins.
-- [ ] WP6 Accepted followers, private activity, verified-email events, expiry and moderation.
-- [ ] WP7 Official-source ingestion, robots compliance and per-place audit log.
-- [ ] WP8 Explainable editable location-based route suggestions.
-- [ ] WP9 Google-based daily MUST GO ranking with review threshold.
-- [ ] WP10 Photo/coordinate-required submissions and moderation notifications.
-- [ ] WP11 Optimistic saves and lightweight motion.
-- [ ] WP12 Persisted/system dark mode, including map.
-- [ ] Privacy/terms, translations, database/API/browser tests, web/native build checks.
+- [x] WP1 Google key validation, matching/enrichment and compliant attribution.
+- [x] WP2 Local category-specific illustrative fallbacks.
+- [x] WP3 Account-owned reviews, comments, check-ins, moderation and rating filters.
+- [x] WP4 Separate Google and community ratings and sorting.
+- [x] WP5 Larger category-colored emoji pins.
+- [x] WP6 Accepted followers, private activity, verified-email events, expiry and moderation.
+- [x] WP7 Official-source ingestion, robots compliance and per-place audit log.
+- [x] WP8 Explainable editable location-based route suggestions.
+- [x] WP9 Google-based daily MUST GO ranking with review threshold.
+- [x] WP10 Photo/coordinate-required submissions and moderation notifications.
+- [x] WP11 Optimistic saves and lightweight motion.
+- [x] WP12 Persisted/system dark mode, including map.
+- [x] Privacy/terms, translations, database/API/browser tests, web/native build checks.
 - [ ] Preview verification and production deployment.
+
+## Audit 2026-10-01
+
+All twelve packages are implemented in code and pass the PHP, Node, PostgreSQL (PGlite) and Playwright suites. WP1, WP4 and WP9 follow the compliant adaptation below rather than the cache-based wording of the v3 prompt.
+
+Fixed in this pass:
+
+- Recurring jobs never ran in production: the container started Apache only. `config/tasks.php` now lists every job and interval, the container runs them every minute, and `POST /api/internal/tasks` (secret-protected) plus the `Recurring tasks` workflow cover hosts that sleep.
+- Google matching ran 3 places per day. It now runs hourly; the database daily cap (`GOOGLE_MATCH_DAILY_LIMIT`) is the only limit.
+- `.github/workflows/check.yml` was invalid YAML, so CI could not start.
+- The v2 browser test shared review text across runs and failed after the first viewport.
+
+Still open, owner action required:
+
+- The live Supabase database has none of the v2 schema (no reviews, events, submissions, matches or daily picks tables; no `google_place_id` column). Back up, then run `php artisan migrate --seed --force` with `DB_URL`, or paste `supabase/setup.sql` into the SQL Editor.
+- No browser key (`VITE_GOOGLE_MAPS_API_KEY`) is configured, so the live Google panel cannot load.
+- Set `RECURRING_TASKS_SECRET` on the host and the two GitHub secrets described in DEPLOYMENT.md.
 
 ## External dependencies discovered
 
@@ -31,6 +48,7 @@ Keep Laravel 13, React/TypeScript, Supabase Auth/Postgres/RLS, Capacitor, hash r
 - Vercel connector get_project has an argument-schema mismatch; authenticated CLI environment listing works.
 
 Primary Google references:
+
 - https://developers.google.com/maps/documentation/places/web-service/place-photos
 - https://developers.google.com/maps/documentation/places/web-service/policies
 - https://cloud.google.com/maps-platform/terms/maps-service-terms

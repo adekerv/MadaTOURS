@@ -1,0 +1,28 @@
+name: Recurring tasks
+
+# Wakes the API and runs due maintenance on hosts that sleep or cannot keep a
+# scheduler process alive. Inactive until both repository secrets are set.
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run due tasks
+        env:
+          TASKS_URL: ${{ secrets.MADATOURS_TASKS_URL }}
+          TASKS_SECRET: ${{ secrets.MADATOURS_TASKS_SECRET }}
+        run: |
+          if [ -z "$TASKS_URL" ] || [ -z "$TASKS_SECRET" ]; then
+            echo "Recurring task secrets are not configured; skipping."
+            exit 0
+          fi
+          curl --fail-with-body --silent --show-error --max-time 240 -X POST \
+            -H "Authorization: Bearer $TASKS_SECRET" -H "X-MadaTours-Client: 1" \
+            "$TASKS_URL/api/internal/tasks"

@@ -18,5 +18,9 @@ services:
         sync: false
       - key: SUPABASE_SECRET_KEY
         sync: false
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: RECURRING_TASKS_SECRET
+        sync: false
       - key: ALLOWED_ORIGINS
         value: capacitor://localhost,https://localhost
