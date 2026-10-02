@@ -1,5 +1,7 @@
 // English is the source language. Keep placeholders identical in both languages.
 export const french: Record<string, string> = {
+  'Show password': 'Afficher le mot de passe',
+  'Hide password': 'Masquer le mot de passe',
   'Community favorites are temporarily unavailable. You can still explore the guide.':
     'Les favoris de la communauté sont temporairement indisponibles. Vous pouvez toujours explorer le guide.',
   'Loading community favorites…': 'Chargement des favoris de la communauté…',

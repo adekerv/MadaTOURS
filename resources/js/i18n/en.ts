@@ -1,5 +1,7 @@
 // English messages are explicit to keep language coverage auditable.
 export const english: Record<string, string> = {
+  'Show password': 'Show password',
+  'Hide password': 'Hide password',
   '1 place found': '1 place found',
   'A few picks from our island guide. Find your own favorite.':
     'A few picks from our island guide. Find your own favorite.',

@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import type { User } from '../../types';
 import { api, errorMessage } from '../../lib/api';
 import { Modal } from '../ui/Modal';
@@ -23,6 +24,7 @@ export function AuthModal({
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const titles: Record<Mode, string> = {
     login: 'Welcome to MadaTours',
     register: 'Create your account',
@@ -63,7 +65,12 @@ export function AuthModal({
         onClose();
         return;
       }
-      if (mode === 'register') {
+      if (mode === 'register' && result.verificationRequired) {
+        // Supabase sends a code when email confirmation is on. The same reply is used for
+        // an address that is already registered, so this never reveals whether it exists.
+        change('verify');
+        setMessage('Check your email and enter the verification code.');
+      } else if (mode === 'register') {
         setError('Could not finish signup. Try signing in or resetting your password.');
       } else if (mode === 'forgot') {
         change('reset');
@@ -156,19 +163,30 @@ export function AuthModal({
         {needsPassword && (
           <label className="field-label">
             {t(mode === 'reset' ? 'New password' : 'Password')}
-            <input
-              aria-label={t(mode === 'reset' ? 'New password' : 'Password')}
-              aria-describedby={mode !== 'login' ? hint : undefined}
-              type="password"
-              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-              minLength={mode === 'login' ? 1 : 12}
-              maxLength={128}
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="field-input"
-              disabled={busy}
-            />
+            <span className="relative block">
+              <input
+                aria-label={t(mode === 'reset' ? 'New password' : 'Password')}
+                aria-describedby={mode !== 'login' ? hint : undefined}
+                type={showPassword ? 'text' : 'password'}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                minLength={mode === 'login' ? 1 : 12}
+                maxLength={128}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="field-input pr-14"
+                disabled={busy}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                aria-label={t(showPassword ? 'Hide password' : 'Show password')}
+                aria-pressed={showPassword}
+                className="absolute inset-y-0 right-0 flex min-h-11 min-w-11 items-center justify-center rounded-r-xl px-3 text-slate-600 hover:text-orange-800"
+              >
+                {showPassword ? <EyeOff size={20} aria-hidden /> : <Eye size={20} aria-hidden />}
+              </button>
+            </span>
             {mode !== 'login' && (
               <span id={hint} className="text-sm font-normal text-slate-600">
                 {t('Use at least 12 characters. A few memorable words work well.')}
