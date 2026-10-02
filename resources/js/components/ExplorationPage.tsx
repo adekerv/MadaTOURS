@@ -8,7 +8,10 @@ import { PlaceDetailModal } from './PlaceDetailModal';
 import { Header } from './exploration/Header';
 import { Sidebar } from './exploration/Sidebar';
 import { LocationPrompt } from './exploration/LocationPrompt';
-import { SelectedPlaceOverlay } from './exploration/SelectedPlaceOverlay';
+import { PlaceCarousel } from './exploration/PlaceCarousel';
+import { MapToolbar } from './exploration/MapToolbar';
+import { FilterControls } from './exploration/FilterControls';
+import { Modal } from './ui/Modal';
 import { calculateDistance, mapsUrl, matchesInterest, matchesSearch } from '../lib/places-utils';
 import { exploreHash } from '../lib/explore-route';
 import { catalogueTown, matchesExperience } from '../lib/catalogue';
@@ -51,7 +54,11 @@ export function ExplorationPage({
   const [selectedId, setSelectedId] = useState<number | null>(
     initialParams.selectedPlaceId ?? null,
   );
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
+  // The carousel keeps its order while you swipe through it; only a pin or list pick re-centres it.
+  const [anchorId, setAnchorId] = useState<number | null>(initialParams.selectedPlaceId ?? null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
   const [manual, setManual] = useState(false);
   const [geoLoading, setGeoLoading] = useState(false);
@@ -129,7 +136,68 @@ export function ExplorationPage({
         ),
     [places, center, radius, filter, sortBy, query, town, experience, minRating],
   );
-  function selectPlace(place: Place) {
+  function changeFilter(value: 'all' | 'restaurant' | 'activity') {
+    setFilter(value);
+    setSortBy('default');
+    setSelectedId(null);
+  }
+  const filterProps = {
+    minRating,
+    setMinRating,
+    filter,
+    setFilter: changeFilter,
+    radius,
+    setRadius: (value: number) => {
+      setRadius(value);
+      setSelectedId(null);
+    },
+    sortBy,
+    setSortBy: (value: typeof sortBy) => {
+      setSortBy(value);
+      setSelectedId(null);
+    },
+    query,
+    setQuery: (value: string) => {
+      setQuery(value);
+      setSelectedId(null);
+    },
+    towns,
+    town,
+    setTown: (value: string) => {
+      setTown(value);
+      setSelectedId(null);
+    },
+    experience,
+    setExperience: (value: string) => {
+      setExperience(value);
+      setSelectedId(null);
+    },
+    manual: center.manual ?? true,
+  };
+  const activeFilters = [
+    filter !== 'all',
+    !!town,
+    !!experience,
+    minRating > 0,
+    !!query,
+    sortBy !== 'default',
+  ].filter(Boolean).length;
+  const carousel = useMemo(() => {
+    const anchor = places.find((place) => place.id === anchorId);
+    if (!anchor) return [];
+    const near = filtered
+      .filter((place) => place.id !== anchor.id)
+      .map((place) => ({
+        place,
+        gap: calculateDistance(anchor.lat, anchor.lng, place.lat, place.lng),
+      }))
+      .sort((a, b) => a.gap - b.gap)
+      .slice(0, 11)
+      .map((item) => item.place);
+    return [filtered.find((place) => place.id === anchor.id) ?? anchor, ...near];
+  }, [places, filtered, anchorId]);
+  function selectPlace(place: Place, fromCarousel = false) {
+    if (!fromCarousel) setAnchorId(place.id);
     setSelectedId(place.id);
     setMobileView('map');
     setManual(false);
@@ -145,6 +213,7 @@ export function ExplorationPage({
     setFilter('all');
     setSortBy('default');
     setSelectedId(null);
+    setHoveredId(null);
     setManual(false);
     setGeoLoading(false);
     setGeoError('');
@@ -204,22 +273,12 @@ export function ExplorationPage({
       <main id="main-content" className="relative flex min-h-0 flex-1" tabIndex={-1}>
         <div className={`explore-list ${mobileView === 'list' ? 'mobile-active' : ''}`}>
           <Sidebar
-            minRating={minRating}
-            setMinRating={setMinRating}
-            filter={filter}
-            setFilter={(value) => {
-              setFilter(value);
-              setSortBy('default');
-              setSelectedId(null);
-            }}
-            radius={radius}
-            setRadius={(value) => {
-              setRadius(value);
-              setSelectedId(null);
-            }}
+            {...filterProps}
             loading={catalogueStatus === 'loading'}
             filteredPlaces={filtered}
             selectedPlace={selectedPlace}
+            hoveredId={hoveredId}
+            onHover={setHoveredId}
             onPlaceSelect={selectPlace}
             onShowDetails={(place) => {
               setSelectedId(place.id);
@@ -227,30 +286,8 @@ export function ExplorationPage({
             }}
             isFavorite={(id) => favorites.some((place) => place.id === id)}
             onResetRadar={reset}
-            sortBy={sortBy}
-            setSortBy={(value) => {
-              setSortBy(value);
-              setSelectedId(null);
-            }}
-            query={query}
-            towns={towns}
-            town={town}
-            setTown={(value) => {
-              setTown(value);
-              setSelectedId(null);
-            }}
-            experience={experience}
-            setExperience={(value) => {
-              setExperience(value);
-              setSelectedId(null);
-            }}
-            setQuery={(value) => {
-              setQuery(value);
-              setSelectedId(null);
-            }}
             user={user}
             onAdminClick={onAdminClick}
-            manual={center.manual ?? true}
           />
         </div>
         <div className={`explore-map ${mobileView === 'map' ? 'mobile-active' : ''}`}>
@@ -259,6 +296,8 @@ export function ExplorationPage({
             places={filtered}
             radius={radius}
             selectedPlace={selectedPlace}
+            hoveredId={hoveredId}
+            onHover={setHoveredId}
             manualSelect={manual}
             onLocationSelect={(lat, lng) => {
               locationRequest.current += 1;
@@ -269,6 +308,14 @@ export function ExplorationPage({
             onPlaceSelect={selectPlace}
             onMapClick={() => setSelectedId(null)}
           />
+          {!manual && (
+            <MapToolbar
+              filter={filter}
+              onFilterChange={changeFilter}
+              onOpenFilters={() => setFiltersOpen(true)}
+              activeFilters={activeFilters}
+            />
+          )}
           {manual && (
             <div role="status" className="map-hint">
               {t('Tap a point on the map to search nearby.')}
@@ -277,17 +324,22 @@ export function ExplorationPage({
               </button>
             </div>
           )}
-          <SelectedPlaceOverlay
-            place={selectedPlace}
-            isVisible={!!selectedPlace && !detailOpen && !manual}
-            onClose={() => setSelectedId(null)}
-            isFavorite={favorites.some((place) => place.id === selectedId)}
-            onToggleFavorite={onToggleFavorite}
-            onShowDetails={() => setDetailOpen(true)}
-            googleMapsUrl={selectedPlace ? mapsUrl(selectedPlace) : ''}
-            user={user}
-            onLoginClick={onLoginClick}
-          />
+          {selectedPlace && !detailOpen && !manual && (
+            <PlaceCarousel
+              places={
+                carousel.some((place) => place.id === selectedPlace.id) ? carousel : [selectedPlace]
+              }
+              selectedId={selectedPlace.id}
+              onSelect={(place) => selectPlace(place, true)}
+              onClose={() => setSelectedId(null)}
+              isFavorite={(id) => favorites.some((place) => place.id === id)}
+              onToggleFavorite={onToggleFavorite}
+              onShowDetails={() => setDetailOpen(true)}
+              mapsUrl={mapsUrl}
+              user={user}
+              onLoginClick={onLoginClick}
+            />
+          )}
         </div>
       </main>
       {catalogueStatus === 'offline' && (
@@ -322,6 +374,16 @@ export function ExplorationPage({
           {t('Map')}
         </button>
       </nav>
+      {filtersOpen && (
+        <Modal title={t('Filters')} sheet onClose={() => setFiltersOpen(false)}>
+          <div className="p-5">
+            <FilterControls {...filterProps} />
+            <button className="primary-button w-full" onClick={() => setFiltersOpen(false)}>
+              {t('Show results')} ({filtered.length})
+            </button>
+          </div>
+        </Modal>
+      )}
       {locationOpen && (
         <LocationPrompt
           onClose={() => {

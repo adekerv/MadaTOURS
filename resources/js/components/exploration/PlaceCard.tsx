@@ -1,24 +1,41 @@
 import { useI18n } from '../../i18n/I18nProvider';
 import { Heart, MapPin } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import type { Place } from '../../types';
 import { PlacePhoto } from '../ui/PlacePhoto';
 export function PlaceCard({
   place,
   isSelected,
+  isHovered,
+  onHover,
   isFavorite,
   onSelect,
   onShowDetails,
 }: {
   place: Place;
   isSelected: boolean;
+  isHovered: boolean;
+  onHover: (id: number | null) => void;
   isFavorite: boolean;
   onSelect: (place: Place) => void;
   onShowDetails: (place: Place) => void;
 }) {
   const { t, language } = useI18n();
+  const card = useRef<HTMLElement>(null);
+  useEffect(() => {
+    // Picking a pin on the map brings its card into view without moving the page.
+    if (!isSelected || !card.current) return;
+    const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    card.current.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
+  }, [isSelected]);
   return (
     <article
-      className={`place-card overflow-hidden rounded-2xl border ${isSelected ? 'border-orange-600 bg-orange-50' : 'border-slate-200 bg-white'}`}
+      ref={card}
+      onMouseEnter={() => onHover(place.id)}
+      onMouseLeave={() => onHover(null)}
+      onFocus={() => onHover(place.id)}
+      onBlur={() => onHover(null)}
+      className={`place-card overflow-hidden rounded-2xl border ${isSelected ? 'border-orange-600 bg-orange-50' : isHovered ? 'place-card-hot border-orange-300 bg-white' : 'border-slate-200 bg-white'}`}
     >
       <PlacePhoto place={place} />
       <div className="p-4">

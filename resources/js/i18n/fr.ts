@@ -287,6 +287,10 @@ export const french: Record<string, string> = {
   'Explore the island': 'Explorer l’île',
   'Explore views': 'Modes d’exploration',
   'Filter places': 'Filtrer les lieux',
+  Filters: 'Filtres',
+  'Map layers': 'Calques de la carte',
+  'Nearby places': 'Lieux à proximité',
+  'Show results': 'Voir les résultats',
   'Find a place': 'Trouver un lieu',
   'Find activities': 'Trouver des activités',
   'Find cinemas, go-karting, and activities for time with friends and family.':

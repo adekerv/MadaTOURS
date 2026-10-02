@@ -292,8 +292,24 @@ test('opening a previously hidden mobile map fits both north and south Martiniqu
   await page.goto('/#explore');
   await expect(page.getByRole('heading', { name: 'Discover places' })).toBeVisible();
   await page.getByRole('button', { name: 'Map', exact: true }).click();
-  await expect(page.locator('.leaflet-marker-icon[title="Montagne Pelée"]')).toBeInViewport();
-  await expect(page.locator('.leaflet-marker-icon[title="Plage des Salines"]')).toBeInViewport();
+  // At island zoom the pins are grouped; every group must sit inside the visible map.
+  await expect(page.locator('.mt-cluster').first()).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const frame = document.querySelector('.leaflet-container')!.getBoundingClientRect();
+        return [...document.querySelectorAll('.mt-cluster')].every((cluster) => {
+          const box = cluster.getBoundingClientRect();
+          return (
+            box.left >= frame.left &&
+            box.right <= frame.right &&
+            box.top >= frame.top &&
+            box.bottom <= frame.bottom
+          );
+        });
+      }),
+    )
+    .toBe(true);
   const header = await page.locator('.explore-header').boundingBox();
   expect(header!.y).toBeGreaterThanOrEqual(0);
 });
@@ -357,4 +373,49 @@ test('password recovery accepts only a recovery code and signs in with the new p
   await page.getByLabel('Password', { exact: true }).fill('Replacement password 42');
   await page.getByRole('dialog').getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+});
+
+test('dense pins cluster, and cards, pins and layers stay in sync', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/#explore');
+  await expect(page.getByRole('heading', { name: 'Discover places' })).toBeVisible();
+  await expect(page.locator('.mt-cluster').first()).toBeVisible();
+  // Hovering a card lights the pin, or the cluster hiding it.
+  await page.locator('.place-results article').nth(1).hover();
+  await expect(page.locator('.leaflet-marker-icon.is-hot')).toHaveCount(1);
+  // Zooming into a cluster eventually reveals single pins; picking one selects its card.
+  const pin = page.locator('.map-pill-container');
+  for (let step = 0; step < 8 && !(await pin.count()); step += 1) {
+    await page.locator('.mt-cluster').first().click();
+    await page.waitForTimeout(700);
+  }
+  await pin.first().click({ force: true });
+  await expect(page.locator('.map-pill-active')).toHaveCount(1);
+  await expect(page.locator('.place-card.border-orange-600')).toHaveCount(1);
+  // Map layers narrow the same results shown in the list.
+  const all = page.getByText(/\d+ places found/);
+  const before = Number((await all.innerText()).match(/\d+/)![0]);
+  await page
+    .getByRole('group', { name: 'Map layers' })
+    .getByRole('button', { name: 'Food' })
+    .click();
+  await expect
+    .poll(async () => Number((await all.innerText()).match(/\d+/)![0]))
+    .toBeLessThan(before);
+  await expect(page.getByRole('button', { name: 'Filters', exact: true })).toBeHidden();
+});
+
+test('compact screens open the filters as a bottom sheet', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#explore');
+  await page.getByRole('button', { name: 'Map', exact: true }).click();
+  await page.getByRole('button', { name: 'Filters', exact: true }).click();
+  const sheet = page.getByRole('dialog', { name: 'Filters' });
+  await expect(sheet).toBeVisible();
+  const box = await sheet.boundingBox();
+  expect(box!.y + box!.height).toBeGreaterThan(843);
+  await sheet.getByRole('button', { name: 'Activities' }).click();
+  await sheet.getByRole('button', { name: /Show results/ }).click();
+  await expect(sheet).toBeHidden();
+  await expect(page.getByRole('button', { name: /^Filters/ })).toContainText('1');
 });

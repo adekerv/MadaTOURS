@@ -5,6 +5,7 @@
 @import '@fontsource/playfair-display/latin-700-italic.css';
 @import 'tailwindcss';
 @import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -240,17 +241,6 @@ summary {
 .leaflet-control-attribution {
   max-width: calc(100vw - 20px);
 }
-.place-marker {
-  display: grid;
-  place-items: center;
-  width: 50px;
-  height: 50px;
-  margin: 3px;
-  border: 3px solid white;
-  border-radius: 50% 50% 50% 8%;
-  box-shadow: 0 3px 8px #0f172a40;
-  font-size: 29px;
-}
 .search-center-marker {
   display: block;
   width: 24px;
@@ -259,13 +249,6 @@ summary {
   background: #2563eb;
   border-radius: 50%;
   box-shadow: 0 1px 8px #0f172a50;
-}
-.selected-place-overlay {
-  bottom: 1.8rem;
-  left: 1rem;
-  right: 1rem;
-  max-height: calc(100% - 2.5rem);
-  overflow-y: auto;
 }
 .map-hint {
   position: absolute;
@@ -350,12 +333,6 @@ summary {
   }
   .explore-shell {
     padding-bottom: env(safe-area-inset-bottom);
-  }
-  .selected-place-overlay {
-    width: min(400px, calc(100% - 2rem));
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
   }
 }
 @media (max-width: 767px) {
@@ -517,4 +494,305 @@ summary {
 
 .app-dialog {
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Name pills: emoji, name and rating on a white capsule with a small tail. */
+.map-pill-container,
+.mt-cluster {
+  background: none;
+  border: 0;
+}
+.map-pill-container {
+  overflow: visible;
+}
+.map-pill-container:hover,
+.map-pill-container.is-hot,
+.map-pill-container:focus-visible {
+  z-index: 10000 !important;
+}
+.map-pill {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  max-width: 200px;
+  padding: 0 11px 0 5px;
+  border-radius: 999px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  box-shadow:
+    0 2px 7px #0f172a40,
+    0 0 0 1px #0f172a14;
+  transition:
+    transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 180ms ease,
+    background-color 160ms ease;
+}
+.map-pill::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 0 0 2px;
+  background: inherit;
+  transform: translateX(-50%) rotate(45deg);
+}
+.map-pill-emoji {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pin) 20%, #fff);
+  font-size: 14px;
+}
+.map-pill-name {
+  max-width: 128px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.map-pill-rating {
+  color: #b45309;
+}
+.map-pill-container:hover .map-pill,
+.map-pill-container:focus-visible .map-pill,
+.map-pill-container.is-hot .map-pill {
+  transform: translateX(-50%) scale(1.1);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--pin) 38%, transparent),
+    0 5px 14px #0f172a59;
+}
+.map-pill-active {
+  background: #c2410c;
+  color: #fff;
+  transform: translateX(-50%) scale(1.15);
+  animation: pill-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.map-pill-active .map-pill-rating {
+  color: #fde68a;
+}
+.map-pill-active .map-pill-emoji {
+  background: #fff;
+}
+.pills-far .map-pill {
+  height: 32px;
+  padding: 0 4px;
+}
+.pills-far .map-pill-name,
+.pills-far .map-pill-rating {
+  display: none;
+}
+.pills-far .map-pill-active .map-pill-name {
+  display: block;
+}
+@keyframes pill-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -14px) scale(0.6);
+  }
+}
+.mt-cluster-count {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #ea580c;
+  border-radius: 50%;
+  background: #fff;
+  color: #9a3412;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow:
+    0 0 0 5px #ea580c24,
+    0 3px 10px #0f172a40;
+  transition:
+    transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 160ms ease,
+    color 160ms ease;
+}
+.mt-cluster:hover .mt-cluster-count,
+.mt-cluster.is-hot .mt-cluster-count {
+  transform: scale(1.12);
+  background: #ea580c;
+  color: #fff;
+}
+.map-toolbar {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 600;
+  display: flex;
+  gap: 0.5rem;
+  max-width: calc(100% - 4.5rem);
+}
+.map-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0 0.85rem;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 999px;
+  background: var(--surface-card);
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px #0f172a26;
+  opacity: 0.72;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+.map-chip-on {
+  opacity: 1;
+}
+.map-chip:active {
+  transform: scale(0.96);
+}
+.map-chip[aria-disabled='true'] {
+  cursor: default;
+}
+.map-chip-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.map-chip-badge {
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #c2410c;
+  color: #fff;
+  font-size: 11px;
+}
+@media (min-width: 768px) {
+  .map-chip-filters {
+    display: none;
+  }
+}
+.place-card-hot {
+  box-shadow: 0 8px 22px #ea580c26;
+}
+/* On narrow screens the filters slide up from the bottom edge as a drawer. */
+@media (max-width: 767px) {
+  .app-dialog-sheet {
+    margin: auto 0 0;
+    width: 100%;
+    max-width: none;
+    max-height: 88dvh;
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+  .app-dialog-sheet[open] {
+    animation: sheet-up 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .app-dialog-sheet[open].dialog-closing {
+    animation: sheet-down 150ms ease-in forwards;
+  }
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+/* While choosing a search point, pins and clusters must not swallow the tap. */
+.map-picking .leaflet-marker-icon {
+  pointer-events: none !important;
+}
+.map-picking .leaflet-container {
+  cursor: crosshair;
+}
+
+/* Carousel of nearby places along the bottom of the map. */
+.place-carousel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 600;
+  pointer-events: none;
+}
+.place-carousel-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  padding: 0 1rem max(1.25rem, env(safe-area-inset-bottom));
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 1rem;
+  scrollbar-width: none;
+}
+.place-carousel-row::-webkit-scrollbar {
+  display: none;
+}
+.place-focus,
+.place-mini {
+  flex: none;
+  scroll-snap-align: center;
+  pointer-events: auto;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 1.25rem;
+  background: var(--surface-card);
+  color: var(--text-primary);
+  box-shadow: 0 8px 24px #0f172a33;
+}
+.place-focus {
+  width: min(330px, 82vw);
+  overflow: hidden;
+  animation: card-rise 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.place-mini {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: min(236px, 66vw);
+  min-height: 72px;
+  padding: 0.5rem;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+.place-mini:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) {
+  .place-mini:hover {
+    transform: translateY(-3px);
+  }
+}
+.place-mini-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 0.9rem;
+  font-size: 28px;
+}
+@keyframes card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
 }
