@@ -4,6 +4,7 @@ import { Search, X, MapPin } from 'lucide-react';
 import type { Place } from '../../types';
 import { matchesSearch } from '../../lib/places-utils';
 import { recentSearches, rememberSearch, clearSearches } from '../../lib/local-preferences';
+import { exploreHash } from '../../lib/explore-route';
 export function SearchBar({
   places,
   onSelectPlace,
@@ -56,6 +57,16 @@ export function SearchBar({
     if (event.key === 'Enter' && expanded && filtered[active]) {
       event.preventDefault();
       select(filtered[active]);
+    } else if (event.key === 'Enter' && query.trim()) {
+      // Typing then pressing Enter or Go (common on phones) shows every match in Explore.
+      event.preventDefault();
+      setHistory(rememberSearch(query));
+      setOpen(false);
+      location.hash = exploreHash({
+        filter: 'all',
+        radius: 100,
+        query: query.trim().slice(0, 100),
+      });
     }
   }
   return (

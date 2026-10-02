@@ -52,7 +52,9 @@ export async function startLaravel(port = 0, providerPort = 0) {
         SUPABASE_URL: `http://127.0.0.1:${address.port}`,
         SUPABASE_PUBLISHABLE_KEY: 'test-public',
         SUPABASE_SECRET_KEY: 'test-secret',
-        SESSION_DRIVER: 'file',
+        // E2E_SESSION_DRIVER=cookie reproduces the Vercel configuration (api/index.php).
+        SESSION_DRIVER: process.env.E2E_SESSION_DRIVER === 'cookie' ? 'cookie' : 'file',
+        SESSION_ENCRYPT: process.env.E2E_SESSION_DRIVER === 'cookie' ? 'false' : 'true',
         SESSION_SECURE_COOKIE: 'false',
         SESSION_SAME_SITE: 'lax',
         SESSION_FILES: path.join(storage, 'sessions'),

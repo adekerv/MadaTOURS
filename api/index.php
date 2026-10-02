@@ -24,7 +24,9 @@ $defaults = [
     'VIEW_COMPILED_PATH' => "$storage/framework/views",
     'LOG_CHANNEL' => 'stderr',
     'SESSION_DRIVER' => 'cookie',
-    'SESSION_ENCRYPT' => 'true',
+    // EncryptCookies already encrypts and signs the session cookie. Encrypting the
+    // payload twice pushes a signed-in session past the browser's 4 KB cookie limit.
+    'SESSION_ENCRYPT' => 'false',
     'SESSION_SECURE_COOKIE' => 'true',
     'CACHE_STORE' => 'file',
     // The function is reachable only through Vercel's edge proxy.
