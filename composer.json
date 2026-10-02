@@ -50,6 +50,9 @@
     "check": [
       "@php vendor/bin/pint --test",
       "@php artisan test"
+    ],
+    "vercel": [
+      "@php -r \"exit(is_file('public/build/manifest.json') ? 0 : 1);\" || (npm ci --no-audit --no-fund && VITE_API_URL= npm run build:web)"
     ]
   },
   "extra": {

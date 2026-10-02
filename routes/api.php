@@ -22,7 +22,8 @@ Route::withoutMiddleware([EncryptCookies::class, AddQueuedCookiesToResponse::cla
     Route::get('places', [PlaceController::class, 'index']);
     Route::get('daily-picks', [EnrichmentController::class, 'picks']);
     Route::get('places/{place}/community', [CommunityController::class, 'show']);
-    Route::post('internal/tasks', RecurringTaskController::class);
+    // Vercel Cron calls with GET; the GitHub workflow uses POST. Both need the secret.
+    Route::match(['get', 'post'], 'internal/tasks', RecurringTaskController::class);
 });
 
 // Allow enough lock time for the bounded, sequential provider calls in auth flows.

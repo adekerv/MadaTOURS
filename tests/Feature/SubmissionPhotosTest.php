@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Exceptions\ApiException;
 use App\Services\SubmissionPhotos;
+use App\Services\Supabase\SupabaseClient;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -57,5 +58,40 @@ class SubmissionPhotosTest extends TestCase
         Http::fake(['*/mt_submissions*' => Http::response([])]);
         $this->get('/photos/community/00000000-0000-4000-8000-000000000001.jpg')->assertNotFound();
         Http::assertNotSent(fn ($request) => str_contains($request->url(), '/storage/'));
+    }
+
+    public function test_without_gd_jpeg_metadata_is_stripped_losslessly_and_other_formats_are_refused(): void
+    {
+        $photos = new class(app(SupabaseClient::class)) extends SubmissionPhotos
+        {
+            protected function canReencode(): bool
+            {
+                return false;
+            }
+        };
+        $image = imagecreatetruecolor(40, 30);
+        ob_start();
+        imagejpeg($image);
+        $jpeg = ob_get_clean();
+        ob_start();
+        imagepng($image);
+        $png = ob_get_clean();
+        imagedestroy($image);
+        $exif = "Exif\0\0".'GPS 14.6N 61.0W camera serial 12345';
+        $comment = 'Private photographer note';
+        $tagged = substr($jpeg, 0, 2)."\xff\xe1".pack('n', strlen($exif) + 2).$exif."\xff\xfe".pack('n', strlen($comment) + 2).$comment.substr($jpeg, 2);
+        $clean = $photos->sanitize(base64_encode($tagged));
+        $this->assertStringNotContainsString('GPS', $clean);
+        $this->assertStringNotContainsString($comment, $clean);
+        $this->assertSame(SubmissionPhotos::stripJpegMetadata($jpeg), $clean);
+        $this->assertSame([40, 30], array_slice(getimagesizefromstring($clean), 0, 2));
+        foreach ([$png, substr($tagged, 0, -40)] as $refused) {
+            try {
+                $photos->sanitize(base64_encode($refused));
+                $this->fail('Unsafe upload was accepted without GD');
+            } catch (ApiException $error) {
+                $this->assertSame(422, $error->status);
+            }
+        }
     }
 }

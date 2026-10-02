@@ -26,15 +26,27 @@ class SubmissionPhotos
         return str_starts_with($key, 'eyJ') ? $request->withToken($key) : $request;
     }
 
+    protected function canReencode(): bool
+    {
+        return function_exists('imagecreatefromstring') && function_exists('imagejpeg');
+    }
+
     public function sanitize(string $base64): string
     {
-        if (! function_exists('imagecreatefromstring') || ! function_exists('imagejpeg')) {
-            throw new ApiException(503, 'Photo processing is temporarily unavailable. Please try again later.');
-        }
         $bytes = base64_decode($base64, true);
         $size = $bytes === false ? false : @getimagesizefromstring($bytes);
         if (! $bytes || strlen($bytes) > 2097152 || ! $size || $size[0] * $size[1] > 9000000 || max($size[0], $size[1]) > 10000 || ! in_array($size['mime'], ['image/jpeg', 'image/png', 'image/webp'], true)) {
             throw new ApiException(422, 'Upload a JPEG, PNG or WebP photo under 2 MB.');
+        }
+        if (! $this->canReencode()) {
+            // Serverless PHP without GD: the app already resizes to a 1600px JPEG on the
+            // device, so accept only that and strip every metadata segment losslessly.
+            $clean = $size['mime'] === 'image/jpeg' && max($size[0], $size[1]) <= 1600 ? self::stripJpegMetadata($bytes) : null;
+            if (! $clean) {
+                throw new ApiException(422, 'This photo could not be read. Choose another photo.');
+            }
+
+            return $clean;
         }
         $original = @imagecreatefromstring($bytes);
         if (! $original) {
@@ -140,5 +152,52 @@ class SubmissionPhotos
         }
 
         return $count;
+    }
+
+    /**
+     * Removes APP1-APP15 (EXIF, XMP, ICC, maker notes) and comment segments from a
+     * baseline or progressive JPEG without decoding it. Returns null if malformed.
+     */
+    public static function stripJpegMetadata(string $jpeg): ?string
+    {
+        $length = strlen($jpeg);
+        if ($length < 4 || substr($jpeg, 0, 2) !== "\xFF\xD8") {
+            return null;
+        }
+        $out = "\xFF\xD8";
+        $offset = 2;
+        while ($offset + 4 <= $length) {
+            if ($jpeg[$offset] !== "\xFF") {
+                return null;
+            }
+            $marker = ord($jpeg[$offset + 1]);
+            if ($marker === 0xFF) {
+                $offset++; // Fill byte.
+
+                continue;
+            }
+            if ($marker === 0x01 || ($marker >= 0xD0 && $marker <= 0xD7)) {
+                $out .= substr($jpeg, $offset, 2); // Standalone marker.
+                $offset += 2;
+
+                continue;
+            }
+            $segment = unpack('n', $jpeg, $offset + 2)[1];
+            if ($segment < 2 || $offset + 2 + $segment > $length) {
+                return null;
+            }
+            if ($marker === 0xDA) {
+                // Start of scan: the rest is entropy-coded image data and the end marker.
+                $out .= substr($jpeg, $offset);
+
+                return str_ends_with($out, "\xFF\xD9") && @getimagesizefromstring($out) ? $out : null;
+            }
+            if (! (($marker >= 0xE1 && $marker <= 0xEF) || $marker === 0xFE)) {
+                $out .= substr($jpeg, $offset, 2 + $segment);
+            }
+            $offset += 2 + $segment;
+        }
+
+        return null;
     }
 }

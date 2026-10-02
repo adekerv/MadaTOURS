@@ -27,6 +27,24 @@ Run database migrations once in a controlled release step, after a backup. Conta
 
 `/up` checks application liveness. `/api/health` checks the database schema through the public Data API. After release, verify immediate signup and the welcome message, login, saved lists in another browser, recovery and admin changes. Existing Express cookies are replaced by Laravel sessions, so users sign in again.
 
+## Vercel
+
+`vercel.json` runs Laravel as one PHP serverless function (`api/index.php`, community runtime `vercel-php@0.9.0`, PHP 8.5) and serves `public/` as static files, including the Vite output in `public/build`. Supabase is connected through the Vercel Supabase integration.
+
+- The entry point keeps writable data in `/tmp`, stores the session in an encrypted cookie and trusts Vercel's proxy. Dashboard variables override these defaults.
+- Vercel's own production, deployment and branch URLs are accepted as API origins automatically.
+- The runtime has no GD extension. Photo submissions then accept the device-resized JPEG and strip all metadata segments without re-encoding.
+- Vercel Cron calls `/api/internal/tasks` daily with `CRON_SECRET`. For the 5-minute and hourly jobs, also enable the GitHub workflow below.
+
+Required variables for Production and Preview, besides the Supabase integration's:
+
+```sh
+php artisan key:generate --show | vercel env add APP_KEY production
+openssl rand -hex 32 | vercel env add CRON_SECRET production
+```
+
+Optional: `GOOGLE_PLACES_API_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, and `APP_ORIGIN` set to a custom domain. Deploy a preview with `vercel deploy`, check `/api/health`, then promote with `vercel deploy --prod`.
+
 ## Recurring tasks
 
 Event expiry, photo cleanup, official-source refresh, Google Place ID matching and the daily MUST GO ranking are listed with their intervals in `config/tasks.php`. Each runs at most once per interval, whatever triggers it.

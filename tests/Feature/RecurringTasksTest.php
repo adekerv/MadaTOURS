@@ -56,4 +56,9 @@ class RecurringTasksTest extends TestCase
         $this->assertStringContainsString('tasks:run-due', $output);
         $this->assertStringNotContainsString('google:match', $output);
     }
+
+    public function test_vercel_cron_get_request_with_bearer_secret_runs_tasks(): void
+    {
+        $this->withHeaders(['Authorization' => 'Bearer '.$this->secret])->getJson('/api/internal/tasks')->assertOk()->assertJsonPath('ran', ['inspire']);
+    }
 }
