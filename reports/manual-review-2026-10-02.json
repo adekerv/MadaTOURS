@@ -1,0 +1,51 @@
+[
+  {
+    "id": 361,
+    "proposed": "update",
+    "checkedOn": "2026-10-02",
+    "evidenceUrl": "https://www.tripadvisor.com/Restaurant_Review-g147328-d9869496-Reviews-Spice_n_Sugar-Fort_de_France_Arrondissement_of_Fort_de_France_Martinique.html",
+    "reason": "Still operating: a Tripadvisor listing with 2025 reviews, a Facebook page (spiceandsugarfwi) and the same telephone as the Terres du Centre page. Our street address is out of date; sources give Pont de Châteauboeuf (Centre d'affaires Valmenière / 25 rue Moreau de Jones). Sources disagree on Saturday opening, so hours stay as the source's own words. Found through web search; Tripadvisor blocks automated fetching."
+  },
+  {
+    "id": 355,
+    "proposed": "keep",
+    "checkedOn": "2026-10-02",
+    "evidenceUrl": "https://www.petitfute.co.uk/v36634-fort-de-france-97200/c1165-restaurants/c126-restauration-rapide-a-domicile/c135-sur-place-a-emporter/2085735-so-elsi.html",
+    "reason": "Active: own website and Facebook page, Tripadvisor 4.9 with 59 reviews, and listed in Petit Futé's 2026 take-away guide. Found through web search."
+  },
+  {
+    "id": 356,
+    "proposed": "keep",
+    "checkedOn": "2026-10-02",
+    "evidenceUrl": "https://www.tripadvisor.co.uk/Restaurant_Review-g147328-d23211399-Reviews-O_Brasil-Fort_de_France_Arrondissement_of_Fort_de_France_Martinique.html",
+    "reason": "Active: Tripadvisor listing marked 2026 and an Instagram page (@obrasilrestaurant). Found through web search."
+  },
+  {
+    "id": 358,
+    "proposed": "keep",
+    "checkedOn": "2026-10-02",
+    "evidenceUrl": "https://www.sushiwavemartinique.com/",
+    "reason": "Active: own website, Tripadvisor and Bellemartinique listings with current hours and delivery. Found through web search."
+  },
+  {
+    "id": 8,
+    "proposed": "keep",
+    "checkedOn": "2026-10-02",
+    "evidenceUrl": "https://la-suite-villa.com/en/restaurant/",
+    "reason": "The hotel's own restaurant page describes Le Zandoli and its Wednesday-to-Saturday dinner service; the page builds its text with scripts, so the automated check could not see the name."
+  },
+  {
+    "id": 9,
+    "proposed": "keep",
+    "checkedOn": "2026-10-02",
+    "evidenceUrl": "https://vr.pnr-martinique.com/caravelle/",
+    "reason": "The regional park's own page covers the Caravelle nature reserve. The script only disagreed because the page calls it a réserve naturelle, not a presqu'île."
+  },
+  {
+    "id": 153,
+    "proposed": "keep",
+    "checkedOn": "2026-10-02",
+    "evidenceUrl": "https://www.martinique.org/fr/que-faire/sites-naturels-publics/anse-trabaud",
+    "reason": "The source describes reaching the beach by a track across private land with a 2.50 € per-car toll. That is a note about access, not a closure."
+  }
+]
