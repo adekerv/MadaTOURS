@@ -70,7 +70,7 @@
         },
         {
           "title": "Delete your account",
-          "body": "In Your account, choose Delete account and confirm your password. We revoke refresh sessions and remove your account, reviews, comments, check-ins, connections, meet-ups, applications, reports and submission records. Published community places may remain as guide entries with the submitter link removed; their uploaded photos are withdrawn and queued for storage deletion. Queued files are retried hourly when the scheduler runs. Clear local plans, searches and offline copies separately. For access problems or privacy requests, contact adejkervin@protonmail.com. You may complain to the competent data-protection authority, including France’s CNIL."
+          "body": "In Account settings, choose Delete your account, type your email address and confirm your password (not needed if you signed in with Google). We revoke refresh sessions and remove your account, reviews, comments, check-ins, connections, meet-ups, applications, reports and submission records. Published community places may remain as guide entries with the submitter link removed; their uploaded photos are withdrawn and queued for storage deletion. Queued files are retried hourly when the scheduler runs. Clear local plans, searches and offline copies separately. For access problems or privacy requests, contact adejkervin@protonmail.com. You may complain to the competent data-protection authority, including France’s CNIL."
         }
       ]
     },
@@ -106,7 +106,7 @@
       "sections": [
         {
           "title": "In the app",
-          "body": "Sign in, open Your account, choose Delete account, enter your password and confirm. We remove your profile, saved places, reviews, comments, check-ins, social connections, meet-ups and submission records and revoke refresh sessions. Published guide entries can remain without contributor links; uploaded photos are withdrawn and queued for file deletion."
+          "body": "Sign in, open Account settings, go to Delete your account, type your email address, enter your password (not needed if you signed in with Google) and confirm. We remove your profile, saved places, reviews, comments, check-ins, social connections, meet-ups and submission records and revoke refresh sessions. Published guide entries can remain without contributor links; uploaded photos are withdrawn and queued for file deletion."
         },
         {
           "title": "If you cannot sign in",
@@ -190,7 +190,7 @@
         },
         {
           "title": "Supprimer votre compte",
-          "body": "Dans Votre compte, choisissez Supprimer le compte et confirmez votre mot de passe. Nous révoquons les sessions de renouvellement et supprimons le compte, avis, commentaires, visites, relations, rencontres, candidatures, signalements et propositions. Les lieux communautaires publiés peuvent rester dans le guide sans lien avec leur auteur ; leurs photos sont retirées et mises en attente de suppression du stockage. Le nettoyage est réessayé chaque heure lorsque le planificateur fonctionne. Effacez séparément les journées, recherches et copies locales. Pour toute demande, contactez adejkervin@protonmail.com. Vous pouvez saisir l’autorité compétente, dont la CNIL en France."
+          "body": "Dans Paramètres du compte, choisissez Supprimer votre compte, saisissez votre adresse e-mail et confirmez votre mot de passe (inutile si vous vous êtes connecté avec Google). Nous révoquons les sessions de renouvellement et supprimons le compte, avis, commentaires, visites, relations, rencontres, candidatures, signalements et propositions. Les lieux communautaires publiés peuvent rester dans le guide sans lien avec leur auteur ; leurs photos sont retirées et mises en attente de suppression du stockage. Le nettoyage est réessayé chaque heure lorsque le planificateur fonctionne. Effacez séparément les journées, recherches et copies locales. Pour toute demande, contactez adejkervin@protonmail.com. Vous pouvez saisir l’autorité compétente, dont la CNIL en France."
         }
       ]
     },
@@ -226,7 +226,7 @@
       "sections": [
         {
           "title": "Dans l’application",
-          "body": "Connectez-vous, ouvrez Votre compte, choisissez Supprimer le compte et confirmez avec votre mot de passe. Le profil, les lieux sauvegardés, avis, commentaires, visites, relations, rencontres et propositions sont supprimés ; les sessions de renouvellement sont révoquées. Les lieux publiés peuvent rester sans lien avec leur auteur ; les photos sont retirées et leur suppression du stockage est programmée."
+          "body": "Connectez-vous, ouvrez Paramètres du compte, rendez-vous dans Supprimer votre compte, saisissez votre adresse e-mail et votre mot de passe (inutile si vous vous êtes connecté avec Google), puis confirmez. Le profil, les lieux sauvegardés, avis, commentaires, visites, relations, rencontres et propositions sont supprimés ; les sessions de renouvellement sont révoquées. Les lieux publiés peuvent rester sans lien avec leur auteur ; les photos sont retirées et leur suppression du stockage est programmée."
         },
         {
           "title": "Si vous ne pouvez pas vous connecter",

@@ -212,10 +212,12 @@ test('register, save, restore session, remove, and delete account from the UI', 
   await page.getByRole('button', { name: 'Remove Jardin de Balata' }).first().click();
   await expect(page.getByRole('heading', { name: 'Your favorites' })).toHaveCount(0);
   await page.getByRole('button', { name: 'Your account', exact: true }).click();
-  await page.getByRole('button', { name: 'Delete account', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Account settings', level: 1 })).toBeVisible();
+  await page.getByLabel(`Type ${email} to confirm`, { exact: true }).fill(email);
   await page.getByLabel('Password', { exact: true }).fill('Browser test password 42');
   await page.getByRole('button', { name: 'Permanently delete my account' }).click();
   await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByText('Your account and its data have been deleted.')).toBeVisible();
 });
 
 test('admin-created places immediately appear in home search and can be deleted', async ({
@@ -255,7 +257,7 @@ test('admin-created places immediately appear in home search and can be deleted'
   );
   await page.request.delete('/api/account', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { password: 'Admin browser password 42' },
+    data: { password: 'Admin browser password 42', confirmation: email },
   });
 });
 

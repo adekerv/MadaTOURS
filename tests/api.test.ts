@@ -165,10 +165,21 @@ test('Laravel API: immediate signup, ownership, roles, recovery, logout, validat
       ).status,
       200,
     );
-    assert.equal((await call('/account', 'DELETE', { password: 'wrong' }, 'bob')).status, 400);
+    const typed = 'bob@example.test';
+    assert.equal(
+      (await call('/account', 'DELETE', { password: 'wrong', confirmation: typed }, 'bob')).status,
+      400,
+    );
     await call('/favorites', 'POST', { placeId: 1 }, 'bob');
     assert.equal(
-      (await call('/account', 'DELETE', { password: 'new very long password' }, 'bob')).status,
+      (
+        await call(
+          '/account',
+          'DELETE',
+          { password: 'new very long password', confirmation: typed },
+          'bob',
+        )
+      ).status,
       200,
     );
     assert.equal((await call('/auth/session', 'GET', undefined, 'bob')).body.user, null);
