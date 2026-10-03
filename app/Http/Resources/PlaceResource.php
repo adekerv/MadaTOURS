@@ -26,6 +26,8 @@ class PlaceResource extends JsonResource
             'openingPeriods' => $p['opening_periods'] ?? null,
             'hoursSource' => $p['hours_source'] ?? null,
             'hoursUpdatedAt' => $p['hours_updated_at'] ?? null,
+            'details' => ! empty($p['details']) ? $p['details'] : null,
+            'listingStatus' => ($p['listing_status'] ?? 'active') === 'needs_review' ? 'needs_review' : null,
             'distance' => $p['distance'] ?? null,
         ], fn ($value) => $value !== null);
     }

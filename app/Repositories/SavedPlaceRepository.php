@@ -14,11 +14,10 @@ class SavedPlaceRepository
         $places = [];
         $offset = 0;
         do {
-            $page = $this->client->request('GET', '/rest/v1/mt_saved_places', ['select' => 'place:mt_places(*)', 'user_id' => 'eq.'.$user, 'kind' => 'eq.'.$kind, 'order' => 'created_at.asc,place_id.asc', 'limit' => 500, 'offset' => $offset], $token);
+            $page = $this->client->request('GET', '/rest/v1/mt_saved_places', ['select' => 'place_id,place:mt_places(*)', 'user_id' => 'eq.'.$user, 'kind' => 'eq.'.$kind, 'order' => 'created_at.asc,place_id.asc', 'limit' => 500, 'offset' => $offset], $token);
             foreach ($page as $row) {
-                if ($row['place']) {
-                    $places[] = $row['place'];
-                }
+                // A place that was later hidden stays in the list as a placeholder, so the person can see and remove it.
+                $places[] = $row['place'] ?: ['id' => (int) $row['place_id'], 'unlisted' => true];
             }
             $offset += count($page);
         } while (count($page) === 500);

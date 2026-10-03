@@ -15,7 +15,12 @@ class SavedPlaceController extends Controller
 
     public function index(Request $request, string $collection): JsonResponse
     {
-        return response()->json(PlaceResource::collection($this->places->list($request->user()->getAuthIdentifier(), $collection, $this->auth->token()))->resolve());
+        $items = $this->places->list($request->user()->getAuthIdentifier(), $collection, $this->auth->token());
+
+        return response()->json(array_map(
+            fn (array $item) => ! empty($item['unlisted']) ? ['id' => (int) $item['id'], 'unlisted' => true] : (new PlaceResource($item))->resolve(),
+            $items,
+        ));
     }
 
     public function store(SavedPlaceRequest $request, string $collection): JsonResponse
