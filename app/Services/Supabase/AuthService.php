@@ -46,6 +46,9 @@ class AuthService
 
         $name = $user['user_metadata']['display_name'] ?? null;
         $name = is_string($name) ? trim(preg_replace('/[\p{C}<>]/u', '', $name)) : '';
+        $language = $user['user_metadata']['language'] ?? null;
+        // Accounts made only through Google have no password to confirm with.
+        $identities = $user['identities'] ?? [];
 
         return [
             'id' => $user['id'],
@@ -53,6 +56,8 @@ class AuthService
             'email' => $user['email'] ?? '',
             'emailVerified' => ! empty($profiles[0]['email_verified_at']),
             'role' => $profiles[0]['role'] === 'admin' ? 'admin' : 'user',
+            'language' => in_array($language, ['en', 'fr'], true) ? $language : null,
+            'hasPassword' => $identities === [] || collect($identities)->contains(fn ($identity) => ($identity['provider'] ?? '') === 'email'),
         ];
     }
 
@@ -100,7 +105,7 @@ class AuthService
 
     public function limit(string $kind, string $identity): void
     {
-        foreach ([[$kind.':ip:'.$this->request->ip(), 30], [$kind.':identity:'.$identity, 10]] as [$identifier, $ceiling]) {
+        foreach ([[$kind.':ip:'.$this->request->ip(), config('supabase.auth_attempts_per_ip')], [$kind.':identity:'.$identity, 10]] as [$identifier, $ceiling]) {
             $allowed = $this->client->request('POST', '/rest/v1/rpc/mt_check_rate_limit', ['identifier' => hash('sha256', $identifier), 'ceiling' => $ceiling], admin: true);
             if ($allowed !== true) {
                 throw new ApiException(429, 'Too many attempts. Please try again in 15 minutes.');

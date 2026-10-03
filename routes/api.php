@@ -48,6 +48,8 @@ Route::middleware('auth:supabase')->group(function () {
     Route::get('places/{place}/my-review', [CommunityController::class, 'mine'])->block(90, 15);
     Route::get('moderation/community', [CommunityController::class, 'moderation'])->block(90, 15);
     Route::post('community/{action}', [CommunityController::class, 'store'])->block(90, 15);
+    Route::post('account/profile', [AccountController::class, 'profile'])->block(90, 15);
+    Route::post('account/email', [AccountController::class, 'email'])->block(90, 15);
     Route::delete('account', [AccountController::class, 'destroy'])->block(90, 15);
     Route::post('places', [PlaceController::class, 'store'])->block(90, 15);
     Route::delete('places/{id}', [PlaceController::class, 'destroy'])->block(90, 15);
