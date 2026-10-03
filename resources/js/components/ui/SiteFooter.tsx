@@ -21,6 +21,7 @@ export function SiteFooter({ onSignup }: { onSignup?: () => void }) {
             ['contact', 'Contact'],
             ['privacy', 'Privacy Policy'],
             ['terms', 'Terms'],
+            ['settings', 'Account settings'],
             ['delete-account', 'Delete account'],
           ].map(([page, label]) => (
             <a key={page} href={`#${page}`} className="inline-flex min-h-11 items-center underline">

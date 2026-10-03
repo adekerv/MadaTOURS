@@ -52,6 +52,8 @@ export async function startLaravel(port = 0, providerPort = 0) {
         SUPABASE_URL: `http://127.0.0.1:${address.port}`,
         SUPABASE_PUBLISHABLE_KEY: 'test-public',
         SUPABASE_SECRET_KEY: 'test-secret',
+        // Browser tests register many accounts from one address; keep the per-IP ceiling out of their way.
+        AUTH_ATTEMPTS_PER_IP: '1000',
         // E2E_SESSION_DRIVER=cookie reproduces the Vercel configuration (api/index.php).
         SESSION_DRIVER: process.env.E2E_SESSION_DRIVER === 'cookie' ? 'cookie' : 'file',
         SESSION_ENCRYPT: process.env.E2E_SESSION_DRIVER === 'cookie' ? 'false' : 'true',

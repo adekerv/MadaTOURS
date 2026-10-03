@@ -9,6 +9,7 @@ type Account = {
   password: string;
   confirmed: boolean;
   name: string;
+  language?: string;
   verify?: string;
   recovery?: string;
 };
@@ -64,7 +65,10 @@ export function testClients(db: PGlite) {
                 user: {
                   id: account()!.id,
                   email: account()!.email,
-                  user_metadata: { display_name: account()!.name },
+                  user_metadata: {
+                    display_name: account()!.name,
+                    language: account()!.language,
+                  },
                 },
               })
             : failure('session_not_found'),
@@ -123,10 +127,27 @@ export function testClients(db: PGlite) {
           if (user) user.recovery = '654321';
           return success();
         },
-        updateUser: ({ password }: { password: string }) => {
+        updateUser: async ({
+          password,
+          data,
+        }: {
+          password?: string;
+          data?: { display_name?: string; language?: string };
+        }) => {
           const user = account();
           if (!user) return failure('session_not_found');
-          user.password = password;
+          if (password !== undefined) user.password = password;
+          if (data) {
+            if (data.display_name !== undefined) user.name = data.display_name;
+            if (data.language !== undefined) user.language = data.language;
+            // Like Supabase, merge into user metadata; the display-name trigger then copies the name.
+            await locked(() =>
+              db.query(
+                'UPDATE auth.users SET raw_user_meta_data = raw_user_meta_data || $2::jsonb WHERE id=$1',
+                [user.id, JSON.stringify(data)],
+              ),
+            );
+          }
           return success({
             user: { id: user.id, email: user.email, user_metadata: { display_name: user.name } },
           });
@@ -139,6 +160,22 @@ export function testClients(db: PGlite) {
           return success();
         },
         admin: {
+          updateUserById: async (id: string, { email }: { email?: string }) => {
+            if (!admin) return failure('not_admin');
+            const user = accounts.get(id);
+            if (!user) return failure('user_not_found');
+            if (email) {
+              if ([...accounts.values()].some((a) => a.id !== id && a.email === email))
+                return failure('email_exists');
+              user.email = email;
+              await locked(() =>
+                db.query('UPDATE auth.users SET email=$2 WHERE id=$1', [id, email]),
+              );
+            }
+            return success({
+              user: { id: user.id, email: user.email, user_metadata: { display_name: user.name } },
+            });
+          },
           deleteUser: async (id: string) => {
             if (!admin) return failure('not_admin');
             await locked(() => db.query('DELETE FROM auth.users WHERE id=$1', [id]));

@@ -38,6 +38,9 @@ export interface User {
   email: string;
   role: 'user' | 'admin';
   emailVerified?: boolean;
+  language?: 'en' | 'fr' | null;
+  /** False for accounts that only sign in with Google. */
+  hasPassword?: boolean;
 }
 export interface UserLocation {
   lat: number;

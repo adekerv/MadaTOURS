@@ -404,8 +404,6 @@ export const english: Record<string, string> = {
     'Illustrative images include AI-generated hiking, seafood and terrace scenes; they do not depict the listed venue.',
   'Illustrative photo': 'Illustrative photo',
   'Image URL (optional)': 'Image URL (optional)',
-  'Incorrect password. Your account has not been deleted.':
-    'Incorrect password. Your account has not been deleted.',
   Indoor: 'Indoor',
   Information: 'Information',
   International: 'International',
@@ -743,8 +741,6 @@ export const english: Record<string, string> = {
   'The verification does not match this account.': 'The verification does not match this account.',
   'This code is invalid or has expired. Request a new code.':
     'This code is invalid or has expired. Request a new code.',
-  'This permanently deletes your account, saved places, and all active sessions. Enter your password to confirm.':
-    'This permanently deletes your account, saved places, and all active sessions. Enter your password to confirm.',
   'This photo could not be read. Choose another photo.':
     'This photo could not be read. Choose another photo.',
   'This photo is too large. Choose a smaller photo.':
@@ -851,8 +847,6 @@ export const english: Record<string, string> = {
   "You're offline or the connection is unavailable. Browse the saved guide; updates need a connection.":
     "You're offline or the connection is unavailable. Browse the saved guide; updates need a connection.",
   'Your account': 'Your account',
-  'Your account and saved places have been deleted.':
-    'Your account and saved places have been deleted.',
   'Your connections': 'Your connections',
   'Your current order is already as short as this suggestion.':
     'Your current order is already as short as this suggestion.',
@@ -894,4 +888,56 @@ export const english: Record<string, string> = {
   '{temp}°C · {conditions} · {humidity}% humidity':
     '{temp}°C · {conditions} · {humidity}% humidity',
   'Étang des Salines landscape': 'Étang des Salines landscape',
+  'Account settings': 'Account settings',
+  'Change your name and email address, or delete your account.':
+    'Change your name and email address, or delete your account.',
+  Profile: 'Profile',
+  'Your name and language are saved with your account.':
+    'Your name and language are saved with your account.',
+  'Save changes': 'Save changes',
+  'Your changes have been saved.': 'Your changes have been saved.',
+  'Email address': 'Email address',
+  'Email changed. Enter the code we sent to {email} to verify it.':
+    'Email changed. Enter the code we sent to {email} to verify it.',
+  'Email changed, but we could not send the code. Try sending it again below.':
+    'Email changed, but we could not send the code. Try sending it again below.',
+  'Your email address comes from your Google account, so it cannot be changed here.':
+    'Your email address comes from your Google account, so it cannot be changed here.',
+  'Change your email address': 'Change your email address',
+  'New email address': 'New email address',
+  'Current password': 'Current password',
+  'You will need to verify the new address before joining meet-ups.':
+    'You will need to verify the new address before joining meet-ups.',
+  'Changing…': 'Changing…',
+  'Change email': 'Change email',
+  'Delete your account': 'Delete your account',
+  'This permanently deletes your account and cannot be undone.':
+    'This permanently deletes your account and cannot be undone.',
+  'We will delete:': 'We will delete:',
+  'Your profile and display name': 'Your profile and display name',
+  'Your favorites and places to revisit': 'Your favorites and places to revisit',
+  'Your reviews, comments and check-ins': 'Your reviews, comments and check-ins',
+  'Your follows, blocks and meet-ups, including the ones you created':
+    'Your follows, blocks and meet-ups, including the ones you created',
+  'Your place suggestions and their photos': 'Your place suggestions and their photos',
+  'Your notifications and every signed-in session':
+    'Your notifications and every signed-in session',
+  'What stays:': 'What stays:',
+  'Places you suggested that were already published stay in the catalogue, without your name. Day plans saved on this device stay on this device.':
+    'Places you suggested that were already published stay in the catalogue, without your name. Day plans saved on this device stay on this device.',
+  'Type {email} to confirm': 'Type {email} to confirm',
+  'You signed in with Google, so no password is needed.':
+    'You signed in with Google, so no password is needed.',
+  'Your account and its data have been deleted.': 'Your account and its data have been deleted.',
+  'Enter a name.': 'Enter a name.',
+  'Your name can have up to 80 characters.': 'Your name can have up to 80 characters.',
+  'Your name cannot contain < or > or control characters.':
+    'Your name cannot contain < or > or control characters.',
+  'Choose English or French.': 'Choose English or French.',
+  'Enter your new email address.': 'Enter your new email address.',
+  'Enter your password to confirm.': 'Enter your password to confirm.',
+  'Type your email address exactly to confirm.': 'Type your email address exactly to confirm.',
+  'Enter a name or choose a language.': 'Enter a name or choose a language.',
+  'This is already your email address.': 'This is already your email address.',
+  'Incorrect password. Nothing was changed.': 'Incorrect password. Nothing was changed.',
 };

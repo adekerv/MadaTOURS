@@ -4,7 +4,6 @@ import { Notice } from './components/ui/Notice';
 import { useNativeBack } from './hooks/useNativeBack';
 import { Homepage } from './components/Homepage';
 import { AuthModal } from './components/home/AuthModal';
-import { AccountModal } from './components/home/AccountModal';
 import { usePlaces } from './hooks/usePlaces';
 import { api, ApiError, errorMessage } from './lib/api';
 import type { ExploreParams, Place, User } from './types';
@@ -25,6 +24,15 @@ function readInformationRoute(): InformationRoute | null {
     : null;
 }
 
+function readSettingsRoute(): boolean {
+  return location.hash.slice(1) === 'settings';
+}
+
+const SettingsPage = lazy(() =>
+  import('./components/settings/SettingsPage').then((module) => ({
+    default: module.SettingsPage,
+  })),
+);
 const PlaceSubmissions = lazy(() =>
   import('./components/submissions/PlaceSubmissions').then((m) => ({
     default: m.PlaceSubmissions,
@@ -56,6 +64,7 @@ export default function App() {
   const { places, catalogueStatus, refreshPlaces } = usePlaces();
   const [exploreParams, setExploreParams] = useState(() => readExploreRoute(location.hash));
   const [informationRoute, setInformationRoute] = useState(readInformationRoute);
+  const [settingsRoute, setSettingsRoute] = useState(readSettingsRoute);
   const [user, setUser] = useState<User | null>(null);
   const [favorites, setFavorites] = useState<Place[]>([]);
   const [revisits, setRevisits] = useState<Place[]>([]);
@@ -70,7 +79,6 @@ export default function App() {
   const [offlineOpen, setOfflineOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
   const [adminOpen, setAdminOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
   const [notice, setNotice] = useState('');
   const [sessionLoading, setSessionLoading] = useState(true);
   const [collectionsLoading, setCollectionsLoading] = useState(false);
@@ -83,6 +91,7 @@ export default function App() {
     const onChange = () => {
       setExploreParams(readExploreRoute(location.hash));
       setInformationRoute(readInformationRoute());
+      setSettingsRoute(readSettingsRoute());
       window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', onChange);
@@ -290,12 +299,25 @@ export default function App() {
           </div>
         }
       >
-        {informationRoute ? (
+        {settingsRoute ? (
+          <SettingsPage
+            user={user}
+            sessionLoading={sessionLoading}
+            onUserChange={setUser}
+            onSignIn={() => setAuthMode('login')}
+            onDeleted={() => {
+              setUser(null);
+              clearOfflinePlaces();
+              location.hash = '';
+              setNotice(t('Your account and its data have been deleted.'));
+            }}
+          />
+        ) : informationRoute ? (
           <InformationPage
             onSubmitPlace={() => (user ? setSubmissionOpen(true) : setAuthMode('login'))}
             page={informationRoute}
             signedIn={!!user}
-            onAccount={() => (user ? setAccountOpen(true) : setAuthMode('login'))}
+            onAccount={() => (user ? (location.hash = 'settings') : setAuthMode('login'))}
           />
         ) : exploreParams ? (
           <ExplorationPage
@@ -333,7 +355,7 @@ export default function App() {
             user={user}
             sessionLoading={sessionLoading}
             collectionsLoading={collectionsLoading}
-            onAccountClick={() => setAccountOpen(true)}
+            onAccountClick={() => (location.hash = 'settings')}
             onLoginClick={() => setAuthMode('login')}
             onLogout={() => void logout()}
             onAdminClick={() => setAdminOpen(true)}
@@ -391,19 +413,6 @@ export default function App() {
             {t('Retry')}
           </button>
         </div>
-      )}
-      {accountOpen && user && (
-        <AccountModal
-          user={user}
-          onVerified={setUser}
-          onClose={() => setAccountOpen(false)}
-          onDeleted={() => {
-            setUser(null);
-            setAccountOpen(false);
-            clearOfflinePlaces();
-            setNotice(t('Your account and saved places have been deleted.'));
-          }}
-        />
       )}
       {authMode && (
         <AuthModal

@@ -107,7 +107,10 @@ export function createProvider(fixture: ReturnType<typeof testClients>) {
           result =
             req.method === 'PUT' ? await client.auth.updateUser(body) : await client.auth.getUser();
         else if (path.startsWith('admin/users/'))
-          result = await client.auth.admin.deleteUser(path.slice(12));
+          result =
+            req.method === 'PUT'
+              ? await client.auth.admin.updateUserById(path.slice(12), body)
+              : await client.auth.admin.deleteUser(path.slice(12));
         else throw new Error('Unknown mock auth route');
         if (result.error) {
           res

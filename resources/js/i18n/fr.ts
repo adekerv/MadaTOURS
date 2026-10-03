@@ -96,7 +96,6 @@ export const french: Record<string, string> = {
   'Loading community…': 'Chargement de la communauté…',
   'Reported meet-ups': 'Rencontres signalées',
   'Meet-up #{id}': 'Rencontre n° {id}',
-
   'MadaTours community': 'Communauté MadaTours',
   'Minimum community rating': 'Note minimale de la communauté',
   'Any rating': 'Toutes les notes',
@@ -141,7 +140,6 @@ export const french: Record<string, string> = {
   'Reviews and comment restrictions': 'Avis et restrictions des commentaires',
   'Please check the required fields and try again.':
     'Vérifiez les champs obligatoires et réessayez.',
-
   Appearance: 'Apparence',
   'System theme': 'Thème du système',
   'Light theme': 'Thème clair',
@@ -461,8 +459,6 @@ export const french: Record<string, string> = {
     'Touchez un point sur la carte pour explorer les alentours.',
   'Tap the heart on any place to save it here. Your next adventure will be easy to find.':
     'Touchez le cœur d’un lieu pour l’enregistrer ici et préparer votre prochaine sortie.',
-  'This permanently deletes your account, saved places, and all active sessions. Enter your password to confirm.':
-    'Votre compte, vos lieux enregistrés et toutes vos sessions seront définitivement supprimés. Saisissez votre mot de passe pour confirmer.',
   Thunderstorms: 'Orages',
   Town: 'Commune',
   'Try a wider radius or a different filter. If you are outside Martinique, browse the island instead.':
@@ -481,8 +477,6 @@ export const french: Record<string, string> = {
   'You are signed in.': 'Vous êtes connecté.',
   'You have signed out.': 'Vous êtes déconnecté.',
   'Your account': 'Votre compte',
-  'Your account and saved places have been deleted.':
-    'Votre compte et vos lieux enregistrés ont été supprimés.',
   'Your favorites': 'Vos favoris',
   'Your favorites and revisit list are linked to this account.':
     'Vos favoris et prochaines visites sont liés à ce compte.',
@@ -602,8 +596,6 @@ export const french: Record<string, string> = {
     'Requête invalide. Rechargez la page et réessayez.',
   'Only administrators can manage places.': 'Seuls les administrateurs peuvent gérer les lieux.',
   'This place could not be found.': 'Ce lieu est introuvable.',
-  'Incorrect password. Your account has not been deleted.':
-    'Mot de passe incorrect. Votre compte n’a pas été supprimé.',
   'The service is temporarily unavailable. Please try again shortly.':
     'Le service est momentanément indisponible. Réessayez dans un instant.',
   'Enter a valid email address.': 'Saisissez une adresse e-mail valide.',
@@ -907,4 +899,57 @@ export const french: Record<string, string> = {
     'Explorez librement. Vérifiez votre email pour rejoindre les rencontres.',
   'Submission sent. You will see the moderation decision here.':
     'Proposition envoyée. Vous verrez ici la décision de modération.',
+  'Account settings': 'Paramètres du compte',
+  'Change your name and email address, or delete your account.':
+    'Modifiez votre nom et votre adresse e-mail, ou supprimez votre compte.',
+  Profile: 'Profil',
+  'Your name and language are saved with your account.':
+    'Votre nom et votre langue sont enregistrés avec votre compte.',
+  'Save changes': 'Enregistrer les modifications',
+  'Your changes have been saved.': 'Vos modifications ont été enregistrées.',
+  'Email address': 'Adresse e-mail',
+  'Email changed. Enter the code we sent to {email} to verify it.':
+    'Adresse e-mail modifiée. Saisissez le code envoyé à {email} pour la vérifier.',
+  'Email changed, but we could not send the code. Try sending it again below.':
+    'Adresse e-mail modifiée, mais le code n’a pas pu être envoyé. Essayez de le renvoyer ci-dessous.',
+  'Your email address comes from your Google account, so it cannot be changed here.':
+    'Votre adresse e-mail provient de votre compte Google ; elle ne peut pas être modifiée ici.',
+  'Change your email address': 'Modifier votre adresse e-mail',
+  'New email address': 'Nouvelle adresse e-mail',
+  'Current password': 'Mot de passe actuel',
+  'You will need to verify the new address before joining meet-ups.':
+    'Vous devrez vérifier la nouvelle adresse avant de rejoindre des rencontres.',
+  'Changing…': 'Modification…',
+  'Change email': 'Modifier l’adresse e-mail',
+  'Delete your account': 'Supprimer votre compte',
+  'This permanently deletes your account and cannot be undone.':
+    'Cette action supprime définitivement votre compte et ne peut pas être annulée.',
+  'We will delete:': 'Nous supprimerons :',
+  'Your profile and display name': 'Votre profil et votre nom affiché',
+  'Your favorites and places to revisit': 'Vos favoris et vos lieux à revisiter',
+  'Your reviews, comments and check-ins': 'Vos avis, commentaires et check-ins',
+  'Your follows, blocks and meet-ups, including the ones you created':
+    'Vos abonnements, blocages et rencontres, y compris celles que vous avez créées',
+  'Your place suggestions and their photos': 'Vos propositions de lieux et leurs photos',
+  'Your notifications and every signed-in session':
+    'Vos notifications et toutes vos sessions connectées',
+  'What stays:': 'Ce qui reste :',
+  'Places you suggested that were already published stay in the catalogue, without your name. Day plans saved on this device stay on this device.':
+    'Les lieux que vous avez proposés et qui ont été publiés restent dans le catalogue, sans votre nom. Les plans de journée enregistrés sur cet appareil restent sur cet appareil.',
+  'Type {email} to confirm': 'Saisissez {email} pour confirmer',
+  'You signed in with Google, so no password is needed.':
+    'Vous vous êtes connecté avec Google : aucun mot de passe n’est nécessaire.',
+  'Your account and its data have been deleted.': 'Votre compte et ses données ont été supprimés.',
+  'Enter a name.': 'Saisissez un nom.',
+  'Your name can have up to 80 characters.': 'Votre nom peut contenir jusqu’à 80 caractères.',
+  'Your name cannot contain < or > or control characters.':
+    'Votre nom ne peut pas contenir < ou > ni de caractères de contrôle.',
+  'Choose English or French.': 'Choisissez l’anglais ou le français.',
+  'Enter your new email address.': 'Saisissez votre nouvelle adresse e-mail.',
+  'Enter your password to confirm.': 'Saisissez votre mot de passe pour confirmer.',
+  'Type your email address exactly to confirm.':
+    'Saisissez exactement votre adresse e-mail pour confirmer.',
+  'Enter a name or choose a language.': 'Saisissez un nom ou choisissez une langue.',
+  'This is already your email address.': 'C’est déjà votre adresse e-mail.',
+  'Incorrect password. Nothing was changed.': 'Mot de passe incorrect. Rien n’a été modifié.',
 };

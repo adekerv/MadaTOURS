@@ -5,12 +5,14 @@ import { useI18n } from '../../i18n/I18nProvider';
 export function EmailVerification({
   user,
   onVerified,
+  codeSent = false,
 }: {
   user: User;
   onVerified: (user: User) => void;
+  codeSent?: boolean;
 }) {
   const { t } = useI18n();
-  const [sent, setSent] = useState(false);
+  const [sent, setSent] = useState(codeSent);
   const [token, setToken] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
