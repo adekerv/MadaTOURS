@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, Plus, Trash2, Route, ExternalLink } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { useI18n } from '../../i18n/I18nProvider';
 import { useDayTrips } from '../../hooks/useDayTrips';
 import { legDirections, moveStop, tripSummary, optimizeTrip, type DayTrip } from '../../lib/trips';
+import { formatClock, formatStart, tripRoute } from '../../lib/trip-route';
 import type { Place } from '../../types';
+const TripRouteMap = lazy(() => import('./TripRouteMap'));
 export function DayPlanner({
   places,
   savedPlaces,
@@ -14,7 +16,7 @@ export function DayPlanner({
   savedPlaces: Place[];
   onClose: () => void;
 }) {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const { trips, saveTrips, storageError } = useDayTrips();
   const [selected, setSelected] = useState<string | null>(() => trips[0]?.id ?? null);
   const [optimization, setOptimization] = useState('');
@@ -51,6 +53,12 @@ export function DayPlanner({
         Number(savedIds.has(b.id)) - Number(savedIds.has(a.id)) || a.name.localeCompare(b.name),
     );
   const summary = trip ? tripSummary(trip, places) : null;
+  const route = useMemo(() => (trip ? tripRoute(trip, places) : null), [trip, places]);
+  const startLabel = trip ? formatStart(trip.date, trip.startTime, language) : null;
+  const clockLabel = (minutes: number) => {
+    const { time, nextDay } = formatClock(minutes);
+    return nextDay ? t('{time} (next day)', { time }) : time;
+  };
   return (
     <Modal title={t('Your day trips')} onClose={onClose} wide>
       <div className="space-y-5 p-5 sm:p-7">
@@ -134,7 +142,7 @@ export function DayPlanner({
         )}
         {trip && (
           <>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-3">
               <label className="field-label">
                 {t('Trip name')}
                 <input
@@ -156,6 +164,18 @@ export function DayPlanner({
                   value={trip.date}
                   onChange={(e) => {
                     if (e.target.validity.valid) update({ ...trip, date: e.target.value });
+                  }}
+                />
+              </label>
+              <label className="field-label">
+                {t('Start time (Martinique)')}
+                <input
+                  className="field-input min-w-0"
+                  type="time"
+                  value={trip.startTime ?? ''}
+                  onChange={(e) => {
+                    if (e.target.validity.valid)
+                      update({ ...trip, startTime: e.target.value || undefined });
                   }}
                 />
               </label>
@@ -201,6 +221,43 @@ export function DayPlanner({
                 {t('A maximum of 20 stops keeps each day manageable.')}
               </p>
             )}
+            {route && route.points.length > 0 && (
+              <section aria-labelledby="route-map-title" className="space-y-3">
+                <h3 id="route-map-title" className="font-bold">
+                  {t('Route map')}
+                </h3>
+                <div className="trip-map-frame">
+                  <Suspense
+                    fallback={
+                      <div role="status" aria-label={t('Loading map…')} className="trip-map" />
+                    }
+                  >
+                    <TripRouteMap
+                      route={route}
+                      label={t('Route map: {stops}', {
+                        stops: route.points.map((p) => `${p.order}. ${p.place.name}`).join(', '),
+                      })}
+                    />
+                  </Suspense>
+                  {startLabel && (
+                    <p className="route-start-badge">
+                      <span aria-hidden="true">🏁 </span>
+                      {t('Starts: {when}', { when: startLabel })}
+                    </p>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500">
+                  {t(
+                    'Stops are joined by straight lines in your visiting order. Check directions for road routes.',
+                  )}
+                </p>
+                {!startLabel && (
+                  <p className="text-sm text-orange-800">
+                    {t('Set a date and start time to show when your trip starts.')}
+                  </p>
+                )}
+              </section>
+            )}
             {!trip.stops.length && (
               <p className="rounded-2xl bg-slate-50 p-5 text-slate-600">
                 {t('No stops yet. Add a place to begin.')}
@@ -211,6 +268,7 @@ export function DayPlanner({
                 const place = places.find((p) => p.id === stop.placeId);
                 const previous = places.find((p) => p.id === trip.stops[index - 1]?.placeId);
                 const name = place?.name ?? t('This place is no longer listed');
+                const arrive = route?.points.find((p) => p.order === index + 1)?.arrive;
                 return (
                   <li key={stop.placeId} className="rounded-2xl border border-slate-200 p-4">
                     <div className="flex flex-wrap justify-between gap-2">
@@ -219,6 +277,13 @@ export function DayPlanner({
                           {index + 1}. {name}
                         </h3>
                         <p className="mt-1 text-sm text-slate-600">{place?.location}</p>
+                        {arrive != null && (
+                          <p className="mt-1 text-sm font-semibold text-orange-800">
+                            {t(index === 0 ? 'Start {time}' : 'Arrive {time}', {
+                              time: clockLabel(arrive),
+                            })}
+                          </p>
+                        )}
                       </div>
                       <div className="flex">
                         <button
@@ -321,9 +386,17 @@ export function DayPlanner({
             )}
             {summary && trip.stops.length > 0 && (
               <div className="space-y-2 rounded-2xl bg-orange-50 p-4">
+                {startLabel && (
+                  <p className="font-semibold">{t('Starts: {when}', { when: startLabel })}</p>
+                )}
                 <p className="font-semibold">
                   {t('Estimated total: {minutes} min', { minutes: summary.totalMinutes })}
                 </p>
+                {route?.finish != null && (
+                  <p className="text-sm">
+                    {t('Estimated finish: {time}', { time: clockLabel(route.finish) })}
+                  </p>
+                )}
                 <p className="text-sm">
                   {t('Visits: {visits} min · Travel allowance: {travel} min', {
                     visits: summary.minutes,

@@ -940,4 +940,14 @@ export const english: Record<string, string> = {
   'Enter a name or choose a language.': 'Enter a name or choose a language.',
   'This is already your email address.': 'This is already your email address.',
   'Incorrect password. Nothing was changed.': 'Incorrect password. Nothing was changed.',
+  'Route map': 'Route map',
+  'Route map: {stops}': 'Route map: {stops}',
+  'Stops are joined by straight lines in your visiting order. Check directions for road routes.':
+    'Stops are joined by straight lines in your visiting order. Check directions for road routes.',
+  'Starts: {when}': 'Starts: {when}',
+  'Set a date and start time to show when your trip starts.':
+    'Set a date and start time to show when your trip starts.',
+  'Start {time}': 'Start {time}',
+  'Arrive {time}': 'Arrive {time}',
+  '{time} (next day)': '{time} (next day)',
 };

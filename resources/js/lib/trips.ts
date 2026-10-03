@@ -11,6 +11,8 @@ const day = z
         new Date(`${value}T12:00:00Z`).toISOString().slice(0, 10) === value),
     'Invalid date.',
   );
+// Local Martinique time, 24 hours. Optional, so trips saved before it existed still load.
+export const startTimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Invalid time.');
 export const tripStopSchema = z.object({
   placeId: z.number().int().positive(),
   minutes: z.number().int().min(5).max(720),
@@ -19,6 +21,7 @@ export const tripSchema = z.object({
   id: z.uuid(),
   name: z.string().max(100),
   date: day,
+  startTime: startTimeSchema.optional(),
   notes: z.string().max(2000),
   stops: z
     .array(tripStopSchema)
@@ -28,6 +31,13 @@ export const tripSchema = z.object({
 });
 export type DayTrip = z.infer<typeof tripSchema>;
 export const tripsSchema = z.object({ version: z.literal(1), trips: z.array(tripSchema).max(20) });
+/**
+ * A planning allowance, not a routed ETA: 1.4x straight-line distance at 30 km/h,
+ * plus five minutes per transfer. Live directions remain the source for road times.
+ */
+export function travelAllowance(distanceKm: number, legs: number) {
+  return Math.ceil(((distanceKm * 1.4) / 30) * 60 + legs * 5);
+}
 export function moveStop(trip: DayTrip, index: number, direction: -1 | 1): DayTrip {
   const target = index + direction;
   if (index < 0 || index >= trip.stops.length || target < 0 || target >= trip.stops.length)
@@ -50,9 +60,7 @@ export function tripSummary(trip: DayTrip, places: Place[]) {
     } else missing = true;
   }
   const minutes = trip.stops.reduce((sum, stop) => sum + stop.minutes, 0);
-  // A planning allowance, not a routed ETA: 1.4x straight-line distance at 30 km/h,
-  // plus five minutes per transfer. Live directions remain the source for road times.
-  const travelMinutes = Math.ceil(((distance * 1.4) / 30) * 60 + legs * 5);
+  const travelMinutes = travelAllowance(distance, legs);
   return { distance, minutes, travelMinutes, totalMinutes: minutes + travelMinutes, missing };
 }
 export function optimizeTrip(trip: DayTrip, places: Place[]): DayTrip {

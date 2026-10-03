@@ -823,6 +823,114 @@ summary {
     0 2px 8px #0f172a66;
 }
 
+/* Trip route map in the day planner: numbered emoji pins joined in visiting order. */
+.trip-map-frame {
+  position: relative;
+}
+.trip-map {
+  height: 15rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--line, #e2e8f0);
+  background: #e8eef0;
+  isolation: isolate;
+}
+@media (min-width: 640px) {
+  .trip-map {
+    height: 20rem;
+  }
+}
+.route-start-badge {
+  position: absolute;
+  z-index: 500;
+  top: 0.5rem;
+  left: 0.5rem;
+  max-width: calc(100% - 4.5rem);
+  margin: 0;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: #fff;
+  color: #7c2d12;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.25;
+  box-shadow:
+    0 2px 7px #0f172a40,
+    0 0 0 1px #0f172a14;
+  pointer-events: none;
+}
+.route-pin-container,
+.route-arrow-container {
+  background: none;
+  border: 0;
+}
+.route-pin {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: 2px;
+  border: 3px solid var(--pin, #c2410c);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 20px;
+  line-height: 1;
+  box-shadow: 0 2px 7px #0f172a59;
+}
+.route-pin-start {
+  box-shadow:
+    0 0 0 4px #c2410c55,
+    0 2px 8px #0f172a66;
+}
+.route-pin-number {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: #c2410c;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+.route-pin-flag {
+  position: absolute;
+  bottom: -9px;
+  left: -9px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 12px;
+  line-height: 1;
+  box-shadow: 0 1px 4px #0f172a59;
+}
+.route-arrow {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #c2410c;
+  box-shadow: 0 1px 3px #0f172a66;
+}
+.route-arrow::before {
+  content: '';
+  border-right: 4px solid transparent;
+  border-bottom: 7px solid #fff;
+  border-left: 4px solid transparent;
+}
+
 /* Homepage coastline: a thin brand-coloured outline, large and cropped, never competing with the headline. */
 :root {
   --coast: #ea580c;

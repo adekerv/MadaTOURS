@@ -77,6 +77,7 @@ export function RouteSuggestion({
         id: tripId,
         name: t('My suggested day trip'),
         date,
+        startTime: start,
         notes: t(
           'Travel times are planning estimates, not live road directions. Confirm opening hours before leaving.',
         ),

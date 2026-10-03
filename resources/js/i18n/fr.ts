@@ -952,4 +952,14 @@ export const french: Record<string, string> = {
   'Enter a name or choose a language.': 'Saisissez un nom ou choisissez une langue.',
   'This is already your email address.': 'C’est déjà votre adresse e-mail.',
   'Incorrect password. Nothing was changed.': 'Mot de passe incorrect. Rien n’a été modifié.',
+  'Route map': 'Carte de l’itinéraire',
+  'Route map: {stops}': 'Carte de l’itinéraire : {stops}',
+  'Stops are joined by straight lines in your visiting order. Check directions for road routes.':
+    'Les étapes sont reliées par des lignes droites, dans l’ordre de visite. Consultez l’itinéraire routier pour la route.',
+  'Starts: {when}': 'Départ : {when}',
+  'Set a date and start time to show when your trip starts.':
+    'Indiquez une date et une heure de départ pour voir quand votre sortie commence.',
+  'Start {time}': 'Départ {time}',
+  'Arrive {time}': 'Arrivée {time}',
+  '{time} (next day)': '{time} (le lendemain)',
 };
