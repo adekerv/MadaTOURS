@@ -6,7 +6,8 @@ return [
     'secret_key' => trim((string) env('SUPABASE_SECRET_KEY', '')),
     'timeout' => (int) env('SUPABASE_TIMEOUT', 12),
     // Sign-in, sign-up and account attempts allowed per IP address in each 15-minute window.
-    'auth_attempts_per_ip' => (int) env('AUTH_ATTEMPTS_PER_IP', 30),
+    // The database function rejects anything outside 1-100, so the value is clamped to that range.
+    'auth_attempts_per_ip' => max(1, min(100, (int) env('AUTH_ATTEMPTS_PER_IP', 30))),
     'allowed_origins' => array_values(array_filter([
         ...array_map('trim', explode(',', env('ALLOWED_ORIGINS', 'capacitor://localhost,https://localhost'))),
         // Vercel system variables: the production domain and this deployment's own URL.
