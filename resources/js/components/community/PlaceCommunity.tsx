@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Star, MapPin } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Star, MapPin, MessageCircle } from 'lucide-react';
 import { api, errorMessage } from '../../lib/api';
 import { useI18n } from '../../i18n/I18nProvider';
 import type { User } from '../../types';
@@ -19,11 +19,14 @@ export function PlaceCommunity({
   user,
   onLogin,
   onRatingChanged,
+  extraActions,
 }: {
   placeId: number;
   user: User | null;
   onLogin: () => void;
   onRatingChanged: () => void;
+  /** Further visit actions shown beside "I've been here". */
+  extraActions?: ReactNode;
 }) {
   const { t } = useI18n();
   const userId = user?.id;
@@ -91,33 +94,42 @@ export function PlaceCommunity({
       setBusy(false);
     }
   }
+  const hasReviews = !!feed?.reviews.length;
+  const hasComments = !!feed?.comments.length;
   return (
-    <section id="community" className="space-y-4 border-t border-slate-200 pt-6">
+    <section
+      id="community"
+      aria-labelledby="community-title"
+      className="space-y-4 border-t border-slate-200 pt-6"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-xl font-bold">{t('MadaTours community')}</h3>
-        <span className="flex items-center gap-1 font-semibold text-orange-800">
-          <Star size={18} />
-          {feed?.rating ? `${Number(feed.rating).toFixed(1)} / 5` : t('Be the first to rate')}{' '}
-          {feed?.count ? `(${feed.count})` : ''}
-        </span>
+        <h3 id="community-title" className="text-xl font-bold">
+          {t('MadaTours community')}
+        </h3>
+        {!!feed?.count && !!feed.rating && (
+          <span className="flex items-center gap-1 font-semibold text-orange-800">
+            <Star size={18} aria-hidden="true" />
+            {Number(feed.rating).toFixed(1)} / 5 ({feed.count})
+          </span>
+        )}
       </div>
-      <p className="text-sm text-slate-600">
-        {t('Reviews are public and linked to your display name. Share your own experience.')}
-      </p>
-      <button
-        disabled={busy}
-        className="secondary-button flex items-center gap-2"
-        onClick={() =>
-          void write(
-            'checkin',
-            {},
-            'Visit recorded. Only one check-in per place per day is counted.',
-          )
-        }
-      >
-        <MapPin size={18} />
-        {t("I've been here")}
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <button
+          disabled={busy}
+          className="secondary-button flex items-center gap-2"
+          onClick={() =>
+            void write(
+              'checkin',
+              {},
+              'Visit recorded. Only one check-in per place per day is counted.',
+            )
+          }
+        >
+          <MapPin size={18} />
+          {t("I've been here")}
+        </button>
+        {extraActions}
+      </div>
       {notice && (
         <p role="status" className="rounded-xl bg-green-50 p-3 text-sm text-green-800">
           {t(notice)}
@@ -150,6 +162,10 @@ export function PlaceCommunity({
           }}
         >
           <fieldset disabled={!ownLoaded || busy} className="space-y-3">
+            <legend className="font-semibold">{t('Rate this place')}</legend>
+            <p className="text-sm text-slate-600">
+              {t('Reviews are public and linked to your display name. Share your own experience.')}
+            </p>
             <label className="field-label">
               {t('Your rating')}
               <select
@@ -182,13 +198,24 @@ export function PlaceCommunity({
           </fieldset>
         </form>
       ) : (
-        <button className="primary-button" onClick={onLogin}>
-          {t('Sign in to review or check in')}
-        </button>
+        <div className="rounded-2xl border border-orange-200 bg-orange-50 p-4">
+          <p className="text-sm text-slate-800">
+            {t('Sign in to rate this place, check in, comment or save it.')}
+          </p>
+          <button className="primary-button mt-3" onClick={onLogin}>
+            {t('Sign in')}
+          </button>
+        </div>
       )}
       {!feed && !error && (
         <div role="status" className="skeleton h-28 rounded-2xl">
           <span className="sr-only">{t('Loading reviews…')}</span>
+        </div>
+      )}
+      {feed && !hasReviews && !hasComments && (
+        <div className="flex items-start gap-3 rounded-2xl border border-dashed border-slate-300 p-4 text-sm text-slate-700">
+          <MessageCircle size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-orange-700" />
+          <p>{t('No reviews or comments yet. Be the first to share how your visit went.')}</p>
         </div>
       )}
       {feed?.reviews.map((review) => (
@@ -215,7 +242,7 @@ export function PlaceCommunity({
           )}
         </article>
       ))}
-      <h4 className="font-semibold">{t('Place comments')}</h4>
+      {(hasComments || user) && <h4 className="font-semibold">{t('Comments')}</h4>}
       {feed?.comments.map((item) => (
         <article key={item.id} className="rounded-xl bg-slate-50 p-3 text-sm">
           <p className="font-semibold">{item.display_name}</p>

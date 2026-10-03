@@ -1,3 +1,4 @@
+import type { PlaceDetails } from './lib/content';
 export interface Place {
   id: number;
   name: string;
@@ -27,6 +28,9 @@ export interface Place {
   openingPeriods?: { day: number; opens: number; closes: number }[];
   tags?: string[];
   image?: string;
+  details?: PlaceDetails;
+  /** Set only when the listing needs a note; closed places are never sent to visitors. */
+  listingStatus?: 'needs_review';
 }
 export interface User {
   id: string;

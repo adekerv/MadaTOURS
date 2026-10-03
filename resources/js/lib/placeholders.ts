@@ -49,6 +49,9 @@ export const placeholders = {
   string,
   { src: string; label: string; credit: string; source?: string; license?: string }
 >;
+/** AI illustrations carry the same message in their label and credit, so the credit is only shown for real photos. */
+export const creditLine = (item: Placeholder) =>
+  item.credit.startsWith('MadaTours') ? undefined : item.credit;
 export function placeholderFor(place: Place): Placeholder {
   const words = normalizeSearch([place.name, ...(place.tags || [])].join(' '));
   if (place.type === 'restaurant')

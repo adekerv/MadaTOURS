@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { placeholderFor } from '../../lib/placeholders';
+import { placeholderFor, creditLine } from '../../lib/placeholders';
 import { MapPin } from 'lucide-react';
 import type { Place } from '../../types';
 import { useI18n } from '../../i18n/I18nProvider';
@@ -54,7 +54,7 @@ export function PlacePhoto({
       {(illustrative || failed) && (
         <span className="absolute inset-x-0 bottom-0 bg-slate-900/80 px-2 py-1 text-[10px] text-white">
           {t(failed ? 'Photo unavailable' : fallback.label)}
-          <span className="block">{t(fallback.credit)}</span>
+          {creditLine(fallback) && <span className="block">{t(creditLine(fallback)!)}</span>}
         </span>
       )}
     </div>

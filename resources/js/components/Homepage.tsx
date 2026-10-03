@@ -20,6 +20,7 @@ import { LanguageSelect } from './ui/LanguageSelect';
 import { WeatherWidget } from './home/WeatherWidget';
 import { OnboardingHint } from './home/OnboardingHint';
 import { SiteFooter } from './ui/SiteFooter';
+import { CoastlineArt } from './home/CoastlineArt';
 import { PlacePhoto, PlaceCardSkeleton } from './ui/PlacePhoto';
 interface Props {
   onPlanDay: () => void;
@@ -33,6 +34,8 @@ interface Props {
   catalogueLoading: boolean;
   favorites: Place[];
   revisits: Place[];
+  unlisted: { favorites: number[]; revisits: number[] };
+  onRemoveUnlisted: (collection: 'favorites' | 'revisits', id: number) => void;
   onRemoveFavorite: (place: Place) => void;
   onRemoveRevisit: (place: Place) => void;
   user: User | null;
@@ -84,6 +87,8 @@ export function Homepage({
   catalogueLoading,
   favorites,
   revisits,
+  unlisted,
+  onRemoveUnlisted,
   onRemoveFavorite,
   onRemoveRevisit,
   user,
@@ -97,18 +102,28 @@ export function Homepage({
   const { t } = useI18n();
   return (
     <div className="home-shell mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-      <header className="relative z-20 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200/70 py-5">
+      <header className="relative z-20 flex flex-wrap items-center gap-x-3 gap-y-3 border-b border-slate-200/70 py-4">
         <a
           href="#"
           aria-label={t('MadaTours home')}
-          className="flex items-center gap-2.5 font-bold text-xl tracking-tight text-slate-900"
+          className="order-1 flex shrink-0 items-center gap-3 text-slate-900"
         >
-          <span className="grid size-11 place-items-center rounded-2xl bg-orange-600 text-white">
-            <Compass size={23} />
+          <span className="grid size-12 place-items-center rounded-2xl bg-orange-600 text-white shadow-sm">
+            <Compass size={26} aria-hidden="true" />
           </span>
-          MADA<span className="-ml-2 font-serif italic text-orange-600">TOURS</span>
+          <span className="leading-none">
+            <span className="block text-2xl font-bold tracking-tight">
+              Mada<span className="font-serif font-semibold italic text-orange-600">Tours</span>
+            </span>
+            <span className="mt-1 hidden text-xs font-medium text-slate-600 sm:block">
+              {t('Martinique travel guide')}
+            </span>
+          </span>
         </a>
-        <nav aria-label={t('Account')} className="lg:order-2 flex items-center gap-1 sm:gap-2">
+        <nav
+          aria-label={t('Account')}
+          className="order-2 ml-auto flex items-center gap-1 sm:gap-2 xl:order-4"
+        >
           <LanguageSelect />
           {sessionLoading ? (
             <span role="status" className="text-sm text-slate-500">
@@ -143,35 +158,43 @@ export function Homepage({
             </button>
           )}
         </nav>
-        <div className="w-full lg:order-none lg:ml-auto lg:mr-4 lg:max-w-sm">
+        <div className="order-4 w-full xl:order-3 xl:ml-auto xl:w-56">
           <SearchBar
             places={places}
             onSelectPlace={(place) => onStart({ filter: place.type, selectedPlaceId: place.id })}
           />
         </div>
+        <nav
+          aria-label={t('Plan and share')}
+          className="order-5 -mx-1 flex w-full gap-2 overflow-x-auto px-1 pb-1 xl:order-2 xl:mx-0 xl:ml-1 xl:w-auto xl:gap-0 xl:overflow-visible xl:px-0 xl:pb-0"
+        >
+          <button
+            disabled={sessionLoading}
+            onClick={onSuggestTrip}
+            className="header-link header-link-accent"
+          >
+            {t('Suggest a trip route')}
+          </button>
+          <button disabled={sessionLoading} onClick={onCommunity} className="header-link">
+            {t('Community and meet-ups')}
+          </button>
+          <button disabled={sessionLoading} onClick={onSubmitPlace} className="header-link">
+            {t('Suggest a place')}
+          </button>
+        </nav>
       </header>
       <main id="main-content" tabIndex={-1}>
         <OnboardingHint onPlan={onPlanDay} />
-        <div className="mt-5 flex flex-wrap justify-end gap-2">
-          <button disabled={sessionLoading} onClick={onSuggestTrip} className="primary-button">
-            {t('Suggest a trip route')}
-          </button>
-          <button disabled={sessionLoading} onClick={onSubmitPlace} className="secondary-button">
-            {t('Suggest a place')}
-          </button>
-          <button disabled={sessionLoading} onClick={onCommunity} className="secondary-button">
-            {t('Community and meet-ups')}
-          </button>
-        </div>
         {user && (
           <p className="mt-6 break-words text-center text-lg font-semibold text-orange-800">
             {t('Welcome, {name}.', { name: user.name })}
           </p>
         )}
-        <section className="relative py-10 sm:py-16 lg:py-20 text-center">
+        <section className="relative py-12 sm:py-20 lg:py-28 text-center">
+          <CoastlineArt />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-orange-100/40 blur-3xl"
+            className="pointer-events-none absolute inset-0 -z-10 hero-glow rounded-full blur-3xl"
           />
           <p className="mb-5 flex justify-center items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-orange-700">
             <Compass size={16} />
@@ -198,7 +221,7 @@ export function Homepage({
               {t('Find something to do')}
             </a>
           </div>
-          <div className="mx-auto mt-8 max-w-xl">
+          <div className="mt-8 flex justify-center">
             <WeatherWidget />
           </div>
         </section>
@@ -354,20 +377,52 @@ export function Homepage({
                   </div>
                 ),
             )}
-            {!collectionsLoading && !favorites.length && !revisits.length && (
-              <div className="rounded-3xl bg-orange-50 p-7 text-center">
-                <Heart className="mx-auto mb-3 text-orange-600" />
-                <h2 className="text-xl font-bold">{t('Start your island list')}</h2>
-                <p className="mx-auto mt-2 max-w-md text-slate-600">
-                  {t(
-                    'Tap the heart on any place to save it here. Your next adventure will be easy to find.',
-                  )}
+            {(unlisted.favorites.length > 0 || unlisted.revisits.length > 0) && (
+              <div role="note" className="rounded-3xl bg-slate-50 p-5">
+                <h2 className="font-bold">{t('Saved places that are no longer listed')}</h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  {t('This saved place is no longer listed. You can remove it from your list.')}
                 </p>
-                <button onClick={() => onStart()} className="primary-button mt-5">
-                  {t('Find a place')}
-                </button>
+                <ul className="mt-3 space-y-2">
+                  {(['favorites', 'revisits'] as const).flatMap((collection) =>
+                    unlisted[collection].map((id) => (
+                      <li
+                        key={`${collection}-${id}`}
+                        className="flex items-center justify-between gap-3 rounded-2xl bg-white p-3"
+                      >
+                        <span className="text-sm font-medium text-slate-700">
+                          {t('This place is no longer listed')}
+                        </span>
+                        <button
+                          className="secondary-button"
+                          onClick={() => onRemoveUnlisted(collection, id)}
+                        >
+                          {t('Remove from list')}
+                        </button>
+                      </li>
+                    )),
+                  )}
+                </ul>
               </div>
             )}
+            {!collectionsLoading &&
+              !favorites.length &&
+              !revisits.length &&
+              !unlisted.favorites.length &&
+              !unlisted.revisits.length && (
+                <div className="rounded-3xl bg-orange-50 p-7 text-center">
+                  <Heart className="mx-auto mb-3 text-orange-600" />
+                  <h2 className="text-xl font-bold">{t('Start your island list')}</h2>
+                  <p className="mx-auto mt-2 max-w-md text-slate-600">
+                    {t(
+                      'Tap the heart on any place to save it here. Your next adventure will be easy to find.',
+                    )}
+                  </p>
+                  <button onClick={() => onStart()} className="primary-button mt-5">
+                    {t('Find a place')}
+                  </button>
+                </div>
+              )}
           </section>
         ) : (
           <section className="mb-10 flex flex-col items-start gap-5 rounded-3xl bg-orange-50 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">

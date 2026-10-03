@@ -9,7 +9,7 @@ import { usePlaces } from './hooks/usePlaces';
 import { api, ApiError, errorMessage } from './lib/api';
 import type { ExploreParams, Place, User } from './types';
 import { clearOfflinePlaces, readOfflinePlaces, saveOfflinePlaces } from './lib/offline';
-import { normalizePlace } from './lib/places-utils';
+import { splitSaved } from './lib/places-utils';
 import { readExploreRoute, exploreHash } from './lib/explore-route';
 import type { InformationRoute } from './components/information/InformationPage';
 
@@ -59,6 +59,10 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [favorites, setFavorites] = useState<Place[]>([]);
   const [revisits, setRevisits] = useState<Place[]>([]);
+  const [unlisted, setUnlisted] = useState<{ favorites: number[]; revisits: number[] }>({
+    favorites: [],
+    revisits: [],
+  });
   const [submissionOpen, setSubmissionOpen] = useState(false);
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
@@ -128,6 +132,7 @@ export default function App() {
     const controller = new AbortController();
     setFavorites([]);
     setRevisits([]);
+    setUnlisted({ favorites: [], revisits: [] });
     pending.current.clear();
     if (!user) {
       setCollectionsLoading(false);
@@ -141,9 +146,11 @@ export default function App() {
     ])
       .then(([favs, visits]) => {
         if (!controller.signal.aborted) {
-          setFavorites(favs.map(normalizePlace));
-          setRevisits(visits.map(normalizePlace));
-          if (!saveOfflinePlaces(user.id, favs.map(normalizePlace), visits.map(normalizePlace)))
+          const saved = { favorites: splitSaved(favs), revisits: splitSaved(visits) };
+          setFavorites(saved.favorites.places);
+          setRevisits(saved.revisits.places);
+          setUnlisted({ favorites: saved.favorites.unlisted, revisits: saved.revisits.unlisted });
+          if (!saveOfflinePlaces(user.id, saved.favorites.places, saved.revisits.places))
             setNotice(
               'Device storage is unavailable. Changes will be lost when you close the app.',
             );
@@ -161,6 +168,18 @@ export default function App() {
     return () => controller.abort();
   }, [user, syncRevision]);
 
+  const removeUnlisted = async (collection: 'favorites' | 'revisits', id: number) => {
+    try {
+      await api(`/${collection}?placeId=${id}`, { method: 'DELETE' });
+      setUnlisted((previous) => ({
+        ...previous,
+        [collection]: previous[collection].filter((item) => item !== id),
+      }));
+      setNotice('Removed a place that is no longer listed.');
+    } catch (error) {
+      setNotice(errorMessage(error));
+    }
+  };
   const toggleSaved = async (collection: 'favorites' | 'revisits', place: Place) => {
     if (!user) {
       setAuthMode('login');
@@ -307,6 +326,8 @@ export default function App() {
             favorites={favorites}
             catalogueLoading={catalogueStatus === 'loading'}
             revisits={revisits}
+            unlisted={unlisted}
+            onRemoveUnlisted={(collection, id) => void removeUnlisted(collection, id)}
             onRemoveFavorite={(place) => void toggleSaved('favorites', place)}
             onRemoveRevisit={(place) => void toggleSaved('revisits', place)}
             user={user}

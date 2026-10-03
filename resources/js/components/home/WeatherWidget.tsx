@@ -66,11 +66,12 @@ export function WeatherWidget() {
     return () => controller.abort();
   }, [revision]);
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left">
-      <CloudSun className="shrink-0 text-orange-600" size={26} />
-      <div className="min-w-0 flex-1" aria-live="polite">
-        <p className="text-sm font-semibold text-slate-900">{t('Fort-de-France weather')}</p>
-        <p className="text-sm text-slate-600">
+    <div className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-slate-200 bg-white/90 py-1 pl-4 pr-1 text-left shadow-sm">
+      <CloudSun className="shrink-0 text-orange-600" size={22} aria-hidden="true" />
+      <div className="min-w-0 py-1" aria-live="polite">
+        <p className="text-sm text-slate-700">
+          <span className="font-semibold text-slate-900">{t('Fort-de-France weather')}</span>
+          {' · '}
           {loading
             ? t('Checking conditions…')
             : weather
@@ -81,9 +82,8 @@ export function WeatherWidget() {
                 })
               : t('Weather is unavailable right now.')}
         </p>
-        {loading && <div aria-hidden="true" className="skeleton mt-2 h-4 w-3/4 rounded" />}
         {weather && !loading && (
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="text-xs text-slate-600">
             <a
               className="inline-flex min-h-11 items-center underline"
               href="https://open-meteo.com/"

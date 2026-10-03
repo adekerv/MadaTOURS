@@ -290,8 +290,8 @@ export function testClients(db: PGlite) {
                 statement = `UPDATE public.${table} SET ${assignments.join(',')}${where ? ' WHERE ' + where : ''} RETURNING *`;
               } else if (op === 'delete')
                 statement = `DELETE FROM public.${table}${where ? ' WHERE ' + where : ''} RETURNING *`;
-              else if (columns === 'place:mt_places(*)')
-                statement = `SELECT to_jsonb(p.*) AS place FROM public.mt_saved_places s JOIN public.mt_places p ON p.id=s.place_id WHERE ${where.split('"user_id"').join('s."user_id"').split('"kind"').join('s."kind"')} ORDER BY s.created_at,s.place_id`;
+              else if (columns === 'place_id,place:mt_places(*)')
+                statement = `SELECT s.place_id, to_jsonb(p.*) AS place FROM public.mt_saved_places s LEFT JOIN public.mt_places p ON p.id=s.place_id WHERE ${where.split('"user_id"').join('s."user_id"').split('"kind"').join('s."kind"')} ORDER BY s.created_at,s.place_id`;
               else
                 statement = `SELECT ${columns === '*' ? '*' : columns.split(',').map(id).join(',')} FROM public.${table}${where ? ' WHERE ' + where : ''}${ordering ? ' ORDER BY ' + ordering : ''}`;
               try {

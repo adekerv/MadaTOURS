@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { sourceSchema, photoCreditSchema } from './content.js';
+import { sourceSchema, photoCreditSchema, parseDetails } from './content.js';
 import type { Place } from '../types';
 export const deg2rad = (degrees: number) => (degrees * Math.PI) / 180;
 export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -79,6 +79,9 @@ export function normalizePlace(value: unknown): Place {
       .safeParse(p.hoursSource ?? p.hours_source).data,
     hoursUpdatedAt: z.string().safeParse(p.hoursUpdatedAt ?? p.hours_updated_at).data,
     hours: typeof p.hours === 'string' ? p.hours : undefined,
+    details: parseDetails(p.details),
+    listingStatus:
+      (p.listingStatus ?? p.listing_status) === 'needs_review' ? 'needs_review' : undefined,
     image:
       typeof p.image === 'string' &&
       (p.image.startsWith('https://') || /^\/photos\/(community\/)?[a-zA-Z0-9._-]+$/.test(p.image))
@@ -87,6 +90,18 @@ export function normalizePlace(value: unknown): Place {
     distance:
       p.distance != null && Number.isFinite(Number(p.distance)) ? Number(p.distance) : undefined,
   };
+}
+/** Saved lists include a placeholder for a place that was later hidden, so people can see and remove it. */
+export function splitSaved(items: unknown[]): { places: Place[]; unlisted: number[] } {
+  const places: Place[] = [];
+  const unlisted: number[] = [];
+  for (const item of items) {
+    const entry = item as { id?: unknown; unlisted?: unknown } | null;
+    if (entry?.unlisted === true && Number.isSafeInteger(Number(entry.id)))
+      unlisted.push(Number(entry.id));
+    else places.push(normalizePlace(item));
+  }
+  return { places, unlisted };
 }
 export const normalizeSearch = (value: string) =>
   value

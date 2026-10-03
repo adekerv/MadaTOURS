@@ -210,7 +210,7 @@ export function DayPlanner({
               {trip.stops.map((stop, index) => {
                 const place = places.find((p) => p.id === stop.placeId);
                 const previous = places.find((p) => p.id === trip.stops[index - 1]?.placeId);
-                const name = place?.name ?? t('Place no longer available');
+                const name = place?.name ?? t('This place is no longer listed');
                 return (
                   <li key={stop.placeId} className="rounded-2xl border border-slate-200 p-4">
                     <div className="flex flex-wrap justify-between gap-2">
@@ -342,7 +342,7 @@ export function DayPlanner({
                 </p>
                 {summary.missing && (
                   <p className="text-sm text-amber-800">
-                    {t('Some stops are unavailable. Their travel time is not included.')}
+                    {t('Some stops are no longer listed. Their travel time is not included.')}
                   </p>
                 )}
               </div>
