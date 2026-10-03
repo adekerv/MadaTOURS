@@ -102,6 +102,34 @@ test('Laravel API: immediate signup, ownership, roles, recovery, logout, validat
     await call('/favorites', 'POST', { placeId: added.body.id }, 'bob');
     assert.equal((await call(`/places/${added.body.id}`, 'DELETE')).status, 200);
     assert.equal((await call('/favorites', 'GET', undefined, 'bob')).body.length, 0);
+    // A place closed after it was saved is hidden everywhere, yet stays visible as a placeholder in saved lists.
+    const closing = await call('/places', 'POST', {
+      name: 'Closing place',
+      type: 'activity',
+      lat: 14.7,
+      lng: -61,
+      location: 'Test',
+      description: 'Closing place',
+    });
+    await call('/favorites', 'POST', { placeId: closing.body.id }, 'bob');
+    await app.db.exec(
+      `SELECT mt_set_listing_status(${closing.body.id},'closed','Test closure.','https://example.test/closed','2026-10-02')`,
+    );
+    assert.ok(
+      !(await call('/places')).body.some((place: { id: number }) => place.id === closing.body.id),
+    );
+    assert.deepEqual((await call('/favorites', 'GET', undefined, 'bob')).body, [
+      { id: closing.body.id, unlisted: true },
+    ]);
+    assert.equal(
+      (await call('/favorites', 'POST', { placeId: closing.body.id }, 'alice')).status,
+      404,
+    );
+    assert.equal(
+      (await call(`/favorites?placeId=${closing.body.id}`, 'DELETE', undefined, 'bob')).status,
+      200,
+    );
+    assert.equal((await call('/favorites', 'GET', undefined, 'bob')).body.length, 0);
     await call('/auth/forgot-password', 'POST', { email: 'bob@example.test' }, 'bob');
     assert.equal(
       (

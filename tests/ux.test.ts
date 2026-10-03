@@ -118,7 +118,13 @@ test('reviewed description corrections are repeatable and never overwrite a newe
     ...update.before,
   }));
   assert.equal(planImport(batch, before, {}).updates.length, 6);
-  assert.equal(planImport(batch, seed, {}).updates.length, 0);
+  // Once applied, the same batch plans nothing. (The seed has since moved on to newer source-based
+  // descriptions, so this checks the corrected values themselves rather than the current seed.)
+  const applied = before.map((row) => ({
+    ...row,
+    ...batch.updates.find((update) => update.id === row.id)!.after,
+  }));
+  assert.equal(planImport(batch, applied, {}).updates.length, 0);
   assert.throws(
     () =>
       planImport(

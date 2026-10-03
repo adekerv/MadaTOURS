@@ -108,12 +108,22 @@ for (const language of ['en', 'fr'] as const)
           exact: true,
         })
         .click();
+      const dialog = page.getByRole('dialog');
       await expect(
-        page.getByRole('dialog').getByText(t('Hours unavailable'), { exact: true }),
+        dialog.getByText(t('Check with the venue for current hours'), { exact: true }),
       ).toBeVisible();
+      await expect(dialog.getByRole('link', { name: t('Directions') })).toHaveAttribute(
+        'href',
+        /google.com\/maps/,
+      );
+      // One rating prompt and no empty headings on a place nobody has reviewed yet.
       await expect(
-        page.getByRole('link', { name: t('Be the first to rate'), exact: true }),
-      ).toHaveAttribute('href', /google.com\/maps\/search/);
+        dialog.getByText(
+          t('No reviews or comments yet. Be the first to share how your visit went.'),
+        ),
+      ).toBeVisible();
+      await expect(dialog.getByRole('button', { name: t('Sign in'), exact: true })).toHaveCount(1);
+      await expect(dialog.getByRole('heading', { name: t('Comments') })).toHaveCount(0);
       await page.screenshot({
         animations: 'disabled',
         path: `test-results/ux-${test.info().project.name}-${language}-${width}-details.png`,

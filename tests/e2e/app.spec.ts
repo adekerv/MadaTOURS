@@ -53,6 +53,8 @@ test('expanded catalogue paginates, filters by town and experience, and translat
   await expect(sidebar.getByRole('article')).toHaveCount(1);
   await sidebar.getByRole('button', { name: 'Details for Le Cèdre', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('Lebanese');
+  // Sources are compact: one line until opened.
+  await page.getByRole('dialog').getByText('Sources and updates').click();
   await expect(
     page
       .getByRole('dialog')
@@ -106,7 +108,7 @@ test('home, list, map, and details fit phone, tablet, landscape, and desktop vie
     expect(bounds!.height).toBeLessThanOrEqual(height);
     await dialog.getByRole('button', { name: 'Close Jardin de Balata' }).click();
     if (width < 768) await page.getByRole('button', { name: 'Map', exact: true }).click();
-    await expect(page.locator('.leaflet-container')).toBeVisible();
+    await expect(page.locator('.explore-map .leaflet-container')).toBeVisible();
     await noOverflow(page);
     await page.screenshot({ path: `test-results/${test.info().project.name}-${width}.png` });
   }
