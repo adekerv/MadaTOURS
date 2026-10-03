@@ -476,7 +476,8 @@
       }
     ],
     "access": "restricted",
-    "published": true
+    "published": true,
+    "listing_status": "needs_review"
   },
   {
     "id": 8,
