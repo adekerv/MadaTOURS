@@ -15,3 +15,4 @@ bootstrap/cache
 storage
 composer.lock
 *.blade.php
+tests/fixtures/

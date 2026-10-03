@@ -796,3 +796,153 @@ summary {
     transform: translateY(14px);
   }
 }
+
+/* Still map on a place's detail page. */
+.detail-map {
+  height: 11rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--line, #e2e8f0);
+  background: #e8eef0;
+  isolation: isolate;
+}
+@media (min-width: 640px) {
+  .detail-map {
+    height: 13rem;
+  }
+}
+.detail-map-dot {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  background: #c2410c;
+  box-shadow:
+    0 0 0 6px #c2410c33,
+    0 2px 8px #0f172a66;
+}
+
+/* Homepage coastline: a thin brand-coloured outline, large and cropped, never competing with the headline. */
+:root {
+  --coast: #ea580c;
+  --coast-opacity: 0.24;
+}
+.dark {
+  --coast: #fb923c;
+  --coast-opacity: 0.22;
+}
+.coast-art {
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+}
+.coast-art svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 185%;
+  width: auto;
+  transform: translate(-46%, -50%);
+  fill: none;
+  stroke: var(--coast);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: var(--coast-opacity);
+}
+@media (min-width: 1024px) {
+  .coast-art svg {
+    height: 210%;
+    transform: translate(-30%, -48%);
+  }
+}
+.coast-line {
+  stroke-width: 1;
+}
+.coast-route {
+  stroke-width: 0.8;
+  stroke-dasharray: 0.5 4;
+}
+.coast-halo {
+  stroke-width: 0.6;
+  opacity: 0.6;
+}
+.coast-dot {
+  fill: var(--coast);
+  stroke: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .coast-line {
+    stroke-dasharray: 1;
+    animation: coast-draw 3s cubic-bezier(0.45, 0, 0.2, 1) both;
+  }
+  .coast-extras {
+    animation: coast-fade 1.2s ease-out 1.8s both;
+  }
+}
+@keyframes coast-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes coast-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Header actions: quiet text links on desktop, a swipeable chip row on phones. */
+.header-link {
+  flex: none;
+  min-height: 44px;
+  padding: 0 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+.header-link:hover:not(:disabled) {
+  background: #fff1e6;
+  color: #9a3412;
+}
+.header-link:disabled {
+  opacity: 0.55;
+}
+.header-link-accent {
+  border-color: #c2410c;
+  color: #9a3412;
+}
+@media (min-width: 1280px) {
+  .header-link {
+    border-color: transparent;
+  }
+  .header-link-accent {
+    border-color: #fdba74;
+  }
+}
+.dark .header-link:hover:not(:disabled) {
+  background: #39291d;
+  color: #ffb987;
+}
+.dark .header-link-accent {
+  border-color: #795035;
+  color: #ffb987;
+}
+
+/* A soft warm glow behind the hero that stays quiet in dark mode, so text keeps its contrast. */
+.hero-glow {
+  background: #ffedd566;
+}
+.dark .hero-glow {
+  background: #ea580c14;
+}

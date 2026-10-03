@@ -34,3 +34,4 @@ android/local.properties
 /storage/framework/views/*
 /.phpunit.cache/
 /.phpunit.result.cache
+reports/listing-audit-*.json
