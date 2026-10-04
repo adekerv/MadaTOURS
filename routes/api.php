@@ -11,6 +11,7 @@ use App\Http\Controllers\ReviewPhotoController;
 use App\Http\Controllers\SavedPlaceController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\TourController;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Session\Middleware\StartSession;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::withoutMiddleware([EncryptCookies::class, AddQueuedCookiesToResponse::class, StartSession::class])->group(function () {
     Route::get('health', HealthController::class);
     Route::get('places', [PlaceController::class, 'index']);
+    Route::get('tours', [TourController::class, 'index']);
     Route::get('daily-picks', [EnrichmentController::class, 'picks']);
     Route::get('places/{place}/community', [CommunityController::class, 'show']);
     // Vercel Cron calls with GET; the GitHub workflow uses POST. Both need the secret.
@@ -55,6 +57,11 @@ Route::middleware('auth:supabase')->group(function () {
     Route::get('account/recovery-codes', [AccountController::class, 'recoveryStatus'])->block(90, 15);
     Route::post('account/recovery-codes', [AccountController::class, 'recoveryCodes'])->block(90, 15);
     Route::delete('account', [AccountController::class, 'destroy'])->block(90, 15);
+    Route::get('moderation/tours', [TourController::class, 'manage'])->block(90, 15);
+    Route::post('tours', [TourController::class, 'store'])->block(90, 15);
+    Route::post('tours/{id}', [TourController::class, 'update'])->block(90, 15);
+    Route::post('tours/{id}/route', [TourController::class, 'recalculate'])->block(90, 15);
+    Route::delete('tours/{id}', [TourController::class, 'destroy'])->block(90, 15);
     Route::post('places', [PlaceController::class, 'store'])->block(90, 15);
     Route::delete('places/{id}', [PlaceController::class, 'destroy'])->block(90, 15);
     Route::controller(SavedPlaceController::class)->where(['collection' => 'favorites|revisits'])->group(function () {

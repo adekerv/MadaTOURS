@@ -23,6 +23,7 @@ class ExportDatabase extends Command
         $sql .= file_get_contents(database_path('schema/listing.sql'))."\n";
         $sql .= file_get_contents(database_path('schema/review-photos.sql'))."\n";
         $sql .= file_get_contents(database_path('schema/recovery.sql'))."\n";
+        $sql .= file_get_contents(database_path('schema/tours.sql'))."\n";
         $sql .= $seed->sql()."\nCOMMIT;\n";
         file_put_contents(base_path('supabase/setup.sql'), $sql);
         $this->info('Generated supabase/setup.sql. No remote changes were made.');
