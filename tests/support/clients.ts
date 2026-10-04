@@ -242,6 +242,7 @@ export function testClients(db: PGlite) {
             'mt_submission_photos',
             'mt_review_photos',
             'mt_recovery_codes',
+            'mt_tours',
             'mt_photo_deletions',
             'mt_notifications',
             'mt_source_settings',
@@ -275,6 +276,10 @@ export function testClients(db: PGlite) {
           },
           like: (column: string, value: unknown) => {
             filters.push([column, value, 'LIKE']);
+            return query;
+          },
+          in: (column: string, values: unknown[]) => {
+            filters.push([column, values.map(String), 'IN']);
             return query;
           },
           order: (column: string, options?: { ascending?: boolean }) => {
@@ -319,7 +324,9 @@ export function testClients(db: PGlite) {
               const where = filters
                 .map(([col, value, operator]) => {
                   args.push(value);
-                  return `${id(col)} ${operator} $${args.length}`;
+                  return operator === 'IN'
+                    ? `${id(col)}::text = ANY($${args.length}::text[])`
+                    : `${id(col)} ${operator} $${args.length}`;
                 })
                 .join(' AND ');
               let statement = '';
@@ -333,7 +340,9 @@ export function testClients(db: PGlite) {
                 statement = `INSERT INTO public.${table} (${entries.map(([k]) => id(k)).join(',')}) VALUES (${args.map((_, i) => `$${i + 1}`).join(',')}) ${ignore ? 'ON CONFLICT DO NOTHING' : ''} RETURNING *`;
               } else if (op === 'update') {
                 const assignments = Object.entries(body ?? {}).map(([k, v]) => {
-                  args.push(v);
+                  args.push(
+                    Array.isArray(v) || (v && typeof v === 'object') ? JSON.stringify(v) : v,
+                  );
                   return `${id(k)}=$${args.length}`;
                 });
                 statement = `UPDATE public.${table} SET ${assignments.join(',')}${where ? ' WHERE ' + where : ''} RETURNING *`;

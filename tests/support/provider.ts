@@ -2,8 +2,22 @@ import { randomUUID } from 'node:crypto';
 import { createServer } from 'node:http';
 import { testClients } from './clients';
 
+/** A stand-in for OpenRouteService: a road line that bends between the stops, so it can never pass for a straight one. */
+function roadBetween(coordinates: [number, number][]) {
+  const line: [number, number][] = [];
+  coordinates.forEach((point, index) => {
+    if (index) {
+      const [fromLng, fromLat] = coordinates[index - 1];
+      line.push([(fromLng + point[0]) / 2 + 0.004, (fromLat + point[1]) / 2 - 0.004]);
+    }
+    line.push(point);
+  });
+  return line;
+}
 export function createProvider(fixture: ReturnType<typeof testClients>) {
   const photos = new Map<string, Buffer>();
+  // 'ok' answers with a road, 'fail' with a server error, 'garbage' with something that is not a route.
+  const ors = { mode: 'ok', requests: [] as { authorization?: string; coordinates: unknown }[] };
   const signed = new Map<string, { path: string; expires: number }>();
   return createServer(async (req, res) => {
     try {
@@ -67,6 +81,49 @@ export function createProvider(fixture: ReturnType<typeof testClients>) {
           return;
         }
         res.writeHead(404).end('{}');
+        return;
+      }
+      if (url.pathname.startsWith('/v2/directions/')) {
+        ors.requests.push({
+          authorization: req.headers.authorization,
+          coordinates: body.coordinates,
+        });
+        if (req.headers.authorization !== 'test-ors-key') {
+          res.writeHead(403).end('{"error":{"code":2010}}');
+        } else if (ors.mode === 'fail') {
+          res.writeHead(500).end('{"error":{"code":500}}');
+        } else if (ors.mode === 'garbage') {
+          res.end('{"features":[]}');
+        } else {
+          const line = roadBetween(body.coordinates);
+          res.end(
+            JSON.stringify({
+              type: 'FeatureCollection',
+              features: [
+                {
+                  type: 'Feature',
+                  properties: { summary: { distance: 1000 * line.length + 0.4, duration: 600 } },
+                  geometry: { type: 'LineString', coordinates: line },
+                },
+              ],
+            }),
+          );
+        }
+        return;
+      }
+      if (url.pathname === '/__test/ors') {
+        if (
+          !process.env.MADATOURS_E2E_TOKEN ||
+          req.headers['x-test-token'] !== process.env.MADATOURS_E2E_TOKEN
+        ) {
+          res.writeHead(403).end('{}');
+          return;
+        }
+        if (req.method === 'POST') {
+          ors.mode = String(body.mode ?? 'ok');
+          if (body.reset) ors.requests.length = 0;
+        }
+        res.end(JSON.stringify(ors));
         return;
       }
       if (url.pathname === '/__test/admin' || url.pathname === '/__test/verify') {
@@ -146,6 +203,8 @@ export function createProvider(fixture: ReturnType<typeof testClients>) {
           else query = client.from(table).select(url.searchParams.get('select') || '*');
           for (const [key, value] of url.searchParams) {
             if (value.startsWith('eq.')) query = query.eq(key, value.slice(3));
+            else if (value.startsWith('in.(') && value.endsWith(')'))
+              query = query.in(key, value.slice(4, -1).split(','));
             else if (value.startsWith('like.'))
               query = query.like(key, value.slice(5).replaceAll('*', '%'));
           }

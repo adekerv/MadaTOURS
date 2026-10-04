@@ -56,6 +56,10 @@ export async function startLaravel(port = 0, providerPort = 0) {
         AUTH_ATTEMPTS_PER_IP: '100',
         // Eight codes are hashed at every signup; the lowest bcrypt cost keeps the suite quick.
         RECOVERY_CODE_COST: '4',
+        // Road routes come from a stand-in served by the same test provider.
+        ORS_API_KEY: 'test-ors-key',
+        ORS_BASE_URL: `http://127.0.0.1:${address.port}`,
+        ORS_DELAY_MS: '0',
         // E2E_SESSION_DRIVER=cookie reproduces the Vercel configuration (api/index.php).
         SESSION_DRIVER: process.env.E2E_SESSION_DRIVER === 'cookie' ? 'cookie' : 'file',
         SESSION_ENCRYPT: process.env.E2E_SESSION_DRIVER === 'cookie' ? 'false' : 'true',
