@@ -76,6 +76,20 @@ function TourDialog({
             : t(
                 'Stops are joined by straight lines in your visiting order. Check directions for road routes.',
               )}
+          {road && (
+            <>
+              {' '}
+              {/* The attribution openrouteservice asks for wherever its routes are shown. */}
+              <a
+                href="https://openrouteservice.org/"
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                © openrouteservice.org by HeiGIT | Map data © OpenStreetMap contributors
+              </a>
+            </>
+          )}
         </p>
         <ol className="space-y-2">
           {tour.stops.map((stop, index) => {

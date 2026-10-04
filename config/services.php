@@ -31,7 +31,7 @@ return [
     // Road routes between a tour's stops. Without a key the app keeps drawing straight lines.
     'openrouteservice' => [
         'key' => env('ORS_API_KEY'),
-        'url' => rtrim((string) env('ORS_BASE_URL', 'https://api.openrouteservice.org'), '/'),
+        'url' => rtrim((string) env('ORS_BASE_URL', 'https://api.heigit.org/openrouteservice'), '/'),
         'timeout' => (int) env('ORS_TIMEOUT', 10),
         // Pause between requests when routes are worked out in bulk, to stay under the free plan's per-minute limit.
         'delay_ms' => (int) env('ORS_DELAY_MS', 1600),

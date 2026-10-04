@@ -78,8 +78,12 @@ async function createTourByApi(page: Page, name: string) {
 async function openTour(page: Page, name: string) {
   await page.goto('/');
   await page.getByRole('heading', { name: 'Island tours' }).scrollIntoViewIfNeeded();
-  await page.getByRole('button', { name: new RegExp(name) }).click();
-  await expect(page.getByRole('dialog').locator('.route-pin')).toHaveCount(2);
+  // The list settles as the page finishes loading; if a tap lands too early the dialog does not open, so tap again.
+  await expect(async () => {
+    if (!(await page.getByRole('dialog').isVisible()))
+      await page.getByRole('button', { name: new RegExp(name) }).click({ timeout: 3000 });
+    await expect(page.getByRole('dialog').locator('.route-pin')).toHaveCount(2, { timeout: 3000 });
+  }).toPass({ timeout: 20000 });
 }
 /** The map credit wraps to two lines on a narrow phone; it must never sit on top of a pin. */
 const creditCoversNoPin = (dialog: Locator) =>

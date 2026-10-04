@@ -32,3 +32,7 @@ Browser tests never reach OpenFreeMap. `tests/e2e/support/map.ts` serves a fixtu
 repository's own OpenStreetMap coastline (`resources/js/lib/martinique-coast.ts`, which also draws the homepage art):
 the outline is turned back into longitude and latitude and drawn as land on a sea background, so screenshots show
 Martinique. `stubMap(page)` installs it; `countColors` lets a test prove a map really drew.
+
+## Routes
+
+Route lines, arrows and tablet gestures are described in [tours and road routes](TOURS.md).

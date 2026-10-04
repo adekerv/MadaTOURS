@@ -58,6 +58,15 @@ export function SiteFooter({ onSignup }: { onSignup?: () => void }) {
         >
           OpenStreetMap
         </a>
+        <span aria-hidden="true">·</span>
+        <a
+          className="inline-flex min-h-11 items-center underline"
+          href="https://openrouteservice.org/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          openrouteservice
+        </a>
         <a className="inline-flex min-h-11 items-center underline" href="#about">
           {t('Photo credits')}
         </a>

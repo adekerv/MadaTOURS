@@ -74,4 +74,4 @@ Deploy Laravel to a PHP host or use the included Dockerfile. The document root i
 
 Keep `VITE_API_URL` empty for the website. Native builds use `dist/mobile` and the deployed Laravel HTTPS origin; see [mobile guide](docs/MOBILE.md). Native signing and store submission are separate release steps.
 
-Additional guides: [accounts without email](docs/ACCOUNTS-WITHOUT-EMAIL.md), [source facts and listing audit](docs/SOURCES-AND-AUDIT.md), [catalogue research](docs/CATALOGUE-RESEARCH.md), [content and photo credits](docs/CONTENT.md), [class demonstration](docs/CLASS-DEMO.md), [verification](docs/VERIFICATION.md).
+Additional guides: [accounts without email](docs/ACCOUNTS-WITHOUT-EMAIL.md), [maps](docs/MAPS.md), [tours and road routes](docs/TOURS.md), [source facts and listing audit](docs/SOURCES-AND-AUDIT.md), [catalogue research](docs/CATALOGUE-RESEARCH.md), [content and photo credits](docs/CONTENT.md), [class demonstration](docs/CLASS-DEMO.md), [verification](docs/VERIFICATION.md).
