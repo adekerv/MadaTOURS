@@ -840,6 +840,24 @@ summary {
     height: 20rem;
   }
 }
+/* Tablets: one finger scrolls the page past the map, two fingers move it. This tells people so. */
+.map-gesture-hint {
+  position: absolute;
+  z-index: 500;
+  bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 2rem);
+  margin: 0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: #0f172ae6;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  pointer-events: none;
+}
 .route-start-badge {
   position: absolute;
   z-index: 500;

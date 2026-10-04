@@ -93,7 +93,7 @@ export async function startLaravel(port = 0, providerPort = 0) {
       if (php.exitCode !== null) throw new Error(`Laravel exited: ${errors}`);
       try {
         if ((await fetch(`${origin}/up`, { signal: AbortSignal.timeout(1000) })).ok)
-          return { origin, fixture, db, close };
+          return { origin, providerOrigin: `http://127.0.0.1:${address.port}`, fixture, db, close };
       } catch {
         /* Wait for PHP to bind its socket. */
       }

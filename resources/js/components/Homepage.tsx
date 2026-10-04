@@ -1,4 +1,5 @@
 import { MustGo } from './home/MustGo';
+import { Tours } from './home/Tours';
 import { useI18n } from '../i18n/I18nProvider';
 import {
   Compass,
@@ -442,6 +443,7 @@ export function Homepage({
           </section>
         )}
       </main>
+      <Tours places={places} />
       <MustGo places={places} catalogueLoading={catalogueLoading} />
       <SiteFooter onSignup={user ? undefined : onSignup} />
     </div>

@@ -7,6 +7,7 @@ import { normalizePlace } from '../../lib/places-utils';
 import { EnrichmentModeration } from './EnrichmentModeration';
 import { SubmissionModeration } from './SubmissionModeration';
 import { CommunityModeration } from './CommunityModeration';
+import { TourManager } from './TourManager';
 import { Modal } from '../ui/Modal';
 const emptyForm = {
   name: '',
@@ -136,6 +137,12 @@ export function AdminDashboard({
             {t('Sources and Google matching')}
           </summary>
           <EnrichmentModeration places={places} onChanged={onRefreshPlaces} />
+        </details>
+        <details className="rounded-2xl border border-slate-200 p-4">
+          <summary className="flex min-h-11 cursor-pointer items-center font-semibold">
+            {t('Tours')}
+          </summary>
+          <TourManager places={places} />
         </details>
         <section>
           <h3 className="mb-4 flex items-center gap-2 text-xl font-bold">

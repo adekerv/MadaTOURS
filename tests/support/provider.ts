@@ -8,7 +8,7 @@ function roadBetween(coordinates: [number, number][]) {
   coordinates.forEach((point, index) => {
     if (index) {
       const [fromLng, fromLat] = coordinates[index - 1];
-      line.push([(fromLng + point[0]) / 2 + 0.004, (fromLat + point[1]) / 2 - 0.004]);
+      line.push([(fromLng + point[0]) / 2 + 0.02, (fromLat + point[1]) / 2 - 0.02]);
     }
     line.push(point);
   });
