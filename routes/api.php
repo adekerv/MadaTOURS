@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::withoutMiddleware([EncryptCookies::class, AddQueuedCookiesToResponse::class, StartSession::class])->group(function () {
     Route::get('health', HealthController::class);
     Route::get('places', [PlaceController::class, 'index']);
+    Route::get('places/{place}', [PlaceController::class, 'show'])->whereNumber('place');
     Route::get('tours', [TourController::class, 'index']);
     Route::get('daily-picks', [EnrichmentController::class, 'picks']);
     Route::get('places/{place}/community', [CommunityController::class, 'show']);

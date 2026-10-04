@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\ApiException;
+use App\Http\Middleware\ApiLocale;
 use App\Http\Middleware\ApiSecurity;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -38,7 +39,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(null);
         $middleware->remove(HandleCors::class);
         $middleware->prepend(ApiSecurity::class);
-        $middleware->api(append: [
+        $middleware->api(prepend: [ApiLocale::class], append: [
             EncryptCookies::class,
             AddQueuedCookiesToResponse::class,
             StartSession::class,
@@ -61,7 +62,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 return response()->json(['error' => 'Please sign in to continue.'], 401);
             }
             if ($error instanceof AuthorizationException) {
-                return response()->json(['error' => 'Only administrators can manage places.'], 403);
+                return response()->json(['error' => 'Only administrators can do this.'], 403);
             }
             if ($error instanceof ValidationException) {
                 return response()->json(['error' => collect($error->errors())->flatten()->first() ?? 'Invalid request.'], 400);

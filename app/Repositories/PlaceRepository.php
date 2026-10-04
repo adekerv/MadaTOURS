@@ -23,6 +23,12 @@ class PlaceRepository
         return $places;
     }
 
+    /** One published place, in full, or null when it does not exist or is hidden. */
+    public function find(int $id): ?array
+    {
+        return $this->client->request('GET', '/rest/v1/mt_places', ['select' => '*', 'id' => 'eq.'.$id, 'published' => 'eq.true', 'limit' => 1])[0] ?? null;
+    }
+
     public function create(array $input, string $token): array
     {
         return $this->client->request('POST', '/rest/v1/mt_places', $input + ['tags' => []], $token, headers: ['Prefer' => 'return=representation'])[0];

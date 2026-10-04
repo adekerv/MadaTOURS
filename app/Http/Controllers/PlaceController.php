@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ApiException;
 use App\Http\Requests\NearbyPlacesRequest;
 use App\Http\Requests\StorePlaceRequest;
 use App\Http\Resources\PlaceResource;
+use App\Http\Resources\PlaceSummaryResource;
 use App\Repositories\PlaceRepository;
 use App\Services\PlaceSearch;
 use App\Services\Supabase\AuthService;
@@ -24,7 +26,22 @@ class PlaceController extends Controller
             $places = $search->nearby($places, (float) $nearby['lat'], (float) $nearby['lng'], (float) ($nearby['radius'] ?? 50));
         }
 
-        return response()->json(PlaceResource::collection($places)->resolve());
+        // The list leaves out the heavy details and sources; ?full=1 keeps them for the admin panel.
+        $resource = $request->boolean('full') ? PlaceResource::class : PlaceSummaryResource::class;
+
+        return response()->json($resource::collection($places)->resolve());
+    }
+
+    /** One place with everything, for the place page. */
+    public function show(string $place): JsonResponse
+    {
+        validator(['id' => $place], ['id' => ['required', 'integer', 'min:1', 'max:9007199254740991']])->validate();
+        $row = $this->places->find((int) $place);
+        if (! $row) {
+            throw new ApiException(404, 'This place could not be found.');
+        }
+
+        return response()->json((new PlaceResource($row))->resolve());
     }
 
     public function store(StorePlaceRequest $request, AuthService $auth): JsonResponse
