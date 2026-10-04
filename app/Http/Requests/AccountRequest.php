@@ -36,6 +36,9 @@ class AccountRequest extends FormRequest
                 'email' => ['required', 'string', 'email:rfc', 'max:254'],
                 'password' => ['required', 'string', 'max:128'],
             ],
+            'recoveryCodes' => [
+                'password' => ['required', 'string', 'max:128'],
+            ],
             'destroy' => [
                 'password' => [Rule::requiredIf(fn () => $this->user()->hasPassword !== false), 'nullable', 'string', 'max:128'],
                 'confirmation' => ['required', 'string', 'max:254', fn ($attribute, $value, $fail) => strcasecmp($value, $this->user()->email) === 0 || $fail('Type your email address exactly to confirm.')],

@@ -16,8 +16,8 @@ class AuthRequest extends FormRequest
         if (is_string($this->input('email'))) {
             $this->merge(['email' => strtolower(trim($this->input('email')))]);
         }
-        if (is_string($this->input('token'))) {
-            $this->merge(['token' => trim($this->input('token'))]);
+        if (is_string($this->input('code'))) {
+            $this->merge(['code' => trim($this->input('code'))]);
         }
         if (is_string($this->input('name'))) {
             $this->merge(['name' => trim($this->input('name'))]);
@@ -32,13 +32,21 @@ class AuthRequest extends FormRequest
             $rules['name'] = ['required', 'string', 'min:1', 'max:80', 'not_regex:/[\p{C}<>]/u'];
             $rules['language'] = ['sometimes', 'in:en,fr'];
         }
-        if (in_array($action, ['register', 'login', 'resetPassword'])) {
-            $rules['password'] = ['required', 'string', 'min:'.($action === 'login' ? 1 : 12), 'max:128'];
+        if ($action === 'recover') {
+            $rules['code'] = ['required', 'string', 'regex:/^[A-Za-z0-9 -]{10,24}$/'];
         }
-        if (in_array($action, ['verify', 'resetPassword'])) {
-            $rules['token'] = ['required', 'string', 'regex:/^[0-9]{6,10}$/'];
+        if (in_array($action, ['register', 'login', 'recover'])) {
+            $rules['password'] = ['required', 'string', 'min:'.($action === 'login' ? 1 : 12), 'max:128'];
         }
 
         return $rules;
+    }
+
+    public function messages(): array
+    {
+        return [
+            'code.required' => 'Enter one of your recovery codes.',
+            'code.regex' => 'Enter a recovery code exactly as you saved it, for example K7QM2-WX4TP.',
+        ];
     }
 }

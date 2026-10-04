@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
 use App\Http\Requests\AccountRequest;
+use App\Services\RecoveryCodes;
 use App\Services\SubmissionPhotos;
 use App\Services\Supabase\AuthService;
 use App\Services\Supabase\SupabaseClient;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AccountController extends Controller
 {
@@ -28,9 +30,9 @@ class AccountController extends Controller
     }
 
     /**
-     * The new address is usable immediately but starts unverified, so verified-only features
-     * stay locked until its owner confirms a code. The flag is cleared before the address
-     * changes: a failure in between leaves the account unverified, never wrongly verified.
+     * The address changes at once, with no email in the way: the current password is the proof. An address nobody
+     * has checked can never count as verified, so a verified account loses that status. The database clears the
+     * flag in the same step as the change (see recovery.sql); the response says so, so the person sees why meet-ups pause.
      */
     public function email(AccountRequest $request): JsonResponse
     {
@@ -45,17 +47,30 @@ class AccountController extends Controller
         $this->auth->limit('email-change', $user->id);
         $this->confirmPassword($user, $input['password']);
 
-        $path = rawurlencode($user->id);
-        $this->client->request('PATCH', '/rest/v1/mt_profiles?id=eq.'.$path, ['email_verified_at' => null], admin: true);
-        $this->client->request('PUT', '/auth/v1/admin/users/'.$path, ['email' => $input['email'], 'email_confirm' => true], admin: true);
-        try {
-            $this->client->request('POST', '/auth/v1/otp', ['email' => $input['email'], 'create_user' => false]);
-            $sent = true;
-        } catch (ApiException) {
-            $sent = false;
-        }
+        $wasVerified = $user->emailVerified === true;
+        $this->client->request('PUT', '/auth/v1/admin/users/'.rawurlencode($user->id), ['email' => $input['email'], 'email_confirm' => true], admin: true);
 
-        return response()->json(['user' => $this->auth->user(), 'verificationSent' => $sent]);
+        return response()->json(['user' => $this->auth->user(), 'verificationLost' => $wasVerified]);
+    }
+
+    public function recoveryStatus(Request $request, RecoveryCodes $codes): JsonResponse
+    {
+        $user = $request->user();
+
+        return response()->json(['remaining' => $user->hasPassword === false ? 0 : $codes->remaining($user->id), 'total' => RecoveryCodes::COUNT]);
+    }
+
+    /** Issues a fresh set of codes, which replaces the old ones. The codes are shown once, in this response. */
+    public function recoveryCodes(AccountRequest $request, RecoveryCodes $codes): JsonResponse
+    {
+        $user = $request->user();
+        if ($user->hasPassword === false) {
+            throw new ApiException(409, 'Recovery codes are for accounts with a password. You sign in with Google.');
+        }
+        $this->auth->limit('recovery-codes', $user->id);
+        $this->confirmPassword($user, $request->validated()['password']);
+
+        return response()->json(['codes' => $codes->replace($user->id)]);
     }
 
     public function destroy(AccountRequest $request, SubmissionPhotos $photos): JsonResponse

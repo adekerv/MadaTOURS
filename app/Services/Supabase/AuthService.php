@@ -103,9 +103,9 @@ class AuthService
         $this->request->session()->regenerateToken();
     }
 
-    public function limit(string $kind, string $identity): void
+    public function limit(string $kind, string $identity, int $identityCeiling = 10): void
     {
-        foreach ([[$kind.':ip:'.$this->request->ip(), config('supabase.auth_attempts_per_ip')], [$kind.':identity:'.$identity, 10]] as [$identifier, $ceiling]) {
+        foreach ([[$kind.':ip:'.$this->request->ip(), config('supabase.auth_attempts_per_ip')], [$kind.':identity:'.$identity, $identityCeiling]] as [$identifier, $ceiling]) {
             $allowed = $this->client->request('POST', '/rest/v1/rpc/mt_check_rate_limit', ['identifier' => hash('sha256', $identifier), 'ceiling' => $ceiling], admin: true);
             if ($allowed !== true) {
                 throw new ApiException(429, 'Too many attempts. Please try again in 15 minutes.');

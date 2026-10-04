@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
 use App\Http\Requests\AuthRequest;
+use App\Services\RecoveryCodes;
 use App\Services\Supabase\AuthService;
 use App\Services\Supabase\SupabaseClient;
 use App\Services\WelcomeMessage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -104,7 +106,7 @@ class AuthController extends Controller
         return redirect()->away($this->origin().'/?'.($error ? 'auth_error='.$error : 'signed_in=google'));
     }
 
-    public function register(AuthRequest $request, WelcomeMessage $welcome): JsonResponse
+    public function register(AuthRequest $request, WelcomeMessage $welcome, RecoveryCodes $recovery): JsonResponse
     {
         $input = $request->validated();
         $this->auth->limit('auth', $input['email']);
@@ -114,11 +116,21 @@ class AuthController extends Controller
             'data' => ['display_name' => $input['name'], 'language' => $input['language'] ?? 'en'],
         ]);
         $user = isset($data['access_token']) ? $this->auth->user() : null;
-        if ($user && $user['email']) {
-            $welcome->send($user, $input['language'] ?? 'en');
+        $codes = [];
+        if ($user) {
+            if ($user['email']) {
+                $welcome->send($user, $input['language'] ?? 'en');
+            }
+            // The only way back into a password account without email. If this fails the account still works and
+            // the person can issue codes from their settings, so signup is not turned into an error.
+            try {
+                $codes = $recovery->replace($user['id']);
+            } catch (\Throwable) {
+                Log::warning('Recovery codes could not be issued at signup.');
+            }
         }
 
-        return response()->json(['user' => $user, 'verificationRequired' => $user === null], 201);
+        return response()->json(['user' => $user, 'verificationRequired' => $user === null] + ($codes ? ['recoveryCodes' => $codes] : []), 201);
     }
 
     public function login(AuthRequest $request): JsonResponse
@@ -130,51 +142,32 @@ class AuthController extends Controller
         return response()->json(['user' => $this->auth->user()]);
     }
 
-    public function verify(AuthRequest $request): JsonResponse
+    /**
+     * Resets a forgotten password with one of the account's recovery codes: no email is involved. A code is the only
+     * thing between a stranger and an account, so attempts are few and every failure reads the same.
+     */
+    public function recover(AuthRequest $request, RecoveryCodes $codes): JsonResponse
     {
         $input = $request->validated();
-        $this->auth->limit('verify', $input['email']);
-        $verified = $this->auth->authenticate('verify', $input + ['type' => 'email']);
-        if (empty($verified['access_token']) || empty($verified['refresh_token'])) {
-            throw new ApiException(502, 'The verification could not be completed. Please request a new code.');
+        $this->auth->limit('recover', $input['email'], 5);
+        $used = $codes->consume($input['email'], $input['code']);
+        if ($used === null) {
+            throw new ApiException(400, 'The email or recovery code is not valid.');
         }
-        $user = $this->auth->user();
-        if (strtolower($user['email']) !== strtolower($input['email'])) {
-            $this->auth->clear();
-            throw new ApiException(403, 'The verification does not match this account.');
-        }
-        $this->client->request('PATCH', '/rest/v1/mt_profiles?id=eq.'.rawurlencode($user['id']), ['email_verified_at' => now()->toIso8601String()], admin: true);
-
-        return response()->json(['user' => $this->auth->user()]);
-    }
-
-    public function resend(AuthRequest $request): JsonResponse
-    {
-        $input = $request->validated();
-        $this->auth->limit('email', $input['email']);
-        $this->client->request('POST', '/auth/v1/resend', $input + ['type' => 'signup']);
-
-        return response()->json(['success' => true]);
-    }
-
-    public function forgotPassword(AuthRequest $request): JsonResponse
-    {
-        $input = $request->validated();
-        $this->auth->limit('email', $input['email']);
-        $this->client->request('POST', '/auth/v1/recover', $input);
-
-        return response()->json(['success' => true]);
-    }
-
-    public function resetPassword(AuthRequest $request): JsonResponse
-    {
-        $input = $request->validated();
-        $this->auth->limit('verify', $input['email']);
-        $this->auth->authenticate('verify', ['email' => $input['email'], 'token' => $input['token'], 'type' => 'recovery']);
         try {
-            $this->client->request('PUT', '/auth/v1/user', ['password' => $input['password']], $this->auth->token());
-        } finally {
-            $this->auth->logout('global');
+            $this->client->request('PUT', '/auth/v1/admin/users/'.rawurlencode($used['userId']), ['password' => $input['password']], admin: true);
+        } catch (\Throwable $error) {
+            try {
+                $codes->restore($used['codeId']);
+            } catch (\Throwable) {
+                // The reset already failed; the person can use another code.
+            }
+            throw $error;
+        }
+        try {
+            $codes->revokeSessions($used['userId']);
+        } catch (\Throwable) {
+            Log::warning('Sessions could not be revoked after a password reset.');
         }
 
         return response()->json(['success' => true]);
