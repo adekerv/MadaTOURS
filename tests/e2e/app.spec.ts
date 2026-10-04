@@ -186,6 +186,10 @@ test('register, save, restore session, remove, and delete account from the UI', 
   await page.getByLabel('Password', { exact: true }).fill('Browser test password 42');
   await page.screenshot({ path: `test-results/${test.info().project.name}-signup.png` });
   await page.getByRole('button', { name: 'Create account', exact: true }).click();
+  // Signup hands over the recovery codes once; the window stays until they are saved.
+  await expect(page.getByRole('dialog').locator('[data-recovery-code]')).toHaveCount(8);
+  await page.getByLabel('I have saved these codes').check();
+  await page.getByRole('button', { name: 'Done', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(
     page.getByText('Thanks for signing up! Welcome, Camille.', { exact: true }),
@@ -356,27 +360,40 @@ test('French preference survives reload and planner edits persist on the device'
   ).toHaveCount(0);
 });
 
-test('password recovery accepts only a recovery code and signs in with the new password', async ({
+test('a forgotten password is reset with a recovery code, once, and the new password signs in', async ({
   page,
 }) => {
   const email = `recovery-${Date.now()}@example.test`;
-  await page.request.post('/api/auth/register', {
+  const signup = await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
     data: { name: 'Recovery user', email, password: 'Original password 42' },
   });
+  const codes: string[] = (await signup.json()).recoveryCodes;
+  expect(codes).toHaveLength(8);
   await page.request.post('/api/auth/logout', { headers: { 'X-MadaTours-Client': '1' } });
   await page.goto('/');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await page.getByRole('button', { name: 'Forgot password?', exact: true }).click();
+  // No email is promised anywhere on this screen.
+  await expect(page.getByRole('dialog')).not.toContainText(/inbox|we sent|sent to your email/i);
   await page.getByLabel('Email', { exact: true }).fill(email);
-  await page.getByRole('button', { name: 'Send recovery code', exact: true }).click();
-  await page.getByLabel('Email code', { exact: true }).fill('654321');
+  await page.getByLabel('Recovery code', { exact: true }).fill('ZZZZZ-ZZZZZ');
   await page.getByLabel('New password', { exact: true }).fill('Replacement password 42');
-  await page.getByRole('button', { name: 'Update password', exact: true }).click();
+  await page.getByRole('button', { name: 'Reset password', exact: true }).click();
+  await expect(page.getByRole('alert')).toHaveText('The email or recovery code is not valid.');
+  await page.getByLabel('Recovery code', { exact: true }).fill(codes[0].toLowerCase());
+  await page.getByRole('button', { name: 'Reset password', exact: true }).click();
   await expect(page.getByText('Password updated. Sign in with your new password.')).toBeVisible();
   await page.getByLabel('Password', { exact: true }).fill('Replacement password 42');
   await page.getByRole('dialog').getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  // The same code does nothing a second time.
+  await page.request.post('/api/auth/logout', { headers: { 'X-MadaTours-Client': '1' } });
+  const again = await page.request.post('/api/auth/recover', {
+    headers: { 'X-MadaTours-Client': '1' },
+    data: { email, code: codes[0], password: 'Third password 4242' },
+  });
+  expect(again.status()).toBe(400);
 });
 
 test('dense pins cluster, and cards, pins and layers stay in sync', async ({ page }) => {

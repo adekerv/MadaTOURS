@@ -50,12 +50,14 @@ test('Laravel API: immediate signup, ownership, roles, recovery, logout, validat
     assert.equal(signup.body.user.role, 'user');
     const aliceId = signup.body.user.id;
     assert.equal((await call('/auth/session')).body.user.id, aliceId);
-    await call(
+    const bobSignup = await call(
       '/auth/register',
       'POST',
       { name: 'Bob', email: 'bob@example.test', password: 'other test password' },
       'bob',
     );
+    const bobCodes: string[] = bobSignup.body.recoveryCodes;
+    assert.equal(bobCodes.length, 8);
     assert.equal(
       (await call('/favorites', 'POST', { placeId: 1, userId: 'someone-else' })).status,
       200,
@@ -130,30 +132,17 @@ test('Laravel API: immediate signup, ownership, roles, recovery, logout, validat
       200,
     );
     assert.equal((await call('/favorites', 'GET', undefined, 'bob')).body.length, 0);
-    await call('/auth/forgot-password', 'POST', { email: 'bob@example.test' }, 'bob');
-    assert.equal(
-      (
-        await call(
-          '/auth/reset-password',
-          'POST',
-          { email: 'bob@example.test', token: '123456', password: 'new very long password' },
-          'bob',
-        )
-      ).status,
-      400,
-    );
-    assert.equal(
-      (
-        await call(
-          '/auth/reset-password',
-          'POST',
-          { email: 'bob@example.test', token: '654321', password: 'new very long password' },
-          'bob',
-        )
-      ).status,
-      200,
-    );
-    assert.equal((await call('/auth/session', 'GET', undefined, 'bob')).body.user, null);
+    // Forgotten password: a wrong code fails, a real one works once, and no email is involved.
+    const reset = (code: string) =>
+      call(
+        '/auth/recover',
+        'POST',
+        { email: 'bob@example.test', code, password: 'new very long password' },
+        'bob',
+      );
+    assert.equal((await reset('ZZZZZ-ZZZZZ')).status, 400);
+    assert.equal((await reset(bobCodes[0])).status, 200);
+    assert.equal((await reset(bobCodes[0])).status, 400, 'a used code cannot be used again');
     assert.equal(
       (
         await call(

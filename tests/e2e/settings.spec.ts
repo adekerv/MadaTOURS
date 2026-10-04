@@ -61,6 +61,13 @@ for (const language of ['en', 'fr'] as const)
       ).toBeVisible();
       await fits(page);
 
+      const section = (heading: string) =>
+        page
+          .locator('section')
+          .filter({ has: page.getByRole('heading', { name: t(heading), level: 2 }) });
+      const emailSection = section('Email address');
+      const recoverySection = section('Account recovery');
+
       // Profile: saved to the account and still there after a reload.
       await page.getByLabel(t('Name'), { exact: true }).fill(newName);
       await page.getByRole('button', { name: t('Save changes'), exact: true }).click();
@@ -70,24 +77,50 @@ for (const language of ['en', 'fr'] as const)
       await expect(page.getByLabel(t('Name'), { exact: true })).toHaveValue(newName);
 
       // Email: a wrong password is refused with a readable message and changes nothing.
-      await page.getByLabel(t('New email address'), { exact: true }).fill(newEmail);
-      await page.getByLabel(t('Current password'), { exact: true }).fill('not the password');
-      await page.getByRole('button', { name: t('Change email'), exact: true }).click();
-      await expect(page.getByRole('alert')).toBeVisible();
+      await emailSection.getByLabel(t('New email address'), { exact: true }).fill(newEmail);
+      await emailSection
+        .getByLabel(t('Current password'), { exact: true })
+        .fill('not the password');
+      await emailSection.getByRole('button', { name: t('Change email'), exact: true }).click();
+      await expect(emailSection.getByRole('alert')).toBeVisible();
       await fits(page);
       expect((await session(page)).user?.email).toBe(user.email);
-      // The right password changes it; the new address is verified with the code sent to it.
-      await page.getByLabel(t('Current password'), { exact: true }).fill('a long test password');
-      await page.getByRole('button', { name: t('Change email'), exact: true }).click();
+      // The right password changes it straight away, and no email is mentioned or sent.
+      await emailSection
+        .getByLabel(t('Current password'), { exact: true })
+        .fill('a long test password');
+      await emailSection.getByRole('button', { name: t('Change email'), exact: true }).click();
       await expect(
-        page.getByText(
-          t('Email changed. Enter the code we sent to {email} to verify it.', { email: newEmail }),
-        ),
+        page.getByText(t('Your email address is now {email}.', { email: newEmail })),
       ).toBeVisible();
       expect((await session(page)).user).toMatchObject({ email: newEmail, emailVerified: false });
-      await page.getByLabel(t('Verification code'), { exact: true }).fill('123456');
-      await page.getByRole('button', { name: t('Verify email'), exact: true }).click();
-      await expect(page.getByText(t('Email verified'), { exact: true })).toBeVisible();
+      await expect(page.getByRole('main')).not.toContainText(/verification code|inbox|we sent/i);
+      await fits(page);
+
+      // Recovery codes: the count is shown, new codes need the password, and they are shown once.
+      await expect(
+        page.getByText(
+          t('{remaining} of {total} recovery codes left', { remaining: '8', total: '8' }),
+        ),
+      ).toBeVisible();
+      await recoverySection
+        .getByLabel(t('Current password'), { exact: true })
+        .fill('wrong password');
+      await recoverySection
+        .getByRole('button', { name: t('Create new recovery codes'), exact: true })
+        .click();
+      await expect(recoverySection.getByRole('alert')).toBeVisible();
+      await recoverySection
+        .getByLabel(t('Current password'), { exact: true })
+        .fill('a long test password');
+      await recoverySection
+        .getByRole('button', { name: t('Create new recovery codes'), exact: true })
+        .click();
+      await expect(page.locator('[data-recovery-code]')).toHaveCount(8);
+      await expect(page.getByRole('button', { name: t('Done'), exact: true })).toBeDisabled();
+      await page.getByLabel(t('I have saved these codes')).check();
+      await page.getByRole('button', { name: t('Done'), exact: true }).click();
+      await expect(page.locator('[data-recovery-code]')).toHaveCount(0);
       await fits(page);
 
       // Delete: the button stays disabled until the exact email is typed.

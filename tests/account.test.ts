@@ -72,7 +72,7 @@ test('Settings: name, language and email changes, and deletion that removes only
     await app.db.exec('RESET ROLE');
     assert.equal((await call('/auth/session')).body.user.emailVerified, true);
 
-    // Email: needs the password, refuses taken addresses, and starts the new address unverified.
+    // Email: needs the password, refuses taken addresses, and takes effect at once with no email involved.
     assert.equal(
       (await call('/account/email', 'POST', { email: 'alice.new@example.test', password: 'wrong' }))
         .status,
@@ -89,8 +89,9 @@ test('Settings: name, language and email changes, and deletion that removes only
       password: 'long test password',
     });
     assert.equal(changed.status, 200);
-    assert.equal(changed.body.verificationSent, true);
     assert.equal(changed.body.user.email, 'alice.new@example.test');
+    // Alice was verified, and an address nobody has checked cannot count as verified.
+    assert.equal(changed.body.verificationLost, true);
     assert.equal(changed.body.user.emailVerified, false);
     assert.equal((await call('/auth/session')).body.user.emailVerified, false);
     assert.equal(
@@ -111,10 +112,6 @@ test('Settings: name, language and email changes, and deletion that removes only
       ).status,
       200,
     );
-    // The new address is proven with the code sent to it.
-    const verified = await call('/account/verification/confirm', 'POST', { token: '123456' });
-    assert.equal(verified.status, 200);
-    assert.equal(verified.body.user.emailVerified, true);
 
     // Deletion: give Alice data in every kind of place, and Bob data that must survive.
     const [first, second] = (await rows('SELECT id FROM mt_places ORDER BY id LIMIT 2')).map(

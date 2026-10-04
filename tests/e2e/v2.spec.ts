@@ -85,9 +85,23 @@ for (const language of ['en', 'fr'] as const)
       await page.goto(`/?lang=${language}`);
       await page.getByRole('button', { name: t('Community and meet-ups'), exact: true }).click();
       await page.getByRole('button', { name: t('Meet-ups'), exact: true }).click();
-      await page.getByRole('button', { name: t('Send verification code'), exact: true }).click();
-      await page.getByLabel(t('Verification code'), { exact: true }).fill('123456');
-      await page.getByRole('button', { name: t('Verify email'), exact: true }).click();
+      // No email is sent, so a password account is not verified; the notice says why and how to unlock meet-ups.
+      await expect(
+        page.getByRole('heading', { name: t('Meet-ups need a confirmed email'), exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole('link', { name: t('Continue with Google'), exact: true }),
+      ).toBeVisible();
+      await fits(page);
+      await page.keyboard.press('Escape');
+      // Google's confirmation is stood in for here; the page then shows the account as verified.
+      await page.request.post('http://127.0.0.1:3101/__test/verify', {
+        headers: { 'X-Test-Token': process.env.MADATOURS_E2E_TOKEN! },
+        data: { email: user.email },
+      });
+      await page.reload();
+      await page.getByRole('button', { name: t('Community and meet-ups'), exact: true }).click();
+      await page.getByRole('button', { name: t('Meet-ups'), exact: true }).click();
       await expect(page.getByText(t('Email verified'), { exact: true })).toBeVisible();
       await fits(page);
       await page.keyboard.press('Escape');
