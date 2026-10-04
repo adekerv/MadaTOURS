@@ -54,6 +54,8 @@ export async function startLaravel(port = 0, providerPort = 0) {
         SUPABASE_SECRET_KEY: 'test-secret',
         // Browser tests register many accounts from one address; keep the per-IP ceiling out of their way.
         AUTH_ATTEMPTS_PER_IP: '100',
+        // Eight codes are hashed at every signup; the lowest bcrypt cost keeps the suite quick.
+        RECOVERY_CODE_COST: '4',
         // E2E_SESSION_DRIVER=cookie reproduces the Vercel configuration (api/index.php).
         SESSION_DRIVER: process.env.E2E_SESSION_DRIVER === 'cookie' ? 'cookie' : 'file',
         SESSION_ENCRYPT: process.env.E2E_SESSION_DRIVER === 'cookie' ? 'false' : 'true',
