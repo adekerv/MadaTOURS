@@ -43,6 +43,15 @@ export function SiteFooter({ onSignup }: { onSignup?: () => void }) {
         <span aria-hidden="true">·</span>
         <a
           className="inline-flex min-h-11 items-center underline"
+          href="https://openfreemap.org/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          OpenFreeMap
+        </a>
+        <span aria-hidden="true">·</span>
+        <a
+          className="inline-flex min-h-11 items-center underline"
           href="https://www.openstreetmap.org/copyright"
           target="_blank"
           rel="noreferrer"

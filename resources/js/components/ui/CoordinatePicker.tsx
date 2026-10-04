@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import { Basemap } from './Basemap';
+import { maxZoom, minZoom } from '../../lib/basemap';
 import L from 'leaflet';
 import { useI18n } from '../../i18n/I18nProvider';
 import { useTheme } from '../../hooks/useTheme';
@@ -47,14 +49,11 @@ export function CoordinatePicker({
           center={[14.6415, -61.0242]}
           zoom={10}
           scrollWheelZoom={false}
+          minZoom={minZoom}
+          maxZoom={maxZoom}
           className="h-full"
         >
-          <TileLayer
-            key={dark ? 'dark' : 'light'}
-            className={dark ? 'map-tiles-dark' : ''}
-            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
+          <Basemap dark={dark} />
           <Picker point={point} onChange={onChange} />
         </MapContainer>
       </div>

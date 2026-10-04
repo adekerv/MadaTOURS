@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { useTheme } from '../../hooks/useTheme';
+import { addBasemap, maxZoom, minZoom } from '../../lib/basemap';
 import { getPlaceTheme } from '../../utils/emoji';
 import type { RoutePoint, TripRoute } from '../../lib/trip-route';
 
@@ -57,15 +58,12 @@ export default function TripRouteMap({ route, label }: { route: TripRoute; label
       boxZoom: false,
       keyboard: false,
       touchZoom: false,
+      minZoom,
+      maxZoom,
     }).setView([14.65, -61], 10);
     // Top right, so the start badge in the top left never covers the buttons.
     if (!touch) L.control.zoom({ position: 'topright' }).addTo(map);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      className: dark ? 'map-tiles-dark' : '',
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>',
-    }).addTo(map);
+    addBasemap(map, dark);
     layer.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     // The dialog sizes the map after it mounts and again when the window rotates.

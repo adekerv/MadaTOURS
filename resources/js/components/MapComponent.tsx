@@ -1,14 +1,8 @@
 import { useI18n } from '../i18n/I18nProvider';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  useMap,
-  useMapEvents,
-  Circle,
-  ZoomControl,
-} from 'react-leaflet';
+import { MapContainer, Marker, useMap, useMapEvents, Circle, ZoomControl } from 'react-leaflet';
+import { Basemap } from './ui/Basemap';
+import { maxZoom, minZoom } from '../lib/basemap';
 import L from 'leaflet';
 // The plugin attaches itself to the global Leaflet object that the import above provides.
 import 'leaflet.markercluster';
@@ -221,20 +215,16 @@ export function MapComponent(props: Props) {
         zoom={10}
         zoomControl={false}
         className="h-full w-full"
-        minZoom={3}
+        minZoom={minZoom}
+        maxZoom={maxZoom}
       >
-        <TileLayer
-          className={dark ? 'map-tiles-dark' : ''}
-          key={dark ? 'dark' : 'light'}
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          eventHandlers={{
-            loading: () => setTilesLoading(true),
-            load: () => setTilesLoading(false),
-            tileerror: () => {
-              setTileError(true);
-              setTilesLoading(false);
-            },
+        <Basemap
+          dark={dark}
+          loading={() => setTilesLoading(true)}
+          loaded={() => setTilesLoading(false)}
+          failed={() => {
+            setTileError(true);
+            setTilesLoading(false);
           }}
         />
         <ZoomControl position="topright" />

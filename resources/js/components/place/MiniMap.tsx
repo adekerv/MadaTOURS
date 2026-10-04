@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { useTheme } from '../../hooks/useTheme';
+import { addBasemap, maxZoom, minZoom } from '../../lib/basemap';
 /** A still map with one point. It never captures scrolling, so the page stays easy to swipe. */
 export default function MiniMap({ lat, lng, label }: { lat: number; lng: number; label: string }) {
   const frame = useRef<HTMLDivElement>(null);
@@ -16,13 +17,10 @@ export default function MiniMap({ lat, lng, label }: { lat: number; lng: number;
       boxZoom: false,
       keyboard: false,
       touchZoom: false,
+      minZoom,
+      maxZoom,
     }).setView([lat, lng], 15);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      className: dark ? 'map-tiles-dark' : '',
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>',
-    }).addTo(map);
+    addBasemap(map, dark);
     L.marker([lat, lng], {
       interactive: false,
       keyboard: false,
