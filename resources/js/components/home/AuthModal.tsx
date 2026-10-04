@@ -4,8 +4,9 @@ import { Eye, EyeOff } from 'lucide-react';
 import type { User } from '../../types';
 import { api, errorMessage } from '../../lib/api';
 import { Modal } from '../ui/Modal';
+import { RecoveryCodes } from '../account/RecoveryCodes';
 import { useI18n } from '../../i18n/I18nProvider';
-type Mode = 'login' | 'register' | 'verify' | 'forgot' | 'reset';
+type Mode = 'login' | 'register' | 'recover' | 'codes';
 export function AuthModal({
   onClose,
   onLoginSuccess,
@@ -21,7 +22,10 @@ export function AuthModal({
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
-  const [token, setToken] = useState('');
+  const [code, setCode] = useState('');
+  const [codes, setCodes] = useState<string[]>([]);
+  const [created, setCreated] = useState<User | null>(null);
+  const [closeAttempted, setCloseAttempted] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -29,14 +33,13 @@ export function AuthModal({
   const titles: Record<Mode, string> = {
     login: 'Welcome to MadaTours',
     register: 'Create your account',
-    verify: 'Verify your email',
-    forgot: 'Reset your password',
-    reset: 'Choose a new password',
+    recover: 'Reset your password',
+    codes: 'Save your recovery codes',
   };
   const change = (next: Mode) => {
     setMode(next);
     setPassword('');
-    setToken('');
+    setCode('');
     setError('');
     setMessage('');
   };
@@ -47,38 +50,36 @@ export function AuthModal({
     setError('');
     setMessage('');
     try {
-      const endpoint =
-        mode === 'forgot' ? 'forgot-password' : mode === 'reset' ? 'reset-password' : mode;
-      const result = await api<{ user?: User | null; verificationRequired?: boolean }>(
-        `/auth/${endpoint}`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            email,
-            password,
-            token,
-            ...(mode === 'register' ? { name, language } : {}),
-          }),
-        },
-      );
+      const result = await api<{
+        user?: User | null;
+        verificationRequired?: boolean;
+        recoveryCodes?: string[];
+      }>(`/auth/${mode}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          email,
+          password,
+          ...(mode === 'recover' ? { code } : {}),
+          ...(mode === 'register' ? { name, language } : {}),
+        }),
+      });
       if (result.user) {
+        if (mode === 'register' && result.recoveryCodes?.length) {
+          // The account is signed in already. The codes are shown once and the window stays until they are saved;
+          // the welcome waits for that, so it does not cover the button that closes this window.
+          setCodes(result.recoveryCodes);
+          setCreated(result.user);
+          setMode('codes');
+          return;
+        }
         onLoginSuccess(result.user, mode === 'register');
         onClose();
         return;
       }
-      if (mode === 'register' && result.verificationRequired) {
-        // Supabase sends a code when email confirmation is on. The same reply is used for
-        // an address that is already registered, so this never reveals whether it exists.
-        change('verify');
-        setMessage('Check your email and enter the verification code.');
-      } else if (mode === 'register') {
-        setError('Could not finish signup. Try signing in or resetting your password.');
-      } else if (mode === 'forgot') {
-        change('reset');
-        setMessage(
-          'If an account exists, a recovery code has been sent. Check your inbox and spam folder.',
-        );
-      } else if (mode === 'reset') {
+      if (mode === 'register') {
+        change('login');
+        setMessage('Your account was created. Sign in with your email and password.');
+      } else if (mode === 'recover') {
         change('login');
         setMessage('Password updated. Sign in with your new password.');
       }
@@ -88,22 +89,26 @@ export function AuthModal({
       setBusy(false);
     }
   }
-  async function resend() {
-    if (busy) return;
-    setBusy(true);
-    setError('');
-    try {
-      await api('/auth/resend', { method: 'POST', body: JSON.stringify({ email }) });
-      setMessage('Check your email and enter the verification code.');
-    } catch (error) {
-      setError(errorMessage(error));
-    } finally {
-      setBusy(false);
-    }
-  }
-  const needsPassword = mode === 'login' || mode === 'register' || mode === 'reset';
+  const needsPassword = mode !== 'codes';
   // Google blocks sign-in inside embedded web views, so native apps keep email sign-in for now.
   const showGoogle = (mode === 'login' || mode === 'register') && !Capacitor.isNativePlatform();
+  if (mode === 'codes')
+    return (
+      // Closing is held back until the codes are saved: they cannot be shown again.
+      <Modal title={t(titles.codes)} onClose={() => setCloseAttempted(true)}>
+        <div className="p-5 sm:p-7">
+          <RecoveryCodes
+            codes={codes}
+            email={email}
+            warn={closeAttempted}
+            onDone={() => {
+              if (created) onLoginSuccess(created, true);
+              onClose();
+            }}
+          />
+        </div>
+      </Modal>
+    );
   return (
     <Modal title={t(titles[mode])} onClose={onClose}>
       <form onSubmit={submit} className="space-y-5 p-5 sm:p-7">
@@ -163,7 +168,9 @@ export function AuthModal({
               />
             </label>
             <p className="text-sm text-slate-600">
-              {t('Explore freely. Verify your email when you want to join meet-ups.')}
+              {t(
+                'You will get 8 recovery codes after signing up. They are the only way to reset a forgotten password, because we do not send email.',
+              )}
             </p>
           </>
         )}
@@ -182,30 +189,32 @@ export function AuthModal({
             disabled={busy}
           />
         </label>
-        {(mode === 'verify' || mode === 'reset') && (
+        {mode === 'recover' && (
           <label className="field-label">
-            {t('Email code')}
+            {t('Recovery code')}
             <input
               type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="[0-9]{6,10}"
-              minLength={6}
-              maxLength={10}
-              value={token}
-              onChange={(e) => setToken(e.target.value.replace(/\D/g, ''))}
+              autoComplete="off"
+              autoCapitalize="characters"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder="K7QM2-WX4TP"
+              minLength={10}
+              maxLength={24}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
               required
-              className="field-input"
+              className="field-input font-mono uppercase"
               disabled={busy}
             />
           </label>
         )}
         {needsPassword && (
           <label className="field-label">
-            {t(mode === 'reset' ? 'New password' : 'Password')}
+            {t(mode === 'recover' ? 'New password' : 'Password')}
             <span className="relative block">
               <input
-                aria-label={t(mode === 'reset' ? 'New password' : 'Password')}
+                aria-label={t(mode === 'recover' ? 'New password' : 'Password')}
                 aria-describedby={mode !== 'login' ? hint : undefined}
                 type={showPassword ? 'text' : 'password'}
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
@@ -252,11 +261,7 @@ export function AuthModal({
                 ? 'Sign in'
                 : mode === 'register'
                   ? 'Create account'
-                  : mode === 'verify'
-                    ? 'Verify email'
-                    : mode === 'forgot'
-                      ? 'Send recovery code'
-                      : 'Update password',
+                  : 'Reset password',
           )}
         </button>
         {mode === 'login' && (
@@ -265,7 +270,7 @@ export function AuthModal({
               type="button"
               disabled={busy}
               className="w-full text-sm font-semibold text-orange-700"
-              onClick={() => change('forgot')}
+              onClick={() => change('recover')}
             >
               {t('Forgot password?')}
             </button>
@@ -277,29 +282,11 @@ export function AuthModal({
             >
               {t('New here? Create an account')}
             </button>
-            <button
-              type="button"
-              disabled={busy}
-              className="w-full text-sm text-slate-600"
-              onClick={() => change('verify')}
-            >
-              {t('Already have a verification code?')}
-            </button>
           </>
         )}
-        {mode === 'verify' && (
-          <button
-            type="button"
-            disabled={busy || !email}
-            className="secondary-button w-full"
-            onClick={() => void resend()}
-          >
-            {t('Resend verification code')}
-          </button>
-        )}
-        {(mode === 'forgot' || mode === 'reset' || mode === 'verify') && (
+        {mode === 'recover' && (
           <p className="text-sm text-slate-600">
-            {t('Having trouble receiving a code?')}{' '}
+            {t('Lost your recovery codes too?')}{' '}
             <a
               href="mailto:adejkervin@protonmail.com"
               className="font-semibold text-orange-800 underline"

@@ -37,7 +37,6 @@ export const english: Record<string, string> = {
   All: 'All',
   'All experiences': 'All experiences',
   'All towns': 'All towns',
-  'Already have a verification code?': 'Already have a verification code?',
   'Already have an account? Sign in': 'Already have an account? Sign in',
   'An exact map location and a photo are required.':
     'An exact map location and a photo are required.',
@@ -90,11 +89,8 @@ export const english: Record<string, string> = {
   'Check the source for current hours and access. Map points are approximate; confirm the entrance with the venue.':
     'Check the source for current hours and access. Map points are approximate; confirm the entrance with the venue.',
   'Check with the venue': 'Check with the venue',
-  'Check your email and enter the verification code.':
-    'Check your email and enter the verification code.',
   'Check your email, password, or verification code and try again.':
     'Check your email, password, or verification code and try again.',
-  'Check your inbox for the verification code.': 'Check your inbox for the verification code.',
   'Checked in at': 'Checked in at',
   'Checking conditions…': 'Checking conditions…',
   Chocolate: 'Chocolate',
@@ -102,7 +98,6 @@ export const english: Record<string, string> = {
   'Choose a category': 'Choose a category',
   'Choose a day trip': 'Choose a day trip',
   'Choose a different password.': 'Choose a different password.',
-  'Choose a new password': 'Choose a new password',
   'Choose a place': 'Choose a place',
   'Choose an official source for scheduled hours updates. Photos need a rights check before publication. Google matching retains Place IDs only.':
     'Choose an official source for scheduled hours updates. Photos need a rights check before publication. Google matching retains Place IDs only.',
@@ -133,8 +128,6 @@ export const english: Record<string, string> = {
   'Conditions unavailable': 'Conditions unavailable',
   'Confirm deletion': 'Confirm deletion',
   'Confirm restriction': 'Confirm restriction',
-  'Confirm that you own {email} before browsing or joining meet-ups.':
-    'Confirm that you own {email} before browsing or joining meet-ups.',
   'Connect to change your saved places.': 'Connect to change your saved places.',
   'Connecting…': 'Connecting…',
   'Connection unavailable. Showing the last loaded guide.':
@@ -150,8 +143,6 @@ export const english: Record<string, string> = {
     'Could not check your session. You can still explore places.',
   'Could not connect. Check your internet connection and try again.':
     'Could not connect. Check your internet connection and try again.',
-  'Could not finish signup. Try signing in or resetting your password.':
-    'Could not finish signup. Try signing in or resetting your password.',
   'Create a meet-up': 'Create a meet-up',
   'Create account': 'Create account',
   'Create an account': 'Create an account',
@@ -212,7 +203,6 @@ export const english: Record<string, string> = {
   'Edited by a moderator': 'Edited by a moderator',
   Education: 'Education',
   Email: 'Email',
-  'Email code': 'Email code',
   'Email or account services are unavailable. Please contact the project owner.':
     'Email or account services are unavailable. Please contact the project owner.',
   'Email verified': 'Email verified',
@@ -237,8 +227,6 @@ export const english: Record<string, string> = {
     'Explore beaches, food and hidden corners. Open Plan a day to arrange your stops and keep a trip on this device.',
   'Explore freely. Create a free account when you want to save places or plan a return visit.':
     'Explore freely. Create a free account when you want to save places or plan a return visit.',
-  'Explore freely. Verify your email when you want to join meet-ups.':
-    'Explore freely. Verify your email when you want to join meet-ups.',
   'Explore hikes': 'Explore hikes',
   'Explore places': 'Explore places',
   'Explore the island': 'Explore the island',
@@ -374,7 +362,6 @@ export const english: Record<string, string> = {
   'Guide rating (optional)': 'Guide rating (optional)',
   'Guided Tour': 'Guided Tour',
   'Guided tours': 'Guided tours',
-  'Having trouble receiving a code?': 'Having trouble receiving a code?',
   Heritage: 'Heritage',
   'Highest community rating': 'Highest community rating',
   'Highest guide rating': 'Highest guide rating',
@@ -398,8 +385,6 @@ export const english: Record<string, string> = {
   "I've been here": "I've been here",
   'Ice Cream': 'Ice Cream',
   'Ideas for your next outing': 'Ideas for your next outing',
-  'If an account exists, a recovery code has been sent. Check your inbox and spam folder.':
-    'If an account exists, a recovery code has been sent. Check your inbox and spam folder.',
   'Illustrative images include AI-generated hiking, seafood and terrace scenes; they do not depict the listed venue.':
     'Illustrative images include AI-generated hiking, seafood and terrace scenes; they do not depict the listed venue.',
   'Illustrative photo': 'Illustrative photo',
@@ -607,7 +592,6 @@ export const english: Record<string, string> = {
   'Report reason': 'Report reason',
   'Reported meet-ups': 'Reported meet-ups',
   'Request to follow': 'Request to follow',
-  'Resend verification code': 'Resend verification code',
   'Reset filters': 'Reset filters',
   'Reset your password': 'Reset your password',
   Restaurant: 'Restaurant',
@@ -656,10 +640,7 @@ export const english: Record<string, string> = {
   'Search places, towns, activities…': 'Search places, towns, activities…',
   'Search radius': 'Search radius',
   'Search this area': 'Search this area',
-  'Send another code': 'Send another code',
-  'Send recovery code': 'Send recovery code',
   'Send report': 'Send report',
-  'Send verification code': 'Send verification code',
   'Sending…': 'Sending…',
   'Share a real place in Martinique. Your submission and photo stay private until an administrator approves them.':
     'Share a real place in Martinique. Your submission and photo stay private until an administrator approves them.',
@@ -775,7 +756,6 @@ export const english: Record<string, string> = {
   'Under review': 'Under review',
   'Underwater Scooter': 'Underwater Scooter',
   Unfollow: 'Unfollow',
-  'Update password': 'Update password',
   'Updated: {date}': 'Updated: {date}',
   'Updating places…': 'Updating places…',
   'Upload a JPEG, PNG or WebP photo under 2 MB.': 'Upload a JPEG, PNG or WebP photo under 2 MB.',
@@ -794,12 +774,7 @@ export const english: Record<string, string> = {
   Vanilla: 'Vanilla',
   'Venue contact and information': 'Venue contact and information',
   'Venue details still need verification.': 'Venue details still need verification.',
-  'Verification code': 'Verification code',
-  'Verify email': 'Verify email',
-  'Verify your email': 'Verify your email',
   'Verify your email before signing in.': 'Verify your email before signing in.',
-  'Verify your email for meet-ups': 'Verify your email for meet-ups',
-  'Verify your email to use meet-ups.': 'Verify your email to use meet-ups.',
   'View details': 'View details',
   'View on Google Maps': 'View on Google Maps',
   'View on map': 'View on map',
@@ -897,17 +872,11 @@ export const english: Record<string, string> = {
   'Save changes': 'Save changes',
   'Your changes have been saved.': 'Your changes have been saved.',
   'Email address': 'Email address',
-  'Email changed. Enter the code we sent to {email} to verify it.':
-    'Email changed. Enter the code we sent to {email} to verify it.',
-  'Email changed, but we could not send the code. Try sending it again below.':
-    'Email changed, but we could not send the code. Try sending it again below.',
   'Your email address comes from your Google account, so it cannot be changed here.':
     'Your email address comes from your Google account, so it cannot be changed here.',
   'Change your email address': 'Change your email address',
   'New email address': 'New email address',
   'Current password': 'Current password',
-  'You will need to verify the new address before joining meet-ups.':
-    'You will need to verify the new address before joining meet-ups.',
   'Changing…': 'Changing…',
   'Change email': 'Change email',
   'Delete your account': 'Delete your account',
@@ -965,4 +934,49 @@ export const english: Record<string, string> = {
   'You can only remove your own photos.': 'You can only remove your own photos.',
   'Your reviews and their photos, comments and check-ins':
     'Your reviews and their photos, comments and check-ins',
+  'Save your recovery codes': 'Save your recovery codes',
+  'If you forget your password, one of these codes lets you reset it. We do not send email, so this is the only way back in. Each code works once, and they are shown only now.':
+    'If you forget your password, one of these codes lets you reset it. We do not send email, so this is the only way back in. Each code works once, and they are shown only now.',
+  'Copy codes': 'Copy codes',
+  Copied: 'Copied',
+  'Download codes': 'Download codes',
+  'Could not copy. Select the codes and copy them by hand.':
+    'Could not copy. Select the codes and copy them by hand.',
+  'I have saved these codes': 'I have saved these codes',
+  'Save your codes first, then tick the box.': 'Save your codes first, then tick the box.',
+  Done: 'Done',
+  'MadaTours recovery codes': 'MadaTours recovery codes',
+  'Each code works once. Keep this file private.': 'Each code works once. Keep this file private.',
+  'Recovery code': 'Recovery code',
+  'Lost your recovery codes too?': 'Lost your recovery codes too?',
+  'You will get 8 recovery codes after signing up. They are the only way to reset a forgotten password, because we do not send email.':
+    'You will get 8 recovery codes after signing up. They are the only way to reset a forgotten password, because we do not send email.',
+  'Reset password': 'Reset password',
+  'Your account was created. Sign in with your email and password.':
+    'Your account was created. Sign in with your email and password.',
+  'Account recovery': 'Account recovery',
+  '{remaining} of {total} recovery codes left': '{remaining} of {total} recovery codes left',
+  'Create a new set soon.': 'Create a new set soon.',
+  'Create new recovery codes': 'Create new recovery codes',
+  'Creating…': 'Creating…',
+  'Creating new codes replaces every old code. Enter your password to continue.':
+    'Creating new codes replaces every old code. Enter your password to continue.',
+  'You sign in with Google, so you do not need recovery codes.':
+    'You sign in with Google, so you do not need recovery codes.',
+  'Your email address is now {email}.': 'Your email address is now {email}.',
+  'It is not confirmed by Google, so meet-ups are paused.':
+    'It is not confirmed by Google, so meet-ups are paused.',
+  'Meet-ups need a confirmed email': 'Meet-ups need a confirmed email',
+  'We do not send email, so Google confirms your address instead. Continue with Google using {email} to unlock meet-ups. You will then sign in with Google, and your recovery codes can set a password again.':
+    'We do not send email, so Google confirms your address instead. Continue with Google using {email} to unlock meet-ups. You will then sign in with Google, and your recovery codes can set a password again.',
+  'Changing your email address pauses meet-ups until Google confirms the new one.':
+    'Changing your email address pauses meet-ups until Google confirms the new one.',
+  'The address changes straight away. We do not send any email.':
+    'The address changes straight away. We do not send any email.',
+  'The email or recovery code is not valid.': 'The email or recovery code is not valid.',
+  'Enter one of your recovery codes.': 'Enter one of your recovery codes.',
+  'Enter a recovery code exactly as you saved it, for example K7QM2-WX4TP.':
+    'Enter a recovery code exactly as you saved it, for example K7QM2-WX4TP.',
+  'Recovery codes are for accounts with a password. You sign in with Google.':
+    'Recovery codes are for accounts with a password. You sign in with Google.',
 };

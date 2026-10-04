@@ -6,6 +6,7 @@ import { SiteFooter } from '../ui/SiteFooter';
 import { DeleteAccount } from './DeleteAccount';
 import { EmailSection } from './EmailSection';
 import { ProfileForm } from './ProfileForm';
+import { RecoverySection } from './RecoverySection';
 export function SettingsPage({
   user,
   sessionLoading,
@@ -43,6 +44,7 @@ export function SettingsPage({
           <div className="mt-8 space-y-6">
             <ProfileForm key={user.id} user={user} onSaved={onUserChange} />
             <EmailSection user={user} onChanged={onUserChange} />
+            <RecoverySection user={user} />
             <DeleteAccount key={user.id} user={user} onDeleted={onDeleted} />
           </div>
         ) : (

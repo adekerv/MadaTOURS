@@ -69,7 +69,7 @@ export function createProvider(fixture: ReturnType<typeof testClients>) {
         res.writeHead(404).end('{}');
         return;
       }
-      if (url.pathname === '/__test/admin') {
+      if (url.pathname === '/__test/admin' || url.pathname === '/__test/verify') {
         if (
           !process.env.MADATOURS_E2E_TOKEN ||
           req.headers['x-test-token'] !== process.env.MADATOURS_E2E_TOKEN
@@ -77,7 +77,8 @@ export function createProvider(fixture: ReturnType<typeof testClients>) {
           res.writeHead(403).end('{}');
           return;
         }
-        await fixture.grantAdmin(String(body.email));
+        if (url.pathname === '/__test/admin') await fixture.grantAdmin(String(body.email));
+        else await fixture.verifyEmail(String(body.email));
         res.end('{"success":true}');
         return;
       }

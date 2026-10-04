@@ -3,7 +3,7 @@ import { useI18n } from '../../i18n/I18nProvider';
 import { api, errorMessage } from '../../lib/api';
 import type { User, Place } from '../../types';
 import { Modal } from '../ui/Modal';
-import { EmailVerification } from './EmailVerification';
+import { VerifiedEmailNotice } from '../account/VerifiedEmailNotice';
 import { Connections } from './Connections';
 import { Events } from './Events';
 import { CreateEvent } from './CreateEvent';
@@ -12,12 +12,10 @@ export function SocialHub({
   user,
   places,
   onClose,
-  onVerified,
 }: {
   user: User;
   places: Place[];
   onClose: () => void;
-  onVerified: (user: User) => void;
 }) {
   const { t } = useI18n();
   const [tab, setTab] = useState<'connections' | 'events'>('connections');
@@ -108,7 +106,7 @@ export function SocialHub({
             />
           ) : (
             <>
-              <EmailVerification user={user} onVerified={onVerified} />
+              <VerifiedEmailNotice user={user} />
               <CreateEvent places={places} act={act} busy={busy} />
               <Events events={data.events} user={user} act={act} busy={busy} />
               {user.role === 'admin' && (

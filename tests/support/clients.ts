@@ -160,10 +160,14 @@ export function testClients(db: PGlite) {
           return success();
         },
         admin: {
-          updateUserById: async (id: string, { email }: { email?: string }) => {
+          updateUserById: async (
+            id: string,
+            { email, password }: { email?: string; password?: string },
+          ) => {
             if (!admin) return failure('not_admin');
             const user = accounts.get(id);
             if (!user) return failure('user_not_found');
+            if (password !== undefined) user.password = password;
             if (email) {
               if ([...accounts.values()].some((a) => a.id !== id && a.email === email))
                 return failure('email_exists');
@@ -190,6 +194,11 @@ export function testClients(db: PGlite) {
           mt_check_rate_limit: ['identifier', 'ceiling'],
           mt_place_community: ['target_place', 'page_offset'],
           mt_place_review_photos: ['target_place', 'page_offset'],
+          mt_replace_recovery_codes: ['target', 'hashes'],
+          mt_recovery_candidates: ['account_email'],
+          mt_consume_recovery_code: ['code_id'],
+          mt_recovery_codes_left: ['target'],
+          mt_revoke_user_sessions: ['target'],
           mt_community_write: ['action', 'payload'],
           mt_social_write: ['action', 'payload'],
           mt_social_dashboard: ['search_text', 'page_offset'],
@@ -232,6 +241,7 @@ export function testClients(db: PGlite) {
             'mt_submissions',
             'mt_submission_photos',
             'mt_review_photos',
+            'mt_recovery_codes',
             'mt_photo_deletions',
             'mt_notifications',
             'mt_source_settings',
@@ -361,6 +371,14 @@ export function testClients(db: PGlite) {
     sql,
     accounts,
     sessions,
+    /** Stands in for Google confirming the address, the only way an account becomes verified without email. */
+    verifyEmail: async (email: string) => {
+      const user = [...accounts.values()].find((a) => a.email === email);
+      if (!user) throw new Error('No test account');
+      await locked(() =>
+        db.query('UPDATE public.mt_profiles SET email_verified_at=now() WHERE id=$1', [user.id]),
+      );
+    },
     grantAdmin: async (email: string) => {
       const user = [...accounts.values()].find((a) => a.email === email);
       if (!user) throw new Error('No test account');

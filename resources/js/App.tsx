@@ -373,12 +373,7 @@ export default function App() {
           />
         )}
         {socialOpen && user && (
-          <SocialHub
-            user={user}
-            places={places}
-            onClose={() => setSocialOpen(false)}
-            onVerified={setUser}
-          />
+          <SocialHub user={user} places={places} onClose={() => setSocialOpen(false)} />
         )}
         {plannerOpen && (
           <DayPlanner

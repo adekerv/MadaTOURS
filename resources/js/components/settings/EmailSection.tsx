@@ -2,13 +2,13 @@ import { useState, type FormEvent } from 'react';
 import type { User } from '../../types';
 import { api, errorMessage } from '../../lib/api';
 import { useI18n } from '../../i18n/I18nProvider';
-import { EmailVerification } from '../social/EmailVerification';
+import { VerifiedEmailNotice } from '../account/VerifiedEmailNotice';
 export function EmailSection({ user, onChanged }: { user: User; onChanged: (user: User) => void }) {
   const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [result, setResult] = useState<{ email: string; sent: boolean } | null>(null);
+  const [result, setResult] = useState<{ email: string; verificationLost: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
   async function change(event: FormEvent) {
     event.preventDefault();
@@ -16,12 +16,12 @@ export function EmailSection({ user, onChanged }: { user: User; onChanged: (user
     setError('');
     setResult(null);
     try {
-      const data = await api<{ user: User; verificationSent: boolean }>('/account/email', {
+      const data = await api<{ user: User; verificationLost: boolean }>('/account/email', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
       onChanged(data.user);
-      setResult({ email: data.user.email, sent: data.verificationSent });
+      setResult({ email: data.user.email, verificationLost: data.verificationLost });
       setEmail('');
       setPassword('');
     } catch (e) {
@@ -35,23 +35,13 @@ export function EmailSection({ user, onChanged }: { user: User; onChanged: (user
       <h2 className="text-xl font-bold">{t('Email address')}</h2>
       <p className="mt-3 break-all font-semibold text-slate-900">{user.email}</p>
       <div className="mt-4">
-        <EmailVerification
-          key={user.email}
-          user={user}
-          onVerified={(verified) => {
-            setResult(null);
-            onChanged(verified);
-          }}
-          codeSent={result?.sent === true}
-        />
+        <VerifiedEmailNotice user={user} />
       </div>
       {result && (
         <p role="status" className="mt-4 rounded-xl bg-green-50 p-3 text-sm text-green-800">
-          {result.sent
-            ? t('Email changed. Enter the code we sent to {email} to verify it.', {
-                email: result.email,
-              })
-            : t('Email changed, but we could not send the code. Try sending it again below.')}
+          {t('Your email address is now {email}.', { email: result.email })}
+          {result.verificationLost &&
+            ` ${t('It is not confirmed by Google, so meet-ups are paused.')}`}
         </p>
       )}
       {user.hasPassword === false ? (
@@ -86,7 +76,9 @@ export function EmailSection({ user, onChanged }: { user: User; onChanged: (user
             />
           </label>
           <p className="text-sm text-slate-600">
-            {t('You will need to verify the new address before joining meet-ups.')}
+            {t('The address changes straight away. We do not send any email.')}
+            {user.emailVerified &&
+              ` ${t('Changing your email address pauses meet-ups until Google confirms the new one.')}`}
           </p>
           {error && (
             <p role="alert" className="error-message">

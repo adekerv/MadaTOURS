@@ -20,14 +20,6 @@ export const french: Record<string, string> = {
   'Photo license': 'Licence de la photo',
   'Community: {rating} / 5 ({count})': 'Communauté : {rating} / 5 ({count})',
   'Email verified': 'Adresse e-mail vérifiée',
-  'Verify your email for meet-ups': 'Vérifiez votre e-mail pour les rencontres',
-  'Confirm that you own {email} before browsing or joining meet-ups.':
-    'Confirmez que vous possédez {email} avant de consulter ou de rejoindre des rencontres.',
-  'Check your inbox for the verification code.':
-    'Consultez votre boîte de réception pour obtenir le code.',
-  'Send another code': 'Envoyer un autre code',
-  'Send verification code': 'Envoyer le code de vérification',
-  'Verify your email to use meet-ups.': 'Vérifiez votre e-mail pour accéder aux rencontres.',
   'The verification does not match this account.': 'La vérification ne correspond pas à ce compte.',
   'Only people you accept can see your check-ins, favorites and plans you choose to share. Your device location is never shared.':
     'Seules les personnes que vous acceptez peuvent voir vos visites, favoris et projets que vous choisissez de partager. La position de votre appareil reste privée.',
@@ -144,7 +136,6 @@ export const french: Record<string, string> = {
   'System theme': 'Thème du système',
   'Light theme': 'Thème clair',
   'Dark theme': 'Thème sombre',
-  'Having trouble receiving a code?': 'Vous ne recevez pas le code ?',
   'Contact support': 'Contacter l’assistance',
   "You're offline or the connection is unavailable. Browse the saved guide; updates need a connection.":
     'Vous êtes hors ligne ou la connexion est indisponible. Consultez le guide sauvegardé ; les mises à jour nécessitent une connexion.',
@@ -221,8 +212,6 @@ export const french: Record<string, string> = {
     'Commencez à explorer immédiatement. Aucune vérification par email nécessaire.',
   'Welcome, {name}.': 'Bienvenue, {name}.',
   'Thanks for signing up! Welcome, {name}.': 'Merci pour votre inscription ! Bienvenue, {name}.',
-  'Could not finish signup. Try signing in or resetting your password.':
-    'Impossible de terminer l’inscription. Essayez de vous connecter ou de réinitialiser votre mot de passe.',
   'Distance and sorting': 'Distance et tri',
   'A little closer to': 'Un peu plus près de la',
   'A taste of Martinique': 'Les saveurs de la Martinique',
@@ -546,14 +535,8 @@ export const french: Record<string, string> = {
   'No offline places yet. Sign in and save a place while connected.':
     'Aucun lieu hors connexion. Connectez-vous et enregistrez un lieu avec Internet.',
   'Connect to change your saved places.': 'Connectez-vous pour modifier vos lieux enregistrés.',
-  'Verify your email': 'Vérifier votre adresse e-mail',
   'Reset your password': 'Réinitialiser votre mot de passe',
-  'Choose a new password': 'Choisir un nouveau mot de passe',
-  'Email code': 'Code reçu par e-mail',
   'New password': 'Nouveau mot de passe',
-  'Verify email': 'Vérifier l’adresse e-mail',
-  'Send recovery code': 'Envoyer le code de récupération',
-  'Update password': 'Modifier le mot de passe',
   'Forgot password?': 'Mot de passe oublié ?',
   'Continue with Google': 'Continuer avec Google',
   'or use your email': 'ou utilisez votre e-mail',
@@ -561,13 +544,7 @@ export const french: Record<string, string> = {
   'Google sign-in could not be completed. Please try again.':
     'La connexion avec Google n’a pas pu aboutir. Veuillez réessayer.',
   'You are signed in with Google.': 'Vous êtes connecté avec Google.',
-  'Already have a verification code?': 'Vous avez déjà un code de vérification ?',
-  'Resend verification code': 'Renvoyer le code de vérification',
   'Back to sign in': 'Retour à la connexion',
-  'Check your email and enter the verification code.':
-    'Consultez vos e-mails et saisissez le code de vérification.',
-  'If an account exists, a recovery code has been sent. Check your inbox and spam folder.':
-    'Si un compte existe, un code de récupération a été envoyé. Vérifiez votre boîte de réception et vos courriers indésirables.',
   'Password updated. Sign in with your new password.':
     'Mot de passe modifié. Connectez-vous avec votre nouveau mot de passe.',
   'The database is not configured yet.': 'La base de données n’est pas encore configurée.',
@@ -821,7 +798,6 @@ export const french: Record<string, string> = {
     'Partager ces étapes prévues avec mes abonnés acceptés',
   'Save to my day planner': 'Enregistrer dans mon planificateur',
   Search: 'Rechercher',
-  'Verification code': 'Code de vérification',
   'Share a real place in Martinique. Your submission and photo stay private until an administrator approves them.':
     'Proposez un vrai lieu en Martinique. Votre proposition et votre photo restent privées jusqu’à leur approbation par un administrateur.',
   'An exact map location and a photo are required.':
@@ -895,8 +871,6 @@ export const french: Record<string, string> = {
     'Les illustrations comprennent des scènes de randonnée, de fruits de mer et de terrasse générées par IA ; elles ne représentent pas le lieu indiqué.',
   'Choose a JPEG, PNG or WebP image under 15 MB.':
     'Choisissez une image JPEG, PNG ou WebP de moins de 15 Mo.',
-  'Explore freely. Verify your email when you want to join meet-ups.':
-    'Explorez librement. Vérifiez votre email pour rejoindre les rencontres.',
   'Submission sent. You will see the moderation decision here.':
     'Proposition envoyée. Vous verrez ici la décision de modération.',
   'Account settings': 'Paramètres du compte',
@@ -908,17 +882,11 @@ export const french: Record<string, string> = {
   'Save changes': 'Enregistrer les modifications',
   'Your changes have been saved.': 'Vos modifications ont été enregistrées.',
   'Email address': 'Adresse e-mail',
-  'Email changed. Enter the code we sent to {email} to verify it.':
-    'Adresse e-mail modifiée. Saisissez le code envoyé à {email} pour la vérifier.',
-  'Email changed, but we could not send the code. Try sending it again below.':
-    'Adresse e-mail modifiée, mais le code n’a pas pu être envoyé. Essayez de le renvoyer ci-dessous.',
   'Your email address comes from your Google account, so it cannot be changed here.':
     'Votre adresse e-mail provient de votre compte Google ; elle ne peut pas être modifiée ici.',
   'Change your email address': 'Modifier votre adresse e-mail',
   'New email address': 'Nouvelle adresse e-mail',
   'Current password': 'Mot de passe actuel',
-  'You will need to verify the new address before joining meet-ups.':
-    'Vous devrez vérifier la nouvelle adresse avant de rejoindre des rencontres.',
   'Changing…': 'Modification…',
   'Change email': 'Modifier l’adresse e-mail',
   'Delete your account': 'Supprimer votre compte',
@@ -977,4 +945,53 @@ export const french: Record<string, string> = {
   'You can only remove your own photos.': 'Vous ne pouvez supprimer que vos propres photos.',
   'Your reviews and their photos, comments and check-ins':
     'Vos avis et leurs photos, commentaires et check-ins',
+  'Save your recovery codes': 'Enregistrez vos codes de récupération',
+  'If you forget your password, one of these codes lets you reset it. We do not send email, so this is the only way back in. Each code works once, and they are shown only now.':
+    'Si vous oubliez votre mot de passe, l’un de ces codes vous permet de le réinitialiser. Nous n’envoyons pas d’e-mails : c’est la seule façon de revenir. Chaque code ne fonctionne qu’une fois et ils ne sont affichés que maintenant.',
+  'Copy codes': 'Copier les codes',
+  Copied: 'Copié',
+  'Download codes': 'Télécharger les codes',
+  'Could not copy. Select the codes and copy them by hand.':
+    'Copie impossible. Sélectionnez les codes et copiez-les à la main.',
+  'I have saved these codes': 'J’ai enregistré ces codes',
+  'Save your codes first, then tick the box.':
+    'Enregistrez d’abord vos codes, puis cochez la case.',
+  Done: 'Terminé',
+  'MadaTours recovery codes': 'Codes de récupération MadaTours',
+  'Each code works once. Keep this file private.':
+    'Chaque code ne fonctionne qu’une fois. Gardez ce fichier privé.',
+  'Recovery code': 'Code de récupération',
+  'Lost your recovery codes too?': 'Vous avez aussi perdu vos codes de récupération ?',
+  'You will get 8 recovery codes after signing up. They are the only way to reset a forgotten password, because we do not send email.':
+    'Vous recevrez 8 codes de récupération après l’inscription. Ils sont le seul moyen de réinitialiser un mot de passe oublié, car nous n’envoyons pas d’e-mails.',
+  'Reset password': 'Réinitialiser le mot de passe',
+  'Your account was created. Sign in with your email and password.':
+    'Votre compte a été créé. Connectez-vous avec votre e-mail et votre mot de passe.',
+  'Account recovery': 'Récupération du compte',
+  '{remaining} of {total} recovery codes left':
+    '{remaining} codes de récupération restants sur {total}',
+  'Create a new set soon.': 'Créez bientôt un nouveau jeu.',
+  'Create new recovery codes': 'Créer de nouveaux codes de récupération',
+  'Creating…': 'Création…',
+  'Creating new codes replaces every old code. Enter your password to continue.':
+    'La création de nouveaux codes remplace tous les anciens. Saisissez votre mot de passe pour continuer.',
+  'You sign in with Google, so you do not need recovery codes.':
+    'Vous vous connectez avec Google : vous n’avez pas besoin de codes de récupération.',
+  'Your email address is now {email}.': 'Votre adresse e-mail est désormais {email}.',
+  'It is not confirmed by Google, so meet-ups are paused.':
+    'Elle n’est pas confirmée par Google : les rencontres sont en pause.',
+  'Meet-ups need a confirmed email': 'Les rencontres nécessitent un e-mail confirmé',
+  'We do not send email, so Google confirms your address instead. Continue with Google using {email} to unlock meet-ups. You will then sign in with Google, and your recovery codes can set a password again.':
+    'Nous n’envoyons pas d’e-mails : c’est Google qui confirme votre adresse. Continuez avec Google en utilisant {email} pour débloquer les rencontres. Vous vous connecterez ensuite avec Google, et vos codes de récupération pourront redéfinir un mot de passe.',
+  'Changing your email address pauses meet-ups until Google confirms the new one.':
+    'Modifier votre adresse e-mail met les rencontres en pause jusqu’à ce que Google confirme la nouvelle.',
+  'The address changes straight away. We do not send any email.':
+    'L’adresse change immédiatement. Nous n’envoyons aucun e-mail.',
+  'The email or recovery code is not valid.':
+    'L’e-mail ou le code de récupération n’est pas valide.',
+  'Enter one of your recovery codes.': 'Saisissez l’un de vos codes de récupération.',
+  'Enter a recovery code exactly as you saved it, for example K7QM2-WX4TP.':
+    'Saisissez un code de récupération exactement comme enregistré, par exemple K7QM2-WX4TP.',
+  'Recovery codes are for accounts with a password. You sign in with Google.':
+    'Les codes de récupération sont pour les comptes avec mot de passe. Vous vous connectez avec Google.',
 };
