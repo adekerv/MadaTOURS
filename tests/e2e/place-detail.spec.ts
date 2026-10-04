@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { stubMap } from './support/map';
 const rich = {
   address: 'Quartier le Coin, 97221 Le Carbet',
   phone: '+596 596 78 04 34',
@@ -16,7 +17,7 @@ const rich = {
 /** Serves the real catalogue, but rewrites two places so the page can be checked against known facts. */
 async function stubCatalogue(page: Page) {
   await page.route('https://api.open-meteo.com/**', (route) => route.abort());
-  await page.route('https://tile.openstreetmap.org/**', (route) => route.abort());
+  await stubMap(page);
   await page.route('**/api/places', async (route) => {
     const response = await route.fetch();
     const places = (await response.json()) as Record<string, unknown>[];

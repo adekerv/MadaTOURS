@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { translate } from '../../resources/js/i18n/core';
 
+import { stubMap } from './support/map';
 async function fitsAndTargets(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
     true,
@@ -37,7 +38,7 @@ test.beforeEach(async ({ page }) => {
       },
     }),
   );
-  await page.route('https://tile.openstreetmap.org/**', (route) => route.abort());
+  await stubMap(page);
 });
 for (const language of ['en', 'fr'] as const)
   for (const width of [360, 390, 1440]) {

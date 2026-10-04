@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { translate } from '../../resources/js/i18n/core';
 import { randomUUID } from 'node:crypto';
 
+import { stubMap } from './support/map';
 test.beforeEach(async ({ page }) => {
   await page.route('https://api.open-meteo.com/**', (route) =>
     route.fulfill({
@@ -15,7 +16,7 @@ test.beforeEach(async ({ page }) => {
       },
     }),
   );
-  await page.route('https://tile.openstreetmap.org/**', (route) => route.abort());
+  await stubMap(page);
 });
 async function register(page: Page) {
   const name = `Camille ${randomUUID().slice(0, 8)}`;

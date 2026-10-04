@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { translate } from '../../resources/js/i18n/core';
 
+import { stubMap } from './support/map';
 test.beforeEach(async ({ page }) => {
   await page.route('https://api.open-meteo.com/**', (route) =>
     route.fulfill({
@@ -14,7 +15,7 @@ test.beforeEach(async ({ page }) => {
       },
     }),
   );
-  await page.route('https://tile.openstreetmap.org/**', (route) => route.abort());
+  await stubMap(page);
 });
 const fits = async (page: Page) => {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(

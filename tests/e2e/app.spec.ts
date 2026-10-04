@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { stubMap } from './support/map';
 
 test.beforeEach(async ({ page }) => {
   await page.route('https://api.open-meteo.com/**', (route) =>
@@ -15,16 +16,7 @@ test.beforeEach(async ({ page }) => {
     }),
   );
   await page.route('https://images.unsplash.com/**', (route) => route.abort());
-  await page.route('https://tile.openstreetmap.org/**', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'image/png',
-      body: Buffer.from(
-        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aB9sAAAAASUVORK5CYII=',
-        'base64',
-      ),
-    }),
-  );
+  await stubMap(page);
 });
 async function noOverflow(page: Page) {
   expect(

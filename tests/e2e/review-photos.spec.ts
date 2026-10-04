@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { translate } from '../../resources/js/i18n/core';
 import { randomUUID } from 'node:crypto';
 
+import { stubMap } from './support/map';
 const base = 'http://127.0.0.1:3100';
 // A one-pixel PNG: the app turns it into a clean JPEG on the device before it uploads.
 const png = Buffer.from(
@@ -21,7 +22,7 @@ const stub = async (page: Page) => {
       },
     }),
   );
-  await page.route('https://tile.openstreetmap.org/**', (route) => route.abort());
+  await stubMap(page);
 };
 test.beforeEach(async ({ page }) => stub(page));
 async function register(page: Page, name: string) {
