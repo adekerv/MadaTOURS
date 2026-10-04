@@ -67,7 +67,8 @@ class SubmissionPhotos
         return $jpeg;
     }
 
-    public function upload(string $userId, string $base64): array
+    /** @param array<string, mixed> $extra Further columns for the row, such as the review a photo belongs to. */
+    public function upload(string $userId, string $base64, string $table = 'mt_submission_photos', array $extra = []): array
     {
         $id = (string) Str::uuid();
         $path = $userId.'/'.$id.'.jpg';
@@ -78,7 +79,7 @@ class SubmissionPhotos
                 throw new ApiException(503, 'Photo upload failed. Please try again.');
             }
             try {
-                $this->client->request('POST', '/rest/v1/mt_submission_photos', ['id' => $id, 'user_id' => $userId, 'path' => $path], admin: true);
+                $this->client->request('POST', '/rest/v1/'.$table, ['id' => $id, 'user_id' => $userId, 'path' => $path, ...$extra], admin: true);
             } catch (\Throwable $error) {
                 $this->storage()->delete('/object/mt-submissions', ['prefixes' => [$path]]);
                 throw $error;

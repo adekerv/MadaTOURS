@@ -8,6 +8,7 @@ use App\Http\Controllers\EnrichmentController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\RecurringTaskController;
+use App\Http\Controllers\ReviewPhotoController;
 use App\Http\Controllers\SavedPlaceController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\SubmissionController;
@@ -48,6 +49,10 @@ Route::middleware('auth:supabase')->group(function () {
     Route::get('places/{place}/my-review', [CommunityController::class, 'mine'])->block(90, 15);
     Route::get('moderation/community', [CommunityController::class, 'moderation'])->block(90, 15);
     Route::post('community/{action}', [CommunityController::class, 'store'])->block(90, 15);
+    // Review photos are for signed-in people only; guests are turned away before any of this runs.
+    Route::get('places/{place}/review-photos', [ReviewPhotoController::class, 'index'])->block(90, 15);
+    Route::post('reviews/{review}/photos', [ReviewPhotoController::class, 'store'])->block(90, 15);
+    Route::delete('review-photos/{photo}', [ReviewPhotoController::class, 'destroy'])->block(90, 15);
     Route::post('account/profile', [AccountController::class, 'profile'])->block(90, 15);
     Route::post('account/email', [AccountController::class, 'email'])->block(90, 15);
     Route::delete('account', [AccountController::class, 'destroy'])->block(90, 15);
