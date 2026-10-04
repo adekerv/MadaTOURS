@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { translate, type Language } from './core';
+import { explainFormErrors } from '../lib/validation';
 const key = 'madatours:language:v1';
 const context = createContext<{
   language: Language;
@@ -33,6 +34,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => {
     document.documentElement.lang = language;
+    return explainFormErrors(language);
   }, [language]);
   const t = useCallback(
     (message: string, values?: Record<string, string | number>) =>

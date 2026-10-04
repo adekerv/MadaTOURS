@@ -15,6 +15,9 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
     throw new ApiError('The mobile service is not configured yet.', 503);
   const headers = new Headers(options.headers);
   if (options.body) headers.set('Content-Type', 'application/json');
+  // The server words validation errors in the language the app is showing.
+  if (!headers.has('Accept-Language'))
+    headers.set('Accept-Language', document.documentElement.lang === 'fr' ? 'fr' : 'en');
   if (options.method && options.method !== 'GET') headers.set('X-MadaTours-Client', '1');
   return withRequestSignal(async (signal) => {
     let data: unknown;

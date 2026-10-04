@@ -241,6 +241,32 @@ summary {
 .leaflet-control-attribution {
   max-width: calc(100vw - 20px);
 }
+/* On narrow maps the credit folds behind a 44px "i" button (see foldCredit in basemap.ts). */
+.map-credit-toggle {
+  display: none;
+}
+.credit-fold .map-credit-toggle {
+  display: block;
+}
+.map-credit-toggle button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: inherit;
+  background: #fff;
+  color: #334155;
+  font:
+    italic 700 1.15rem Georgia,
+    serif;
+  cursor: pointer;
+}
+.credit-fold:not(.credit-open) .leaflet-control-attribution {
+  display: none;
+}
+.dark .map-credit-toggle button {
+  background: var(--surface-card);
+  color: var(--text-primary);
+}
 .search-center-marker {
   display: block;
   width: 24px;
@@ -828,8 +854,7 @@ summary {
   position: relative;
 }
 .trip-map {
-  /* Tall enough that the two-row map credit on a phone still leaves room for the route above it. */
-  height: 18rem;
+  height: 15rem;
   overflow: hidden;
   border-radius: 1rem;
   border: 1px solid var(--line, #e2e8f0);

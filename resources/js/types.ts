@@ -29,6 +29,11 @@ export interface Place {
   tags?: string[];
   image?: string;
   details?: PlaceDetails;
+  /**
+   * False for a place from the list, which leaves out its practical details and sources to stay small. The place
+   * page loads the rest when it opens (see usePlaceDetail).
+   */
+  detailLoaded?: boolean;
   /** Set only when the listing needs a note; closed places are never sent to visitors. */
   listingStatus?: 'needs_review';
 }

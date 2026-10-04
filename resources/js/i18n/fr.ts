@@ -1043,4 +1043,24 @@ export const french: Record<string, string> = {
   'Edit {name}': 'Modifier {name}',
   'Recalculate route for {name}': 'Recalculer l’itinéraire de {name}',
   Tours: 'Circuits',
+  'Search area': 'Zone de recherche',
+  'Map credits': 'Crédits de la carte',
+  'Please tick this box to continue.': 'Cochez cette case pour continuer.',
+  'Please choose an option.': 'Choisissez une option.',
+  'Please fill in this field.': 'Remplissez ce champ.',
+  'Enter an email address, for example name@example.com.':
+    'Saisissez une adresse e-mail, par exemple nom@exemple.com.',
+  'Enter a web address starting with https://.':
+    'Saisissez une adresse web commençant par https://.',
+  'Enter a valid value.': 'Saisissez une valeur valide.',
+  'Use at least {min} characters (you have {count}).':
+    'Utilisez au moins {min} caractères (vous en avez {count}).',
+  'Use at most {max} characters.': 'Utilisez au plus {max} caractères.',
+  'Use the format shown.': 'Respectez le format indiqué.',
+  'Enter {min} or more.': 'Saisissez {min} ou plus.',
+  'Enter {max} or less.': 'Saisissez {max} ou moins.',
+  'Enter a valid number.': 'Saisissez un nombre valide.',
+  'Only administrators can do this.': 'Seuls les administrateurs peuvent effectuer cette action.',
+  'Loading more details…': 'Chargement des détails…',
+  'More details could not be loaded.': 'Les détails n’ont pas pu être chargés.',
 };

@@ -1,6 +1,7 @@
 import L from 'leaflet';
 import { MaplibreGL, maplibreGL } from '@maplibre/maplibre-gl-leaflet';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { translate } from '../i18n/core';
 
 /**
  * The base map for every Leaflet map in the app: OpenFreeMap vector tiles, which are free, need no key and may be
@@ -46,6 +47,58 @@ binding._transitionEnd = function (this: Binding, ...args: unknown[]) {
   }
 };
 
+/**
+ * Narrower than this, the credit would take two or three rows (every link keeps a 44px touch target) and cover a
+ * third of the map, so it folds behind an "i" button, as map libraries do on phones. The credit is still one tap away
+ * and every link in it is unchanged.
+ */
+const foldBelow = 440;
+class CreditToggle extends L.Control {
+  constructor(private label: () => string) {
+    super({ position: 'bottomright' });
+  }
+  onAdd(map: L.Map) {
+    const box = L.DomUtil.create('div', 'leaflet-bar map-credit-toggle');
+    const button = L.DomUtil.create('button', '', box);
+    button.type = 'button';
+    button.textContent = 'i';
+    button.setAttribute('aria-expanded', 'false');
+    const name = () => button.setAttribute('aria-label', this.label());
+    name();
+    // The language can change while a map stays open, so the name is read again when the button is used.
+    button.addEventListener('focus', name);
+    L.DomEvent.disableClickPropagation(box);
+    L.DomEvent.on(button, 'click', () =>
+      button.setAttribute(
+        'aria-expanded',
+        String(map.getContainer().classList.toggle('credit-open')),
+      ),
+    );
+    return box;
+  }
+}
+function foldCredit(map: L.Map): () => void {
+  const container = map.getContainer();
+  const toggle = new CreditToggle(() =>
+    translate(document.documentElement.lang === 'fr' ? 'fr' : 'en', 'Map credits'),
+  ).addTo(map);
+  const apply = () => {
+    const folded = map.getSize().x < foldBelow;
+    container.classList.toggle('credit-fold', folded);
+    if (!folded) {
+      container.classList.remove('credit-open');
+      toggle.getContainer()?.querySelector('button')?.setAttribute('aria-expanded', 'false');
+    }
+  };
+  map.on('resize', apply);
+  apply();
+  return () => {
+    map.off('resize', apply);
+    toggle.remove();
+    container.classList.remove('credit-fold', 'credit-open');
+  };
+}
+
 export type BasemapEvents = { loading?: () => void; loaded?: () => void; failed?: () => void };
 
 /**
@@ -79,7 +132,9 @@ export function addBasemap(map: L.Map, dark: boolean, events: BasemapEvents = {}
     raster.on('tileerror', () => events.failed?.());
     layer = raster.addTo(map);
   }
+  const unfold = foldCredit(map);
   return () => {
+    unfold();
     if (layer && map.hasLayer(layer)) map.removeLayer(layer);
   };
 }

@@ -256,7 +256,11 @@ export function ExplorationPage({
   return (
     <div className="explore-shell flex flex-col bg-slate-50">
       <Header onBack={onBack} userLocation={center} onGetLocation={() => setLocationOpen(true)} />
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-orange-100 bg-orange-50 px-4 text-sm">
+      <div
+        role="region"
+        aria-label={t('Search area')}
+        className="flex shrink-0 items-center justify-between gap-3 border-b border-orange-100 bg-orange-50 px-4 text-sm"
+      >
         <span className="text-orange-900">
           {t(
             center.manual ? 'Find your next stop nearby' : 'Sorted by distance from your location',

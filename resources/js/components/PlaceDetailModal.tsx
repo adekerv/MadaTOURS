@@ -14,13 +14,14 @@ import { PlacePhoto } from './ui/PlacePhoto';
 import type { Place, User } from '../types';
 import { placeholderFor, creditLine } from '../lib/placeholders';
 import { placeFacts, telHref } from '../lib/place-details';
+import { usePlaceDetail } from '../hooks/usePlaceDetail';
 import { PlaceCommunity } from './community/PlaceCommunity';
 import { PracticalInfo } from './place/PracticalInfo';
 import { Modal } from './ui/Modal';
 const MiniMap = lazy(() => import('./place/MiniMap'));
 const action = 'flex min-h-11 items-center justify-center gap-2 text-center';
 export function PlaceDetailModal({
-  place,
+  place: listed,
   onClose,
   isFavorite,
   onToggleFavorite,
@@ -43,6 +44,7 @@ export function PlaceDetailModal({
   onRatingChanged: () => void;
 }) {
   const { t, language } = useI18n();
+  const { place, status } = usePlaceDetail(listed);
   const [failedPhoto, setFailedPhoto] = useState('');
   const showingPlaceholder = !place.image || failedPhoto === place.image;
   const illustrative = placeholderFor(place);
@@ -147,6 +149,13 @@ export function PlaceDetailModal({
           </h3>
           <p className="leading-relaxed text-slate-700">{facts.about}</p>
         </section>
+        {status !== 'ready' && (
+          <p role="status" className="text-sm text-slate-600">
+            {t(
+              status === 'loading' ? 'Loading more details…' : 'More details could not be loaded.',
+            )}
+          </p>
+        )}
         <PracticalInfo place={place} facts={facts} />
         <section aria-labelledby="place-map" className="space-y-2">
           <h3 id="place-map" className="text-lg font-bold">

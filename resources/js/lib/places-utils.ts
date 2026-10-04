@@ -48,6 +48,9 @@ export function normalizePlace(value: unknown): Place {
         ? String(p.description_fr ?? p.descriptionFr)
         : undefined,
     access: p.access === 'restricted' || p.access === 'open' ? p.access : 'unknown',
+    // The list sends no `sources` at all; a full place always does, even when there are none. A place read back
+    // from the device cache already says which it is.
+    detailLoaded: typeof p.detailLoaded === 'boolean' ? p.detailLoaded : Array.isArray(p.sources),
     sources: sourceSchema.array().safeParse(p.sources).data ?? [],
     photoCredit: photoCreditSchema.safeParse(p.photo_credit ?? p.photoCredit).data,
     tags: Array.isArray(tags) ? tags.filter((tag): tag is string => typeof tag === 'string') : [],

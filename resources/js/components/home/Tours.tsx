@@ -3,8 +3,10 @@ import { ArrowUpRight, Route } from 'lucide-react';
 import { useI18n } from '../../i18n/I18nProvider';
 import { api } from '../../lib/api';
 import {
+  cacheTours,
   formatRoute,
   parseTours,
+  readTours,
   roadLine,
   tourDescription,
   tourName,
@@ -122,15 +124,18 @@ function TourDialog({
 /** Ready-made routes an administrator curated. Nothing is shown until there is a published tour. */
 export function Tours({ places }: { places: Place[] }) {
   const { t, language } = useI18n();
-  const [tours, setTours] = useState<Tour[]>([]);
+  const [tours, setTours] = useState<Tour[]>(() => readTours() ?? []);
   const [open, setOpen] = useState<Tour | null>(null);
   useEffect(() => {
     const controller = new AbortController();
     api<unknown>('/tours', { signal: controller.signal })
       .then((data) => {
-        if (!controller.signal.aborted) setTours(parseTours(data));
+        if (controller.signal.aborted) return;
+        const next = parseTours(data);
+        setTours(next);
+        cacheTours(next);
       })
-      // Tours are an extra: if they cannot load, the rest of the page is unaffected.
+      // Tours are an extra: offline or on an error the last tours this device saw stay, and the page is unaffected.
       .catch(() => {});
     return () => controller.abort();
   }, []);

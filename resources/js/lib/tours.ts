@@ -62,3 +62,25 @@ export function formatRoute(tour: Tour) {
   const minutes = tour.route.durationS ? Math.round(tour.route.durationS / 60) : null;
   return { km: km < 10 ? km.toFixed(1) : String(Math.round(km)), minutes };
 }
+
+const cacheKey = 'madatours:tours:v1';
+/** The last published tours this device loaded, so the homepage still shows them offline. */
+export function readTours(): Tour[] | null {
+  try {
+    const data = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+    if (data?.version !== 1 || !Array.isArray(data.tours) || data.tours.length > 200) return null;
+    return parseTours(data.tours);
+  } catch {
+    return null;
+  }
+}
+export function cacheTours(tours: Tour[]): void {
+  try {
+    localStorage.setItem(
+      cacheKey,
+      JSON.stringify({ version: 1, savedAt: new Date().toISOString(), tours }),
+    );
+  } catch {
+    /* Without device storage the tours simply load again next time. */
+  }
+}

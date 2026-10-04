@@ -1026,4 +1026,23 @@ export const english: Record<string, string> = {
   'Edit {name}': 'Edit {name}',
   'Recalculate route for {name}': 'Recalculate route for {name}',
   Tours: 'Tours',
+  'Search area': 'Search area',
+  'Map credits': 'Map credits',
+  'Please tick this box to continue.': 'Please tick this box to continue.',
+  'Please choose an option.': 'Please choose an option.',
+  'Please fill in this field.': 'Please fill in this field.',
+  'Enter an email address, for example name@example.com.':
+    'Enter an email address, for example name@example.com.',
+  'Enter a web address starting with https://.': 'Enter a web address starting with https://.',
+  'Enter a valid value.': 'Enter a valid value.',
+  'Use at least {min} characters (you have {count}).':
+    'Use at least {min} characters (you have {count}).',
+  'Use at most {max} characters.': 'Use at most {max} characters.',
+  'Use the format shown.': 'Use the format shown.',
+  'Enter {min} or more.': 'Enter {min} or more.',
+  'Enter {max} or less.': 'Enter {max} or less.',
+  'Enter a valid number.': 'Enter a valid number.',
+  'Only administrators can do this.': 'Only administrators can do this.',
+  'Loading more details…': 'Loading more details…',
+  'More details could not be loaded.': 'More details could not be loaded.',
 };

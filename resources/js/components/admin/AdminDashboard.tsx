@@ -41,7 +41,8 @@ export function AdminDashboard({
   const [deletePlace, setDeletePlace] = useState<Place | null>(null);
   useEffect(() => {
     const controller = new AbortController();
-    api<unknown[]>('/places', { signal: controller.signal })
+    // The full list: the sources panel suggests each place's first source address.
+    api<unknown[]>('/places?full=1', { signal: controller.signal })
       .then((data) => {
         if (!controller.signal.aborted) setPlaces(data.map(normalizePlace));
       })
