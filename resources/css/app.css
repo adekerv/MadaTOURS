@@ -150,21 +150,12 @@
 }
 .app-dialog a,
 .home-shell footer a,
-.info-page a {
+.info-page a,
+.leaflet-control-attribution a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
   min-width: 44px;
-}
-/* The map credit is a sentence of inline links, which WCAG 2.5.8 exempts from the target size. A 44px box on each
-   link made the credit two tall rows that covered a third of a phone's map, so the links keep their text height
-   and gain padding for a 24px target instead. */
-.leaflet-control-attribution a,
-.app-dialog .leaflet-control-attribution a {
-  display: inline;
-  min-height: 0;
-  min-width: 0;
-  padding: 5px 1px;
 }
 summary {
   min-height: 44px;
@@ -837,7 +828,8 @@ summary {
   position: relative;
 }
 .trip-map {
-  height: 15rem;
+  /* Tall enough that the two-row map credit on a phone still leaves room for the route above it. */
+  height: 18rem;
   overflow: hidden;
   border-radius: 1rem;
   border: 1px solid var(--line, #e2e8f0);
