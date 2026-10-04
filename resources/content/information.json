@@ -14,7 +14,7 @@
         },
         {
           "title": "Maps, weather and trip estimates",
-          "body": "Maps use OpenStreetMap and Leaflet; the dark display recolors the same tiles. The coastline outline on the homepage is drawn from OpenStreetMap data (© OpenStreetMap contributors, ODbL). Weather for Fort-de-France comes from Open-Meteo. Distances are estimates. Trip suggestions require an optional account and use device location, rough driving or walking times and known official-source hours. Unknown hours are labeled. Directions links help you check the actual road route; no traffic data is used."
+          "body": "Maps use OpenFreeMap vector tiles built from OpenStreetMap data (© OpenMapTiles, © OpenStreetMap contributors), drawn with MapLibre inside Leaflet; the dark display recolors the same map. The coastline outline on the homepage is drawn from OpenStreetMap data (© OpenStreetMap contributors, ODbL). Weather for Fort-de-France comes from Open-Meteo. Distances are estimates. Trip suggestions require an optional account and use device location, rough driving or walking times and known official-source hours. Unknown hours are labeled. Directions links help you check the actual road route; no traffic data is used."
         },
         {
           "title": "Photos with context",
@@ -62,7 +62,7 @@
         },
         {
           "title": "Service providers and external links",
-          "body": "Supabase processes accounts, reviews, connections, meet-ups, submissions and private photo uploads. Our host processes website requests and technical logs. OpenStreetMap and Open-Meteo receive map and weather requests, including IP address and request information. Google receives requests only when you load its live place panel or open its external links; its privacy policy and terms apply. Venue photo hosts receive image requests. Providers may process information outside your country under their applicable safeguards. The contact form opens your email app and sends nothing until you send the email."
+          "body": "Supabase processes accounts, reviews, connections, meet-ups, submissions and private photo uploads. Our host processes website requests and technical logs. OpenFreeMap (which serves the map tiles) and Open-Meteo receive map and weather requests, including IP address and request information. Google receives requests only when you load its live place panel or open its external links; its privacy policy and terms apply. Venue photo hosts receive image requests. Providers may process information outside your country under their applicable safeguards. The contact form opens your email app and sends nothing until you send the email."
         },
         {
           "title": "Purpose, retention and your choices",
@@ -134,7 +134,7 @@
         },
         {
           "title": "Cartes, météo et estimations",
-          "body": "Les cartes utilisent OpenStreetMap et Leaflet ; le mode sombre recolore les mêmes tuiles. Le tracé du littoral de la page d’accueil est dessiné à partir de données OpenStreetMap (© contributeurs d’OpenStreetMap, ODbL). La météo de Fort-de-France provient d’Open-Meteo. Les distances sont estimatives. Les suggestions de trajet nécessitent un compte facultatif et utilisent la position de l’appareil, des estimations en voiture ou à pied et les horaires connus de sources officielles. Les horaires inconnus sont signalés. Les liens d’itinéraire permettent de vérifier le trajet routier réel ; aucune donnée de trafic n’est utilisée."
+          "body": "Les cartes utilisent les tuiles vectorielles d’OpenFreeMap, construites à partir de données OpenStreetMap (© OpenMapTiles, © contributeurs d’OpenStreetMap), dessinées avec MapLibre dans Leaflet ; le mode sombre recolore la même carte. Le tracé du littoral de la page d’accueil est dessiné à partir de données OpenStreetMap (© contributeurs d’OpenStreetMap, ODbL). La météo de Fort-de-France provient d’Open-Meteo. Les distances sont estimatives. Les suggestions de trajet nécessitent un compte facultatif et utilisent la position de l’appareil, des estimations en voiture ou à pied et les horaires connus de sources officielles. Les horaires inconnus sont signalés. Les liens d’itinéraire permettent de vérifier le trajet routier réel ; aucune donnée de trafic n’est utilisée."
         },
         {
           "title": "Des photos avec leur contexte",
@@ -182,7 +182,7 @@
         },
         {
           "title": "Prestataires et liens externes",
-          "body": "Supabase traite les comptes, avis, relations, rencontres, propositions et photos privées. L’hébergeur traite les requêtes et journaux techniques. OpenStreetMap et Open-Meteo reçoivent les requêtes de carte et météo, avec l’adresse IP et les informations de requête. Google reçoit des requêtes lorsque vous chargez son panneau ou ouvrez ses liens ; sa politique et ses conditions s’appliquent. Les hébergeurs de photos reçoivent les requêtes d’images. Des prestataires peuvent traiter des données hors de votre pays avec leurs garanties applicables. Le formulaire de contact ouvre votre messagerie et n’envoie rien avant votre envoi."
+          "body": "Supabase traite les comptes, avis, relations, rencontres, propositions et photos privées. L’hébergeur traite les requêtes et journaux techniques. OpenFreeMap (qui fournit les tuiles de carte) et Open-Meteo reçoivent les requêtes de carte et météo, avec l’adresse IP et les informations de requête. Google reçoit des requêtes lorsque vous chargez son panneau ou ouvrez ses liens ; sa politique et ses conditions s’appliquent. Les hébergeurs de photos reçoivent les requêtes d’images. Des prestataires peuvent traiter des données hors de votre pays avec leurs garanties applicables. Le formulaire de contact ouvre votre messagerie et n’envoie rien avant votre envoi."
         },
         {
           "title": "Finalités, conservation et choix",
