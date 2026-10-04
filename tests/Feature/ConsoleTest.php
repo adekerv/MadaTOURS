@@ -35,6 +35,55 @@ class ConsoleTest extends TestCase
             && $request->header('apikey')[0] === 'server-secret');
     }
 
+    public function test_resetting_a_password_by_hand_replaces_it_and_signs_the_account_out(): void
+    {
+        Http::fake([
+            '*/admin/users?*' => Http::response(['users' => [['id' => 'a', 'email' => 'user@example.com']]]),
+            '*/admin/users/a' => Http::response([]),
+            '*/rpc/mt_revoke_user_sessions' => Http::response('', 204),
+        ]);
+        $this->artisan('account:reset-password', ['email' => ' USER@example.com '])
+            ->expectsQuestion('New password (at least 12 characters)', 'a long new password')
+            ->expectsQuestion('Repeat the new password', 'a long new password')
+            ->assertSuccessful();
+        Http::assertSent(fn ($r) => $r->method() === 'PUT' && str_ends_with($r->url(), '/auth/v1/admin/users/a') && $r['password'] === 'a long new password' && $r->header('apikey')[0] === 'server-secret');
+        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/rpc/mt_revoke_user_sessions') && $r['target'] === 'a');
+    }
+
+    public function test_resetting_a_password_can_issue_fresh_recovery_codes(): void
+    {
+        config(['supabase.recovery_code_cost' => 4]);
+        Http::fake([
+            '*/admin/users?*' => Http::response(['users' => [['id' => 'a', 'email' => 'user@example.com']]]),
+            '*/admin/users/a' => Http::response([]),
+            '*/rpc/*' => Http::response('', 204),
+        ]);
+        $this->artisan('account:reset-password', ['email' => 'user@example.com', '--new-codes' => true])
+            ->expectsQuestion('New password (at least 12 characters)', 'a long new password')
+            ->expectsQuestion('Repeat the new password', 'a long new password')
+            ->expectsOutputToContain('New recovery codes')
+            ->assertSuccessful();
+        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/rpc/mt_replace_recovery_codes') && $r['target'] === 'a' && count($r['hashes']) === 8);
+    }
+
+    public function test_a_mismatched_short_or_unknown_reset_changes_nothing(): void
+    {
+        Http::fake(['*/admin/users?*' => Http::response(['users' => []])]);
+        $this->artisan('account:reset-password', ['email' => 'user@example.com'])
+            ->expectsQuestion('New password (at least 12 characters)', 'short')
+            ->assertFailed();
+        $this->artisan('account:reset-password', ['email' => 'user@example.com'])
+            ->expectsQuestion('New password (at least 12 characters)', 'a long new password')
+            ->expectsQuestion('Repeat the new password', 'a different password')
+            ->assertFailed();
+        $this->artisan('account:reset-password', ['email' => 'user@example.com'])
+            ->expectsQuestion('New password (at least 12 characters)', 'a long new password')
+            ->expectsQuestion('Repeat the new password', 'a long new password')
+            ->assertFailed();
+        $this->artisan('account:reset-password', ['email' => 'invalid'])->assertFailed();
+        Http::assertNotSent(fn ($r) => $r->method() === 'PUT');
+    }
+
     public function test_invalid_admin_email_does_not_contact_the_provider(): void
     {
         $this->artisan('admin:grant', ['email' => 'invalid'])->assertFailed();

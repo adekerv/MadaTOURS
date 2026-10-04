@@ -22,10 +22,10 @@ class AccountTest extends TestCase
     }
 
     /** @param array<int, string> $providers Identity providers on the account; only "email" means it has a password. */
-    private function provider(array $providers = ['email'], bool $otpWorks = true): void
+    private function provider(array $providers = ['email'], bool $verified = true): void
     {
         $this->calls = [];
-        Http::fake(function (Request $request) use ($providers, $otpWorks) {
+        Http::fake(function (Request $request) use ($providers, $verified) {
             $path = parse_url($request->url(), PHP_URL_PATH);
             $this->calls[] = $request->method().' '.$path;
             if (str_ends_with($path, '/rpc/mt_check_rate_limit')) {
@@ -43,14 +43,17 @@ class AccountTest extends TestCase
                     'identities' => array_map(fn ($provider) => ['provider' => $provider], $providers),
                 ]);
             }
-            if ($path === '/auth/v1/otp') {
-                return $otpWorks ? Http::response([]) : Http::response([], 500);
-            }
             if ($path === '/auth/v1/logout' || str_starts_with($path, '/auth/v1/admin/users/') || str_ends_with($path, '/mt_profiles') && $request->method() === 'PATCH') {
                 return Http::response([]);
             }
             if (str_ends_with($path, '/mt_profiles')) {
-                return Http::response([['role' => 'user', 'email_verified_at' => '2026-10-01T00:00:00Z']]);
+                return Http::response([['role' => 'user', 'email_verified_at' => $verified ? '2026-10-01T00:00:00Z' : null]]);
+            }
+            if (str_ends_with($path, '/rpc/mt_recovery_codes_left')) {
+                return Http::response('5');
+            }
+            if (str_ends_with($path, '/rpc/mt_replace_recovery_codes')) {
+                return Http::response('', 204);
             }
             if (str_ends_with($path, '/mt_photo_deletions')) {
                 return Http::response([]);
@@ -71,6 +74,8 @@ class AccountTest extends TestCase
         $this->postJson('/api/account/profile', ['name' => 'Someone'])->assertUnauthorized();
         $this->postJson('/api/account/email', ['email' => 'a@example.test', 'password' => self::PASSWORD])->assertUnauthorized();
         $this->deleteJson('/api/account', ['confirmation' => 'camille@example.test', 'password' => self::PASSWORD])->assertUnauthorized();
+        $this->getJson('/api/account/recovery-codes')->assertUnauthorized();
+        $this->postJson('/api/account/recovery-codes', ['password' => self::PASSWORD])->assertUnauthorized();
         Http::assertNothingSent();
     }
 
@@ -123,19 +128,23 @@ class AccountTest extends TestCase
         $this->assertFalse($this->sent('PUT /auth/v1/user'));
     }
 
-    public function test_changing_email_needs_the_password_and_starts_unverified(): void
+    public function test_changing_email_needs_the_password_takes_effect_at_once_and_sends_nothing(): void
     {
         $this->provider();
         $this->postJson('/api/account/email', ['email' => ' New@Example.TEST ', 'password' => self::PASSWORD])
-            ->assertOk()->assertJsonPath('verificationSent', true);
-        // The verified flag is cleared first, so a failure part-way can never leave a new address marked verified.
-        $this->assertSame(
-            ['PATCH /rest/v1/mt_profiles', 'PUT /auth/v1/admin/users/original-user', 'POST /auth/v1/otp'],
-            array_values(array_filter($this->calls, fn ($call) => preg_match('#^(PATCH|PUT /auth/v1/admin|POST /auth/v1/otp)#', $call))),
-        );
-        Http::assertSent(fn (Request $r) => $r->method() === 'PATCH' && array_key_exists('email_verified_at', $r->data()) && $r['email_verified_at'] === null);
+            ->assertOk()->assertJsonPath('verificationLost', true);
         Http::assertSent(fn (Request $r) => $r->method() === 'PUT' && str_ends_with($r->url(), '/auth/v1/admin/users/original-user') && $r['email'] === 'new@example.test' && $r['email_confirm'] === true);
-        Http::assertSent(fn (Request $r) => str_ends_with($r->url(), '/auth/v1/otp') && $r['email'] === 'new@example.test' && $r['create_user'] === false);
+        $this->assertFalse($this->sent('POST /auth/v1/otp'), 'no email is requested');
+        // The database clears the verified flag with the change; the server does not do it in a separate step.
+        $this->assertFalse($this->sent('PATCH /rest/v1/mt_profiles'));
+    }
+
+    public function test_an_account_that_was_never_verified_just_changes_its_email(): void
+    {
+        $this->provider(verified: false);
+        $this->postJson('/api/account/email', ['email' => 'new@example.test', 'password' => self::PASSWORD])
+            ->assertOk()->assertJsonPath('verificationLost', false);
+        $this->assertTrue($this->sent('PUT /auth/v1/admin/users/original-user'));
     }
 
     public function test_a_wrong_password_changes_nothing(): void
@@ -163,12 +172,36 @@ class AccountTest extends TestCase
         $this->assertFalse($this->sent('PUT /auth/v1/admin/users/original-user'));
     }
 
-    public function test_the_email_still_changes_when_the_code_cannot_be_sent(): void
+    public function test_settings_show_how_many_recovery_codes_are_left(): void
     {
-        $this->provider(otpWorks: false);
-        $this->postJson('/api/account/email', ['email' => 'new@example.test', 'password' => self::PASSWORD])
-            ->assertOk()->assertJsonPath('verificationSent', false);
-        $this->assertTrue($this->sent('PUT /auth/v1/admin/users/original-user'));
+        $this->provider();
+        $this->getJson('/api/account/recovery-codes')->assertOk()->assertExactJson(['remaining' => 5, 'total' => 8]);
+        Http::assertSent(fn (Request $r) => str_ends_with($r->url(), '/rpc/mt_recovery_codes_left') && $r['target'] === 'original-user');
+    }
+
+    public function test_google_only_accounts_have_no_recovery_codes(): void
+    {
+        $this->provider(['google']);
+        $this->getJson('/api/account/recovery-codes')->assertOk()->assertExactJson(['remaining' => 0, 'total' => 8]);
+        $this->postJson('/api/account/recovery-codes', ['password' => self::PASSWORD])->assertStatus(409);
+        $this->assertFalse($this->sent('POST /rest/v1/rpc/mt_replace_recovery_codes'));
+    }
+
+    public function test_new_recovery_codes_need_the_password_and_replace_the_old_set(): void
+    {
+        $this->provider();
+        $codes = $this->postJson('/api/account/recovery-codes', ['password' => self::PASSWORD])->assertOk()->assertJsonCount(8, 'codes')->json('codes');
+        $this->assertCount(8, array_unique($codes));
+        Http::assertSent(fn (Request $r) => str_ends_with($r->url(), '/rpc/mt_replace_recovery_codes') && $r['target'] === 'original-user' && count($r['hashes']) === 8
+            && ! str_contains(json_encode($r->data()), str_replace('-', '', $codes[0])));
+    }
+
+    public function test_a_wrong_password_issues_no_recovery_codes(): void
+    {
+        $this->provider();
+        $this->postJson('/api/account/recovery-codes', ['password' => 'wrong password'])->assertStatus(400)->assertJsonPath('error', 'Incorrect password. Nothing was changed.');
+        $this->postJson('/api/account/recovery-codes', [])->assertStatus(400);
+        $this->assertFalse($this->sent('POST /rest/v1/rpc/mt_replace_recovery_codes'));
     }
 
     public function test_deleting_needs_the_typed_email_before_anything_else_happens(): void

@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Mail\WelcomeMail;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -26,6 +28,7 @@ class SignupTest extends TestCase
             '*/auth/v1/signup' => Http::response(['access_token' => 'private-access', 'refresh_token' => 'private-refresh', 'expires_in' => 3600]),
             '*/auth/v1/user' => Http::response(['id' => 'new-user', 'email' => 'user@example.com', 'user_metadata' => ['display_name' => 'Camille', 'role' => 'admin']]),
             '*/mt_profiles*' => Http::response([['role' => 'user']]),
+            '*/rpc/mt_replace_recovery_codes' => Http::response('', 204),
         ]);
     }
 
@@ -38,6 +41,45 @@ class SignupTest extends TestCase
         Http::assertSent(fn ($r) => str_ends_with($r->url(), '/signup') && $r['data'] === ['display_name' => 'Camille', 'language' => 'fr'] && ! isset($r['role']) && $r['email'] === 'user@example.com');
         Mail::assertSent(WelcomeMail::class, fn ($mail) => $mail->hasTo('user@example.com') && $mail->displayName === 'Camille' && $mail->language === 'fr');
         Mail::assertSentCount(1);
+    }
+
+    public function test_signup_issues_eight_recovery_codes_once_and_stores_only_hashes(): void
+    {
+        $this->provider();
+        $codes = $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password'])
+            ->assertCreated()->assertJsonCount(8, 'recoveryCodes')->json('recoveryCodes');
+        $this->assertCount(8, array_unique($codes));
+        foreach ($codes as $code) {
+            $this->assertMatchesRegularExpression('/^[A-HJKMNP-TV-Z2-9]{5}-[A-HJKMNP-TV-Z2-9]{5}$/', $code);
+        }
+        Http::assertSent(function (Request $r) use ($codes) {
+            if (! str_ends_with($r->url(), '/rpc/mt_replace_recovery_codes')) {
+                return false;
+            }
+            $sent = json_encode($r->data());
+            foreach ($codes as $code) {
+                // The server never sends a readable code to the database.
+                if (str_contains($sent, $code) || str_contains($sent, str_replace('-', '', $code))) {
+                    return false;
+                }
+            }
+
+            return $r['target'] === 'new-user' && count($r['hashes']) === 8
+                && collect($codes)->every(fn ($code, $i) => Hash::check(str_replace('-', '', $code), $r['hashes'][$i]));
+        });
+    }
+
+    public function test_a_failure_issuing_codes_never_breaks_signup(): void
+    {
+        Http::fake([
+            '*/rpc/mt_check_rate_limit' => Http::response('true'),
+            '*/auth/v1/signup' => Http::response(['access_token' => 'a', 'refresh_token' => 'r', 'expires_in' => 3600]),
+            '*/auth/v1/user' => Http::response(['id' => 'new-user', 'email' => 'user@example.com', 'user_metadata' => ['display_name' => 'Camille']]),
+            '*/mt_profiles*' => Http::response([['role' => 'user']]),
+            '*/rpc/mt_replace_recovery_codes' => Http::response(['code' => 'XX000'], 500),
+        ]);
+        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password'])
+            ->assertCreated()->assertJsonPath('user.name', 'Camille')->assertJsonMissingPath('recoveryCodes');
     }
 
     public function test_invalid_or_missing_name_does_not_create_an_account(): void
