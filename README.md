@@ -2,7 +2,7 @@
 
 A Laravel 13 application for discovering Martinique, with a React 19 / TypeScript interface, Leaflet maps, and Supabase PostgreSQL and Auth. Laravel serves the website and every API endpoint; Vite builds the interface. Capacitor projects support iOS and Android.
 
-Browse 354 published places, search in French or English, create an account without email verification, save favorites and revisit lists across devices, recover a password, and manage places as an administrator. Day plans and offline place copies remain on the device; map tiles and itineraries are not synced offline.
+Browse 354 published places, search in French or English, create an account with no email sent (a forgotten password is reset with a one-time recovery code), save favorites and revisit lists across devices, and manage places as an administrator. Day plans and offline place copies remain on the device; map tiles and itineraries are not synced offline.
 
 ## Requirements and local setup
 
@@ -74,4 +74,4 @@ Deploy Laravel to a PHP host or use the included Dockerfile. The document root i
 
 Keep `VITE_API_URL` empty for the website. Native builds use `dist/mobile` and the deployed Laravel HTTPS origin; see [mobile guide](docs/MOBILE.md). Native signing and store submission are separate release steps.
 
-Additional guides: [source facts and listing audit](docs/SOURCES-AND-AUDIT.md), [catalogue research](docs/CATALOGUE-RESEARCH.md), [content and photo credits](docs/CONTENT.md), [class demonstration](docs/CLASS-DEMO.md), [verification](docs/VERIFICATION.md).
+Additional guides: [accounts without email](docs/ACCOUNTS-WITHOUT-EMAIL.md), [source facts and listing audit](docs/SOURCES-AND-AUDIT.md), [catalogue research](docs/CATALOGUE-RESEARCH.md), [content and photo credits](docs/CONTENT.md), [class demonstration](docs/CLASS-DEMO.md), [verification](docs/VERIFICATION.md).

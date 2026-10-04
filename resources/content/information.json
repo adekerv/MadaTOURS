@@ -46,7 +46,7 @@
         },
         {
           "title": "Optional account",
-          "body": "We use your display name, email, password credentials and account activity to provide the features you request. Supabase manages authentication and password hashes. Email ownership must be verified with a code before browsing or joining meet-ups. Older automatically confirmed accounts must complete this check too. We use an essential session cookie and send account-related messages when email delivery is available. Phone signup is not offered."
+          "body": "We use your display name, email, password credentials and account activity to provide the features you request. Supabase manages authentication and password hashes. We send no email. Meet-ups need an email address that Google has confirmed, which happens when you continue with Google using that address. If you forget your password, you can reset it with one of the eight one-time recovery codes shown when you sign up; we keep only a hash of each code. Older automatically confirmed accounts must complete this check too. We use an essential session cookie and send account-related messages when email delivery is available. Phone signup is not offered."
         },
         {
           "title": "Reviews, social activity and meet-ups",
@@ -110,7 +110,7 @@
         },
         {
           "title": "If you cannot sign in",
-          "body": "Use Forgot password to recover access. If recovery is unavailable or you prefer to request deletion, email adejkervin@protonmail.com with the subject MadaTours account deletion from the account’s email address. We will check ownership before acting. Never send your password by email."
+          "body": "Use Forgot password with one of your recovery codes to get back in. If you have lost your recovery codes too, or you prefer to request deletion, email adejkervin@protonmail.com with the subject MadaTours account deletion from the account’s email address. We will check ownership before acting. Never send your password by email."
         },
         {
           "title": "Local data and provider records",
@@ -166,7 +166,7 @@
         },
         {
           "title": "Compte facultatif",
-          "body": "Votre nom affiché, email, identifiants et activité servent aux fonctions demandées. Supabase gère l’authentification et les empreintes de mots de passe. L’email doit être vérifié par un code avant de consulter ou rejoindre les rencontres, y compris pour les anciens comptes confirmés automatiquement. Un cookie essentiel maintient votre connexion. Les messages liés au compte sont envoyés lorsque la messagerie est disponible. L’inscription par téléphone n’est pas proposée."
+          "body": "Votre nom affiché, email, identifiants et activité servent aux fonctions demandées. Supabase gère l’authentification et les empreintes de mots de passe. Nous n’envoyons pas d’e-mails. Les rencontres nécessitent une adresse confirmée par Google, ce qui se fait en continuant avec Google avec cette adresse. Si vous oubliez votre mot de passe, vous pouvez le réinitialiser avec l’un des huit codes de récupération à usage unique affichés à l’inscription ; nous n’en conservons qu’une empreinte. Un cookie essentiel maintient votre connexion. Les messages liés au compte sont envoyés lorsque la messagerie est disponible. L’inscription par téléphone n’est pas proposée."
         },
         {
           "title": "Avis, activité sociale et rencontres",
@@ -230,7 +230,7 @@
         },
         {
           "title": "Si vous ne pouvez pas vous connecter",
-          "body": "Utilisez Mot de passe oublié pour récupérer l’accès. Si la récupération est indisponible ou si vous préférez demander la suppression, écrivez à adejkervin@protonmail.com avec l’objet Suppression du compte MadaTours depuis l’adresse du compte. Nous vérifierons sa propriété avant d’agir. N’envoyez jamais votre mot de passe par email."
+          "body": "Utilisez Mot de passe oublié avec l’un de vos codes de récupération pour revenir. Si vous avez aussi perdu vos codes de récupération, ou si vous préférez demander la suppression, écrivez à adejkervin@protonmail.com avec l’objet Suppression du compte MadaTours depuis l’adresse du compte. Nous vérifierons sa propriété avant d’agir. N’envoyez jamais votre mot de passe par email."
         },
         {
           "title": "Données locales et prestataires",

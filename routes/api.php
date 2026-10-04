@@ -3,7 +3,6 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommunityController;
-use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\EnrichmentController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\PlaceController;
@@ -32,7 +31,7 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
     Route::get('session', 'session')->block(90, 15);
     Route::get('google', 'google')->block(90, 15);
     Route::get('google/callback', 'googleCallback')->block(90, 15);
-    foreach (['register', 'login', 'verify', 'resend', 'logout', 'forgot-password' => 'forgotPassword', 'reset-password' => 'resetPassword'] as $path => $method) {
+    foreach (['register', 'login', 'logout', 'recover'] as $path => $method) {
         Route::post(is_int($path) ? $method : $path, $method)->block(90, 15);
     }
 });
@@ -44,8 +43,6 @@ Route::middleware('auth:supabase')->group(function () {
     Route::post('submissions/{action}', [SubmissionController::class, 'decide'])->block(90, 15);
     Route::get('social', [SocialController::class, 'index'])->block(90, 15);
     Route::post('social/{action}', [SocialController::class, 'store'])->block(90, 15);
-    Route::post('account/verification/send', [EmailVerificationController::class, 'send'])->block(90, 15);
-    Route::post('account/verification/confirm', [EmailVerificationController::class, 'confirm'])->block(90, 15);
     Route::get('places/{place}/my-review', [CommunityController::class, 'mine'])->block(90, 15);
     Route::get('moderation/community', [CommunityController::class, 'moderation'])->block(90, 15);
     Route::post('community/{action}', [CommunityController::class, 'store'])->block(90, 15);
@@ -55,6 +52,8 @@ Route::middleware('auth:supabase')->group(function () {
     Route::delete('review-photos/{photo}', [ReviewPhotoController::class, 'destroy'])->block(90, 15);
     Route::post('account/profile', [AccountController::class, 'profile'])->block(90, 15);
     Route::post('account/email', [AccountController::class, 'email'])->block(90, 15);
+    Route::get('account/recovery-codes', [AccountController::class, 'recoveryStatus'])->block(90, 15);
+    Route::post('account/recovery-codes', [AccountController::class, 'recoveryCodes'])->block(90, 15);
     Route::delete('account', [AccountController::class, 'destroy'])->block(90, 15);
     Route::post('places', [PlaceController::class, 'store'])->block(90, 15);
     Route::delete('places/{id}', [PlaceController::class, 'destroy'])->block(90, 15);

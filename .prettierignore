@@ -16,3 +16,11 @@ storage
 composer.lock
 *.blade.php
 tests/fixtures/
+
+# Written and rewritten by Laravel Boost for AI agents; not hand-formatted.
+.agents/
+.claude/skills/
+.cursor/
+.mcp.json
+AGENTS.md
+boost.json
