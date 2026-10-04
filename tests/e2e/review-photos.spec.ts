@@ -122,6 +122,8 @@ for (const [language, width] of [
 
       // The same visitor signs in and now sees the photo.
       await register(guestPage, `Bob ${randomUUID().slice(0, 8)}`);
+      // The address is unchanged, so leave the page first to get a full reload with the new session.
+      await guestPage.goto('about:blank');
       const signedIn = await openCommunity(guestPage);
       const theirView = signedIn.locator('article').filter({ hasText: text });
       const shown = theirView.getByRole('img', {

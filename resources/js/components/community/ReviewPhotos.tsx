@@ -38,7 +38,7 @@ export function ReviewPhotos({
               disabled={disabled}
               aria-label={t('Remove photo')}
               onClick={() => onRemove(photo)}
-              className="absolute -right-2 -top-2 grid size-8 place-items-center rounded-full bg-white text-red-700 shadow ring-1 ring-slate-300"
+              className="absolute -right-3 -top-3 grid size-11 place-items-center rounded-full bg-white text-red-700 shadow ring-1 ring-slate-300"
             >
               <X size={16} aria-hidden="true" />
             </button>

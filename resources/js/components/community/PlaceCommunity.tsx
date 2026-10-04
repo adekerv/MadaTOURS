@@ -91,16 +91,26 @@ export function PlaceCommunity({
   }, [userId, placeId, offset, revision]);
   const ownReview = feed?.reviews.find((review) => review.user_id === userId);
   const room = Math.max(0, maxPhotos - photos.filter((p) => p.reviewId === ownReview?.id).length);
-  async function submitReview() {
-    if (!user) {
-      onLogin();
-      return;
-    }
+  /** One action at a time: clears the last message, and shows any error the action throws. */
+  async function run(task: () => Promise<void>) {
     if (busy) return;
     setBusy(true);
     setError('');
     setNotice('');
     try {
+      await task();
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function submitReview() {
+    if (!user) {
+      onLogin();
+      return;
+    }
+    await run(async () => {
       const saved = await api<{ id: number }>('/community/review', {
         method: 'POST',
         body: JSON.stringify({ placeId, rating, body }),
@@ -138,54 +148,33 @@ export function PlaceCommunity({
             ? 'Your review and photos are live. You can edit them here at any time.'
             : 'Your review is live. You can edit it here at any time.',
         );
-    } catch (e) {
-      setError(errorMessage(e));
-    } finally {
-      setBusy(false);
-    }
+    });
   }
-  async function removePhoto(photo: ReviewPhoto) {
-    if (busy) return;
-    setBusy(true);
-    setError('');
-    setNotice('');
-    try {
+  const removePhoto = (photo: ReviewPhoto) =>
+    run(async () => {
       await api(`/review-photos/${photo.id}`, { method: 'DELETE' });
       setNotice('Photo removed.');
       setRevision((v) => v + 1);
-    } catch (e) {
-      setError(errorMessage(e));
-    } finally {
-      setBusy(false);
-    }
-  }
+    });
   async function write(action: string, data: object, success: string) {
     if (!user) {
       onLogin();
       return;
     }
-    if (busy) return;
-    setBusy(true);
-    setError('');
-    setNotice('');
-    try {
+    await run(async () => {
       await api(`/community/${action}`, {
         method: 'POST',
         body: JSON.stringify({ placeId, ...data }),
       });
       setNotice(success);
       setRevision((v) => v + 1);
-      if (action === 'review' || action === 'delete-review') onRatingChanged();
       if (action === 'delete-review') {
+        onRatingChanged();
         setBody('');
         setRating(5);
       }
       if (action === 'comment') setComment('');
-    } catch (e) {
-      setError(errorMessage(e));
-    } finally {
-      setBusy(false);
-    }
+    });
   }
   const hasReviews = !!feed?.reviews.length;
   const hasComments = !!feed?.comments.length;
