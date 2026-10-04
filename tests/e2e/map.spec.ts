@@ -82,3 +82,33 @@ test('the explore map draws the island under the place pills', async ({ page }) 
   await expectDrawnMap(page, map, false);
   await page.screenshot({ path: `test-results/map-explore-${test.info().project.name}.png` });
 });
+
+test('on a phone the map credit folds behind a button and opens with every link intact', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#explore');
+  await page.getByRole('button', { name: 'Map', exact: true }).click();
+  const map = page.locator('.explore-map .leaflet-container');
+  const credit = map.locator('.leaflet-control-attribution');
+  const toggle = map.getByRole('button', { name: 'Map credits' });
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(credit).toBeHidden();
+  // The button is a full-size touch target.
+  const box = (await toggle.boundingBox())!;
+  expect(box.width).toBeGreaterThanOrEqual(44);
+  expect(box.height).toBeGreaterThanOrEqual(44);
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  for (const name of ['OpenFreeMap', '© OpenMapTiles', 'OpenStreetMap'])
+    await expect(credit.getByRole('link', { name })).toBeVisible();
+  await toggle.click();
+  await expect(credit).toBeHidden();
+
+  // On a wide map nothing is folded: the credit is on the map and there is no button.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(credit).toBeVisible();
+  await expect(toggle).toBeHidden();
+});

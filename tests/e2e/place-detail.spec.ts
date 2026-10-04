@@ -14,29 +14,39 @@ const rich = {
   services: ['Point wifi'],
   from: { address: { url: 'https://www.martinique.org/fr/x', checkedAt: '2026-10-02' } },
 };
-/** Serves the real catalogue, but rewrites two places so the page can be checked against known facts. */
+/**
+ * Serves the real catalogue, but rewrites two places so the page can be checked against known facts. The list leaves
+ * out each place's details, which the place page loads when it opens, so both requests are rewritten.
+ */
 async function stubCatalogue(page: Page) {
   await page.route('https://api.open-meteo.com/**', (route) => route.abort());
   await stubMap(page);
+  const rewrite = (place: Record<string, unknown>) => {
+    if (place.id === 1) {
+      place.details = rich;
+      // Real structured hours would take precedence over the text hours checked below.
+      delete place.openingPeriods;
+      delete place.hoursSource;
+    }
+    if (place.id === 2) {
+      delete place.details;
+      delete place.openingPeriods;
+      delete place.hours;
+      place.description = 'A plain place. Listed street: 1 Rue Test. Contact: +596 596 11 22 33.';
+      place.listingStatus = 'needs_review';
+    }
+  };
   await page.route('**/api/places', async (route) => {
     const response = await route.fetch();
     const places = (await response.json()) as Record<string, unknown>[];
-    for (const place of places) {
-      if (place.id === 1) {
-        place.details = rich;
-        // Real structured hours would take precedence over the text hours checked below.
-        delete place.openingPeriods;
-        delete place.hoursSource;
-      }
-      if (place.id === 2) {
-        delete place.details;
-        delete place.openingPeriods;
-        delete place.hours;
-        place.description = 'A plain place. Listed street: 1 Rue Test. Contact: +596 596 11 22 33.';
-        place.listingStatus = 'needs_review';
-      }
-    }
+    places.forEach(rewrite);
     await route.fulfill({ response, json: places });
+  });
+  await page.route(/\/api\/places\/\d+$/, async (route) => {
+    const response = await route.fetch();
+    const place = (await response.json()) as Record<string, unknown>;
+    rewrite(place);
+    await route.fulfill({ response, json: place });
   });
 }
 async function open(page: Page, name: string, language = 'en') {
@@ -120,4 +130,37 @@ test('the detail page reads in French and fits a small phone', async ({ page }) 
   );
   const box = await dialog.boundingBox();
   expect(box!.width).toBeLessThanOrEqual(360);
+});
+
+test('the list is light and the place page loads the details when it opens', async ({ page }) => {
+  await page.route('https://api.open-meteo.com/**', (route) => route.abort());
+  await stubMap(page);
+  const listing = page.waitForResponse((r) => new URL(r.url()).pathname === '/api/places');
+  const asked: string[] = [];
+  page.on('request', (request) => {
+    if (/\/api\/places\/\d+$/.test(request.url())) asked.push(new URL(request.url()).pathname);
+  });
+  const dialog = await open(page, 'Le Petibonum');
+  const places = (await (await listing).json()) as Record<string, unknown>[];
+  // Nothing in the list carries the heavy fields, yet the open page shows them.
+  expect(places.length).toBeGreaterThan(300);
+  expect(places.some((place) => 'details' in place || 'sources' in place)).toBe(false);
+  await expect(dialog.getByRole('heading', { name: 'About' })).toBeVisible();
+  await expect(dialog.getByText('Loading more details…')).toHaveCount(0);
+  await expect(dialog.getByRole('link', { name: /Call/ })).toBeVisible();
+  expect(asked).toHaveLength(1);
+  // Closing and opening again does not ask twice.
+  await dialog.getByRole('button', { name: /^Close/ }).click();
+  await page.getByRole('button', { name: 'Details for Le Petibonum', exact: true }).click();
+  await expect(page.getByRole('dialog').getByRole('link', { name: /Call/ })).toBeVisible();
+  expect(asked).toHaveLength(1);
+});
+
+test('without a connection the place page fills in from the bundled guide', async ({ page }) => {
+  await page.route('https://api.open-meteo.com/**', (route) => route.abort());
+  await stubMap(page);
+  await page.route(/\/api\/places\/\d+$/, (route) => route.abort());
+  const dialog = await open(page, 'Le Petibonum');
+  await expect(dialog.getByRole('link', { name: /Call/ })).toBeVisible();
+  await expect(dialog.getByText('More details could not be loaded.')).toHaveCount(0);
 });

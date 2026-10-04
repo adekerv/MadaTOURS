@@ -201,6 +201,26 @@ test('a routing outage never blocks saving, and visitors then see straight lines
   }
 });
 
+test('tours stay on the homepage when the network fails after they were loaded', async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  const email = await signInAsAdmin(page);
+  try {
+    await createTourByApi(page, 'Offline trip');
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: 'Island tours' })).toBeVisible();
+    // The tours request now fails, as it would on a plane or a bad connection; the saved list is shown instead.
+    await page.route('**/api/tours', (route) => route.abort());
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Island tours' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Offline trip/ })).toBeVisible();
+  } finally {
+    await page.unroute('**/api/tours');
+    await cleanUp(page, email);
+  }
+});
+
 test.describe('tablet', () => {
   test.skip(
     ({ browserName }) => browserName !== 'chromium',
@@ -226,6 +246,9 @@ test.describe('tablet', () => {
       const map = dialog.locator('.trip-map');
       // Buttons are the alternative to gestures, and only tablets and desktops get them.
       await expect(dialog.locator('.leaflet-control-zoom')).toBeVisible();
+      // The tablet map is wide enough for the whole credit, so there is no button.
+      await expect(dialog.locator('.leaflet-control-attribution')).toBeVisible();
+      await expect(dialog.locator('.map-credit-toggle')).toBeHidden();
       await expect(map).toHaveClass(/leaflet-touch-zoom/);
       await expect(map).not.toHaveClass(/leaflet-touch-drag/);
       await expect(dialog.locator('.route-line-road')).toHaveCount(1);
@@ -337,6 +360,13 @@ test.describe('phone', () => {
       await openTour(page, 'Phone trip');
       const dialog = page.getByRole('dialog');
       await expect(dialog.locator('.route-line-road')).toHaveCount(1);
+      // The credit sits behind a button on a phone, so it never covers the route; one tap opens it.
+      const credit = dialog.locator('.leaflet-control-attribution');
+      await expect(dialog.getByRole('button', { name: 'Map credits' })).toBeVisible();
+      await expect(credit).toBeHidden();
+      await dialog.getByRole('button', { name: 'Map credits' }).click();
+      await expect(credit).toContainText('OpenStreetMap');
+      await dialog.getByRole('button', { name: 'Map credits' }).click();
       const map = dialog.locator('.trip-map');
       await expect(map).not.toHaveClass(/leaflet-touch-zoom/);
       await expect(map).not.toHaveClass(/leaflet-touch-drag/);

@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { translate } from '../../resources/js/i18n/core';
 import { stubMap } from './support/map';
 
 test.beforeEach(async ({ page }) => {
@@ -432,3 +433,41 @@ test('compact screens open the filters as a bottom sheet', async ({ page }) => {
   await expect(sheet).toBeHidden();
   await expect(page.getByRole('button', { name: /^Filters/ })).toContainText('1');
 });
+
+test('the Explore location bar is a named region, so no content sits outside a landmark', async ({
+  page,
+}) => {
+  await page.goto('/#explore');
+  const region = page.getByRole('region', { name: 'Search area' });
+  await expect(region).toBeVisible();
+  await expect(region.getByRole('button', { name: 'Places near me' })).toBeVisible();
+});
+
+for (const language of ['en', 'fr'] as const)
+  test(`the browser's form checks speak the app language (${language})`, async ({ page }) => {
+    const t = (message: string) => translate(language, message);
+    await page.goto(`/?lang=${language}`);
+    await page
+      .getByRole('button', { name: t('Sign in'), exact: true })
+      .first()
+      .click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByRole('button', { name: t('New here? Create an account') }).click();
+    await dialog.getByLabel(t('Your name')).fill('Camille');
+    await dialog.locator('input[type=email]').fill('camille@example.test');
+    const password = dialog.locator('input[autocomplete=new-password]');
+    await password.fill('short');
+    await dialog.getByRole('button', { name: t('Create account'), exact: true }).click();
+    // The browser blocks the form and shows this message, in the app's language rather than the browser's.
+    await expect
+      .poll(() => password.evaluate((input: HTMLInputElement) => input.validationMessage))
+      .toBe(
+        translate(language, 'Use at least {min} characters (you have {count}).', {
+          min: 12,
+          count: 5,
+        }),
+      );
+    // Editing the field clears the message, so the form can be sent once the password is long enough.
+    await password.fill('a long enough password');
+    expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
+  });
