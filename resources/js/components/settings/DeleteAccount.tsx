@@ -41,7 +41,7 @@ export function DeleteAccount({ user, onDeleted }: { user: User; onDeleted: () =
       <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
         <li>{t('Your profile and display name')}</li>
         <li>{t('Your favorites and places to revisit')}</li>
-        <li>{t('Your reviews, comments and check-ins')}</li>
+        <li>{t('Your reviews and their photos, comments and check-ins')}</li>
         <li>{t('Your follows, blocks and meet-ups, including the ones you created')}</li>
         <li>{t('Your place suggestions and their photos')}</li>
         <li>{t('Your notifications and every signed-in session')}</li>

@@ -1,8 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Star, MapPin, MessageCircle } from 'lucide-react';
 import { api, errorMessage } from '../../lib/api';
+import { preparePhoto } from '../../lib/upload-photo';
 import { useI18n } from '../../i18n/I18nProvider';
 import type { User } from '../../types';
+import { ReviewPhotos, type ReviewPhoto } from './ReviewPhotos';
+const maxPhotos = 3;
 type Review = {
   id: number;
   user_id: string;
@@ -41,6 +44,9 @@ export function PlaceCommunity({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [photos, setPhotos] = useState<ReviewPhoto[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
+  const [fileInput, setFileInput] = useState(0);
   useEffect(() => {
     const controller = new AbortController();
     setError('');
@@ -66,6 +72,93 @@ export function PlaceCommunity({
       });
     return () => controller.abort();
   }, [userId, placeId, ownRetry]);
+  useEffect(() => {
+    // Photos are for signed-in people: guests never ask for them and are never sent any.
+    if (!userId) {
+      setPhotos([]);
+      return;
+    }
+    const controller = new AbortController();
+    api<{ photos: ReviewPhoto[] }>(`/places/${placeId}/review-photos?offset=${offset}`, {
+      signal: controller.signal,
+    })
+      .then((data) => setPhotos(data.photos))
+      .catch(() => {
+        // Photos are an extra; the reviews themselves still show.
+        if (!controller.signal.aborted) setPhotos([]);
+      });
+    return () => controller.abort();
+  }, [userId, placeId, offset, revision]);
+  const ownReview = feed?.reviews.find((review) => review.user_id === userId);
+  const room = Math.max(0, maxPhotos - photos.filter((p) => p.reviewId === ownReview?.id).length);
+  async function submitReview() {
+    if (!user) {
+      onLogin();
+      return;
+    }
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const saved = await api<{ id: number }>('/community/review', {
+        method: 'POST',
+        body: JSON.stringify({ placeId, rating, body }),
+      });
+      onRatingChanged();
+      let failed = '';
+      for (const file of files) {
+        let photo: string;
+        try {
+          photo = await preparePhoto(file);
+        } catch (e) {
+          failed =
+            e instanceof Error ? e.message : 'This photo could not be read. Choose another photo.';
+          break;
+        }
+        try {
+          await api(`/reviews/${saved.id}/photos`, {
+            method: 'POST',
+            body: JSON.stringify({ photo }),
+          });
+        } catch (e) {
+          failed = errorMessage(e);
+          break;
+        }
+      }
+      setFiles([]);
+      setFileInput((v) => v + 1);
+      setRevision((v) => v + 1);
+      if (failed) {
+        setNotice('Your review is live, but some photos could not be added.');
+        setError(failed);
+      } else
+        setNotice(
+          files.length
+            ? 'Your review and photos are live. You can edit them here at any time.'
+            : 'Your review is live. You can edit it here at any time.',
+        );
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function removePhoto(photo: ReviewPhoto) {
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      await api(`/review-photos/${photo.id}`, { method: 'DELETE' });
+      setNotice('Photo removed.');
+      setRevision((v) => v + 1);
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  }
   async function write(action: string, data: object, success: string) {
     if (!user) {
       onLogin();
@@ -154,11 +247,7 @@ export function PlaceCommunity({
           className="space-y-3 rounded-2xl bg-slate-50 p-4"
           onSubmit={(e) => {
             e.preventDefault();
-            void write(
-              'review',
-              { rating, body },
-              'Your review is live. You can edit it here at any time.',
-            );
+            void submitReview();
           }}
         >
           <fieldset disabled={!ownLoaded || busy} className="space-y-3">
@@ -192,6 +281,34 @@ export function PlaceCommunity({
                 onChange={(e) => setBody(e.target.value)}
               />
             </label>
+            <label className="field-label">
+              {t('Photos (optional)')}
+              <input
+                key={fileInput}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                disabled={room === 0}
+                className="field-input"
+                onChange={(e) => {
+                  const chosen = Array.from(e.target.files ?? []);
+                  if (chosen.length > room) setError('A review can have up to 3 photos.');
+                  setFiles(chosen.slice(0, room));
+                }}
+              />
+              <span className="text-xs font-normal text-slate-600">
+                {t('Up to 3 photos. Only signed-in people can see photos on reviews.')}
+              </span>
+            </label>
+            {files.length > 0 && (
+              <ul className="list-disc pl-5 text-sm text-slate-700">
+                {files.map((file) => (
+                  <li key={`${file.name}-${file.size}`} className="break-all">
+                    {file.name}
+                  </li>
+                ))}
+              </ul>
+            )}
             <button className="primary-button" disabled={busy}>
               {t('Publish or update review')}
             </button>
@@ -231,6 +348,13 @@ export function PlaceCommunity({
             {review.moderated ? ` · ${t('Edited by a moderator')}` : ''}
           </p>
           <p className="mt-3 whitespace-pre-wrap text-sm text-slate-700">{review.body}</p>
+          <ReviewPhotos
+            photos={photos.filter((photo) => photo.reviewId === review.id)}
+            author={review.display_name}
+            canRemove={user?.id === review.user_id || user?.role === 'admin'}
+            disabled={busy}
+            onRemove={(photo) => void removePhoto(photo)}
+          />
           {user?.id === review.user_id && (
             <button
               disabled={busy}

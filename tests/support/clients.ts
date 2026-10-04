@@ -189,6 +189,7 @@ export function testClients(db: PGlite) {
         const functions: Record<string, string[]> = {
           mt_check_rate_limit: ['identifier', 'ceiling'],
           mt_place_community: ['target_place', 'page_offset'],
+          mt_place_review_photos: ['target_place', 'page_offset'],
           mt_community_write: ['action', 'payload'],
           mt_social_write: ['action', 'payload'],
           mt_social_dashboard: ['search_text', 'page_offset'],
@@ -230,6 +231,7 @@ export function testClients(db: PGlite) {
             'mt_public_profiles',
             'mt_submissions',
             'mt_submission_photos',
+            'mt_review_photos',
             'mt_photo_deletions',
             'mt_notifications',
             'mt_source_settings',

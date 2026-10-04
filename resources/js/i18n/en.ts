@@ -916,7 +916,6 @@ export const english: Record<string, string> = {
   'We will delete:': 'We will delete:',
   'Your profile and display name': 'Your profile and display name',
   'Your favorites and places to revisit': 'Your favorites and places to revisit',
-  'Your reviews, comments and check-ins': 'Your reviews, comments and check-ins',
   'Your follows, blocks and meet-ups, including the ones you created':
     'Your follows, blocks and meet-ups, including the ones you created',
   'Your place suggestions and their photos': 'Your place suggestions and their photos',
@@ -950,4 +949,20 @@ export const english: Record<string, string> = {
   'Start {time}': 'Start {time}',
   'Arrive {time}': 'Arrive {time}',
   '{time} (next day)': '{time} (next day)',
+  'Photos (optional)': 'Photos (optional)',
+  'Up to 3 photos. Only signed-in people can see photos on reviews.':
+    'Up to 3 photos. Only signed-in people can see photos on reviews.',
+  'Photo shared by {name}': 'Photo shared by {name}',
+  'Remove photo': 'Remove photo',
+  'Photo removed.': 'Photo removed.',
+  'Your review is live, but some photos could not be added.':
+    'Your review is live, but some photos could not be added.',
+  'Your review and photos are live. You can edit them here at any time.':
+    'Your review and photos are live. You can edit them here at any time.',
+  'A review can have up to 3 photos.': 'A review can have up to 3 photos.',
+  'Review not found.': 'Review not found.',
+  'Photo not found.': 'Photo not found.',
+  'You can only remove your own photos.': 'You can only remove your own photos.',
+  'Your reviews and their photos, comments and check-ins':
+    'Your reviews and their photos, comments and check-ins',
 };

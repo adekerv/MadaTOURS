@@ -927,7 +927,6 @@ export const french: Record<string, string> = {
   'We will delete:': 'Nous supprimerons :',
   'Your profile and display name': 'Votre profil et votre nom affiché',
   'Your favorites and places to revisit': 'Vos favoris et vos lieux à revisiter',
-  'Your reviews, comments and check-ins': 'Vos avis, commentaires et check-ins',
   'Your follows, blocks and meet-ups, including the ones you created':
     'Vos abonnements, blocages et rencontres, y compris celles que vous avez créées',
   'Your place suggestions and their photos': 'Vos propositions de lieux et leurs photos',
@@ -962,4 +961,20 @@ export const french: Record<string, string> = {
   'Start {time}': 'Départ {time}',
   'Arrive {time}': 'Arrivée {time}',
   '{time} (next day)': '{time} (le lendemain)',
+  'Photos (optional)': 'Photos (facultatif)',
+  'Up to 3 photos. Only signed-in people can see photos on reviews.':
+    'Jusqu’à 3 photos. Seules les personnes connectées voient les photos des avis.',
+  'Photo shared by {name}': 'Photo partagée par {name}',
+  'Remove photo': 'Supprimer la photo',
+  'Photo removed.': 'Photo supprimée.',
+  'Your review is live, but some photos could not be added.':
+    'Votre avis est publié, mais certaines photos n’ont pas pu être ajoutées.',
+  'Your review and photos are live. You can edit them here at any time.':
+    'Votre avis et vos photos sont publiés. Vous pouvez les modifier ici à tout moment.',
+  'A review can have up to 3 photos.': 'Un avis peut contenir jusqu’à 3 photos.',
+  'Review not found.': 'Avis introuvable.',
+  'Photo not found.': 'Photo introuvable.',
+  'You can only remove your own photos.': 'Vous ne pouvez supprimer que vos propres photos.',
+  'Your reviews and their photos, comments and check-ins':
+    'Vos avis et leurs photos, commentaires et check-ins',
 };
