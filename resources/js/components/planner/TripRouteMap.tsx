@@ -38,31 +38,37 @@ function arrowIcon(bearing: number) {
   });
 }
 
-/** Where an arrow fits along a drawn line: every `spacing` pixels, pointing the way the line runs there. */
+/**
+ * Where an arrow fits along a drawn line: every `spacing` pixels, pointing the way the line runs there. Only places
+ * on screen (or just off it) get one, so a long road at a high zoom does not create thousands of markers.
+ */
 function arrowsAlong(map: L.Map, line: L.LatLngTuple[], spacing: number) {
   const points = line.map((point) => map.latLngToContainerPoint(point));
-  const found: { at: L.LatLng; bearing: number }[] = [];
+  const found: { at: L.LatLng; point: L.Point; bearing: number }[] = [];
   const total = points.reduce(
     (sum, point, i) => (i ? sum + points[i - 1].distanceTo(point) : 0),
     0,
   );
   // A line too short for an arrow gets none; a short one still gets a single arrow at its middle.
   if (total < 72) return found;
+  const { x: width, y: height } = map.getSize();
+  const margin = spacing;
   let walked = 0;
   let next = Math.min(spacing / 2, total / 2);
-  for (let i = 1; i < points.length; i++) {
+  for (let i = 1; i < points.length && found.length < 80; i++) {
     const from = points[i - 1];
     const to = points[i];
     const length = from.distanceTo(to);
     while (length && walked + length >= next) {
       const share = (next - walked) / length;
-      found.push({
-        at: map.containerPointToLatLng([
-          from.x + (to.x - from.x) * share,
-          from.y + (to.y - from.y) * share,
-        ]),
-        bearing: ((Math.atan2(to.x - from.x, from.y - to.y) * 180) / Math.PI + 360) % 360,
-      });
+      const x = from.x + (to.x - from.x) * share;
+      const y = from.y + (to.y - from.y) * share;
+      if (x > -margin && y > -margin && x < width + margin && y < height + margin)
+        found.push({
+          at: map.containerPointToLatLng([x, y]),
+          point: L.point(x, y),
+          bearing: ((Math.atan2(to.x - from.x, from.y - to.y) * 180) / Math.PI + 360) % 360,
+        });
       next += spacing;
     }
     walked += length;
@@ -195,7 +201,7 @@ export default function TripRouteMap({
       if (roadLine) {
         const pins = route.points.map((point) => map.latLngToContainerPoint(at(point)));
         for (const arrow of arrowsAlong(map, roadLine, 140))
-          if (pins.every((pin) => pin.distanceTo(map.latLngToContainerPoint(arrow.at)) >= 34))
+          if (pins.every((pin) => pin.distanceTo(arrow.point) >= 34))
             placeArrow(arrow.at, arrow.bearing);
         return;
       }

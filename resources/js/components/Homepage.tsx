@@ -245,7 +245,7 @@ export function Homepage({
           </div>
           <div className="grid gap-5 sm:grid-cols-3">
             {catalogueLoading && !places.length
-              ? [0, 1, 2].map((id) => <PlaceCardSkeleton key={id} />)
+              ? [0, 1, 2].map((id) => <PlaceCardSkeleton key={id} pick />)
               : [...places]
                   .filter((place) => place.access !== 'restricted')
                   .sort((a, b) => Number(!!b.image) - Number(!!a.image))
@@ -443,7 +443,7 @@ export function Homepage({
           </section>
         )}
       </main>
-      <Tours places={places} />
+      <Tours places={places} placesLoading={catalogueLoading} />
       <MustGo places={places} catalogueLoading={catalogueLoading} />
       <SiteFooter onSignup={user ? undefined : onSignup} />
     </div>

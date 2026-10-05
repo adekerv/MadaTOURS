@@ -22,23 +22,27 @@ CREATE TABLE IF NOT EXISTS public.mt_tours (
 );
 CREATE INDEX IF NOT EXISTS mt_tours_published_idx ON public.mt_tours(published, id);
 
--- Every stop must be a place that exists, with a sensible visit length, and no place may appear twice.
+-- Every stop must be a listed place that visitors may go to, with a sensible visit length, and no place may appear twice.
 CREATE OR REPLACE FUNCTION mt_private.check_tour() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
-DECLARE stop jsonb; seen bigint[] := '{}';
+DECLARE stop jsonb; seen bigint[] := '{}'; place_access text; place_listed boolean;
 BEGIN
   NEW.updated_at := now();
   -- Only changed stops are checked, so a place removed later never blocks renaming or unpublishing the tour.
   IF TG_OP = 'UPDATE' AND NEW.stops IS NOT DISTINCT FROM OLD.stops THEN RETURN NEW; END IF;
   FOR stop IN SELECT value FROM jsonb_array_elements(NEW.stops) LOOP
-    IF jsonb_typeof(stop->'placeId') <> 'number' OR jsonb_typeof(stop->'minutes') <> 'number'
-       OR (stop->>'placeId') !~ '^[0-9]{1,15}$' OR (stop->>'minutes') !~ '^[0-9]{1,3}$'
-       OR (stop->>'minutes')::int NOT BETWEEN 5 AND 720 THEN
+    -- A stop with a missing or malformed key makes the test NULL, which counts as invalid.
+    IF NOT coalesce(
+      CASE WHEN jsonb_typeof(stop->'placeId')='number' AND jsonb_typeof(stop->'minutes')='number'
+                AND (stop->>'placeId') ~ '^[0-9]{1,15}$' AND (stop->>'minutes') ~ '^[0-9]{1,3}$'
+           THEN (stop->>'minutes')::int BETWEEN 5 AND 720 END, false) THEN
       RAISE EXCEPTION 'Each stop needs a place and a visit time of 5 to 720 minutes' USING ERRCODE='22023';
     END IF;
     IF (stop->>'placeId')::bigint = ANY(seen) THEN RAISE EXCEPTION 'A place can appear once in a tour' USING ERRCODE='22023'; END IF;
     seen := seen || (stop->>'placeId')::bigint;
-    IF NOT EXISTS(SELECT 1 FROM public.mt_places WHERE id=(stop->>'placeId')::bigint) THEN RAISE EXCEPTION 'Unknown place in tour' USING ERRCODE='23503'; END IF;
+    SELECT access, published INTO place_access, place_listed FROM public.mt_places WHERE id=(stop->>'placeId')::bigint;
+    IF NOT FOUND OR NOT coalesce(place_listed, false) THEN RAISE EXCEPTION 'Unknown place in tour' USING ERRCODE='23503'; END IF;
+    IF place_access = 'restricted' THEN RAISE EXCEPTION 'A place with restricted access cannot be part of a tour' USING ERRCODE='22023'; END IF;
   END LOOP;
   RETURN NEW;
 END; $$;

@@ -1063,4 +1063,8 @@ export const french: Record<string, string> = {
   'Only administrators can do this.': 'Seuls les administrateurs peuvent effectuer cette action.',
   'Loading more details…': 'Chargement des détails…',
   'More details could not be loaded.': 'Les détails n’ont pas pu être chargés.',
+  'Loading the road route…': 'Chargement de l’itinéraire routier…',
+  'Every stop must be a place that is listed.': 'Chaque étape doit être un lieu référencé.',
+  'Places with restricted access cannot be part of a tour.':
+    'Les lieux à accès restreint ne peuvent pas faire partie d’un circuit.',
 };

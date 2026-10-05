@@ -23,6 +23,7 @@ Route::withoutMiddleware([EncryptCookies::class, AddQueuedCookiesToResponse::cla
     Route::get('places', [PlaceController::class, 'index']);
     Route::get('places/{place}', [PlaceController::class, 'show'])->whereNumber('place');
     Route::get('tours', [TourController::class, 'index']);
+    Route::get('tours/{id}', [TourController::class, 'show'])->whereNumber('id');
     Route::get('daily-picks', [EnrichmentController::class, 'picks']);
     Route::get('places/{place}/community', [CommunityController::class, 'show']);
     // Vercel Cron calls with GET; the GitHub workflow uses POST. Both need the secret.
@@ -60,9 +61,9 @@ Route::middleware('auth:supabase')->group(function () {
     Route::delete('account', [AccountController::class, 'destroy'])->block(90, 15);
     Route::get('moderation/tours', [TourController::class, 'manage'])->block(90, 15);
     Route::post('tours', [TourController::class, 'store'])->block(90, 15);
-    Route::post('tours/{id}', [TourController::class, 'update'])->block(90, 15);
-    Route::post('tours/{id}/route', [TourController::class, 'recalculate'])->block(90, 15);
-    Route::delete('tours/{id}', [TourController::class, 'destroy'])->block(90, 15);
+    Route::post('tours/{id}', [TourController::class, 'update'])->whereNumber('id')->block(90, 15);
+    Route::post('tours/{id}/route', [TourController::class, 'recalculate'])->whereNumber('id')->block(90, 15);
+    Route::delete('tours/{id}', [TourController::class, 'destroy'])->whereNumber('id')->block(90, 15);
     Route::post('places', [PlaceController::class, 'store'])->block(90, 15);
     Route::delete('places/{id}', [PlaceController::class, 'destroy'])->block(90, 15);
     Route::controller(SavedPlaceController::class)->where(['collection' => 'favorites|revisits'])->group(function () {

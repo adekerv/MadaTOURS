@@ -1045,4 +1045,8 @@ export const english: Record<string, string> = {
   'Only administrators can do this.': 'Only administrators can do this.',
   'Loading more details…': 'Loading more details…',
   'More details could not be loaded.': 'More details could not be loaded.',
+  'Loading the road route…': 'Loading the road route…',
+  'Every stop must be a place that is listed.': 'Every stop must be a place that is listed.',
+  'Places with restricted access cannot be part of a tour.':
+    'Places with restricted access cannot be part of a tour.',
 };

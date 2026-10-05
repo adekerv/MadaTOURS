@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ArrowDown, ArrowUp, Pencil, RefreshCw, Trash2, X } from 'lucide-react';
 import { useI18n } from '../../i18n/I18nProvider';
 import { api, errorMessage } from '../../lib/api';
+import { moveItem } from '../../lib/trips';
 import { formatRoute, parseTours, type Tour } from '../../lib/tours';
 import type { Place } from '../../types';
 
@@ -27,7 +28,10 @@ export function TourManager({ places }: { places: Place[] }) {
   const choices = useMemo(
     () =>
       places
-        .filter((place) => !stops.some((stop) => stop.placeId === place.id))
+        .filter(
+          (place) =>
+            place.access !== 'restricted' && !stops.some((stop) => stop.placeId === place.id),
+        )
         .sort((a, b) => a.name.localeCompare(b.name)),
     [places, stops],
   );
@@ -62,13 +66,7 @@ export function TourManager({ places }: { places: Place[] }) {
     setNotice('');
   };
   const move = (index: number, direction: -1 | 1) =>
-    setStops((previous) => {
-      const next = [...previous];
-      const target = index + direction;
-      if (target < 0 || target >= next.length) return previous;
-      [next[index], next[target]] = [next[target], next[index]];
-      return next;
-    });
+    setStops((previous) => moveItem(previous, index, direction));
   const routeNotice = (tour: Tour) => {
     const facts = formatRoute(tour);
     return tour.routeSource === 'road' && facts

@@ -5,6 +5,7 @@ import { api } from '../../lib/api';
 import {
   cacheTours,
   formatRoute,
+  parseTourDetail,
   parseTours,
   readTours,
   roadLine,
@@ -12,6 +13,7 @@ import {
   tourName,
   tourRoute,
   type Tour,
+  type TourDetail,
 } from '../../lib/tours';
 import type { Place } from '../../types';
 import { Modal } from '../ui/Modal';
@@ -35,19 +37,48 @@ function RouteFacts({ tour }: { tour: Tour }) {
   );
 }
 
+/** Tour pages opened this session, so reopening one does not ask for its road line again. */
+const opened = new Map<number, TourDetail>();
+
 function TourDialog({
   tour,
   places,
+  placesLoading,
   onClose,
 }: {
   tour: Tour;
   places: Place[];
+  placesLoading: boolean;
   onClose: () => void;
 }) {
   const { t, language } = useI18n();
+  const [detail, setDetail] = useState<TourDetail | null>(opened.get(tour.id) ?? null);
+  const hasRoad = tour.routeSource === 'road';
+  const [roadStatus, setRoadStatus] = useState<'loading' | 'ready' | 'failed'>(
+    !hasRoad || detail ? 'ready' : 'loading',
+  );
+  // The list says how long the road is; the road line itself is fetched when a tour is opened.
+  useEffect(() => {
+    if (!hasRoad || opened.has(tour.id)) return;
+    const controller = new AbortController();
+    api<unknown>(`/tours/${tour.id}`, { signal: controller.signal })
+      .then((data) => {
+        if (controller.signal.aborted) return;
+        const parsed = parseTourDetail(data);
+        if (parsed) opened.set(tour.id, parsed);
+        setDetail(parsed);
+        setRoadStatus(parsed ? 'ready' : 'failed');
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setRoadStatus('failed');
+      });
+    return () => controller.abort();
+  }, [tour.id, hasRoad]);
   const route = useMemo(() => tourRoute(tour, places), [tour, places]);
-  const road = roadLine(tour, route);
+  const road = roadLine(detail, route);
   const name = tourName(tour, language);
+  // The tour can open from the saved list before the catalogue has arrived; without places there is nothing to draw.
+  const waiting = placesLoading && !places.length;
   return (
     <Modal title={name} onClose={onClose} wide>
       <div className="space-y-5 p-5 sm:p-7">
@@ -55,74 +86,85 @@ function TourDialog({
         <p className="text-sm font-semibold text-orange-800">
           <RouteFacts tour={tour} />
         </p>
-        {route.points.length > 0 && (
-          <div className="trip-map-frame">
-            <Suspense
-              fallback={<div role="status" aria-label={t('Loading map…')} className="trip-map" />}
-            >
-              <TripRouteMap
-                route={route}
-                road={road}
-                label={t('Route map: {stops}', {
-                  stops: route.points.map((p) => `${p.order}. ${p.place.name}`).join(', '),
-                })}
-              />
-            </Suspense>
-          </div>
-        )}
-        <p className="text-xs text-slate-500">
-          {road
-            ? t(
-                'The line follows the road between the stops. Check live directions before you set off.',
-              )
-            : t(
-                'Stops are joined by straight lines in your visiting order. Check directions for road routes.',
+        {waiting ? (
+          <p role="status" className="text-sm text-slate-600">
+            {t('Loading places…')}
+          </p>
+        ) : (
+          <>
+            {route.points.length > 0 && (
+              <div className="trip-map-frame">
+                <Suspense
+                  fallback={
+                    <div role="status" aria-label={t('Loading map…')} className="trip-map" />
+                  }
+                >
+                  <TripRouteMap
+                    route={route}
+                    road={road}
+                    label={t('Route map: {stops}', {
+                      stops: route.points.map((p) => `${p.order}. ${p.place.name}`).join(', '),
+                    })}
+                  />
+                </Suspense>
+              </div>
+            )}
+            <p className="text-xs text-slate-500">
+              {roadStatus === 'loading' ? (
+                t('Loading the road route…')
+              ) : road ? (
+                <>
+                  {t(
+                    'The line follows the road between the stops. Check live directions before you set off.',
+                  )}{' '}
+                  {/* The attribution openrouteservice asks for wherever its routes are shown. */}
+                  <a
+                    href="https://openrouteservice.org/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    © openrouteservice.org by HeiGIT | Map data © OpenStreetMap contributors
+                  </a>
+                </>
+              ) : (
+                t(
+                  'Stops are joined by straight lines in your visiting order. Check directions for road routes.',
+                )
               )}
-          {road && (
-            <>
-              {' '}
-              {/* The attribution openrouteservice asks for wherever its routes are shown. */}
-              <a
-                href="https://openrouteservice.org/"
-                target="_blank"
-                rel="noreferrer"
-                className="underline"
-              >
-                © openrouteservice.org by HeiGIT | Map data © OpenStreetMap contributors
-              </a>
-            </>
-          )}
-        </p>
-        <ol className="space-y-2">
-          {tour.stops.map((stop, index) => {
-            const place = places.find((candidate) => candidate.id === stop.placeId);
-            return (
-              <li
-                key={stop.placeId}
-                className="flex flex-wrap items-baseline justify-between gap-2 rounded-2xl border border-slate-200 p-3"
-              >
-                <span className="min-w-0 font-semibold">
-                  {index + 1}. {place?.name ?? t('This place is no longer listed')}
-                  {place && (
-                    <span className="block text-sm font-normal text-slate-600">
-                      {place.location}
+            </p>
+            <ol className="space-y-2">
+              {tour.stops.map((stop, index) => {
+                const place = places.find((candidate) => candidate.id === stop.placeId);
+                return (
+                  <li
+                    key={stop.placeId}
+                    className="flex flex-wrap items-baseline justify-between gap-2 rounded-2xl border border-slate-200 p-3"
+                  >
+                    <span className="min-w-0 font-semibold">
+                      {index + 1}. {place?.name ?? t('This place is no longer listed')}
+                      {place && (
+                        <span className="block text-sm font-normal text-slate-600">
+                          {place.location}
+                        </span>
+                      )}
                     </span>
-                  )}
-                </span>
-                <span className="text-sm text-slate-600">
-                  {t('{minutes} min', { minutes: stop.minutes })}
-                </span>
-              </li>
-            );
-          })}
-        </ol>
+                    <span className="text-sm text-slate-600">
+                      {t('{minutes} min', { minutes: stop.minutes })}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </>
+        )}
       </div>
     </Modal>
   );
 }
 
 /** Ready-made routes an administrator curated. Nothing is shown until there is a published tour. */
-export function Tours({ places }: { places: Place[] }) {
+export function Tours({ places, placesLoading }: { places: Place[]; placesLoading: boolean }) {
   const { t, language } = useI18n();
   const [tours, setTours] = useState<Tour[]>(() => readTours() ?? []);
   const [open, setOpen] = useState<Tour | null>(null);
@@ -175,7 +217,14 @@ export function Tours({ places }: { places: Place[] }) {
           </li>
         ))}
       </ul>
-      {open && <TourDialog tour={open} places={places} onClose={() => setOpen(null)} />}
+      {open && (
+        <TourDialog
+          tour={open}
+          places={places}
+          placesLoading={placesLoading}
+          onClose={() => setOpen(null)}
+        />
+      )}
     </section>
   );
 }

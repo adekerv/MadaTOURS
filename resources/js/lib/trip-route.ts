@@ -53,7 +53,7 @@ export function bearing(from: { lat: number; lng: number }, to: { lat: number; l
  * time is set. Times use the same travel allowance as the trip summary, so the finish time
  * here always equals the start plus the summary's estimated total.
  */
-export function tripRoute(trip: DayTrip, places: Place[]): TripRoute {
+export function tripRoute(trip: Pick<DayTrip, 'stops' | 'startTime'>, places: Place[]): TripRoute {
   const byId = new Map(places.map((place) => [place.id, place]));
   const start = parseClock(trip.startTime);
   const points: RoutePoint[] = [];

@@ -13,17 +13,7 @@ const tour: Tour = {
     { placeId: 1, minutes: 60 },
     { placeId: 2, minutes: 45 },
   ],
-  route: {
-    geometry: {
-      type: 'LineString',
-      coordinates: [
-        [-61, 14.6],
-        [-61.1, 14.7],
-      ],
-    },
-    distanceM: 9000,
-    durationS: 800,
-  },
+  route: { distanceM: 9000, durationS: 800 },
   routeSource: 'road',
 };
 test('the last tours are kept on the device and corrupt or unavailable storage is tolerated', () => {

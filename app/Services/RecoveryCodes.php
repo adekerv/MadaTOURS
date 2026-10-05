@@ -18,7 +18,7 @@ class RecoveryCodes
     /** Thirty characters with no look-alikes (no 0, 1, I, L, O or U): about 49 bits per code. */
     private const ALPHABET = 'ABCDEFGHJKMNPQRSTVWXYZ23456789';
 
-    /** A fixed hash, checked when an email has no codes, so an unknown address costs as much time as a wrong code. */
+    /** A fixed hash, used to pad a failed attempt to the same number of checks whatever the account has. */
     private const FILLER = '$2y$10$dfA5WfEB6X4Vu3MoIC.KQebUm0oUHLxBzx3A0mp/WCBLBwP8S3TNi';
 
     public function __construct(private SupabaseClient $client) {}
@@ -53,6 +53,8 @@ class RecoveryCodes
     /**
      * Uses up the code if it belongs to the account that owns this email. Returns that account's id and the
      * code's id, or null for a wrong code, an unknown email or an account without codes, which look identical.
+     * Every code is checked, matched or not, and a failed attempt is padded to a full set of checks, so the time
+     * taken never says which code was right, whether the email has an account, or how many codes are left.
      *
      * @return array{userId: string, codeId: int}|null
      */
@@ -60,17 +62,14 @@ class RecoveryCodes
     {
         $candidates = $this->client->request('POST', '/rest/v1/rpc/mt_recovery_candidates', ['account_email' => $email], admin: true) ?: [];
         $code = self::normalize($code);
-        if (! $candidates) {
-            Hash::driver('bcrypt')->check($code, self::FILLER);
-
-            return null;
-        }
         $match = null;
-        // Every code is checked, matched or not, so the time taken does not say which one was right.
         foreach ($candidates as $candidate) {
             if (Hash::driver('bcrypt')->check($code, $candidate['hash']) && $match === null) {
                 $match = $candidate;
             }
+        }
+        for ($checked = count($candidates); $match === null && $checked < self::COUNT; $checked++) {
+            Hash::driver('bcrypt')->check($code, self::filler());
         }
         if ($match === null) {
             return null;
@@ -90,6 +89,12 @@ class RecoveryCodes
     public function revokeSessions(string $userId): void
     {
         $this->client->request('POST', '/rest/v1/rpc/mt_revoke_user_sessions', ['target' => $userId], admin: true);
+    }
+
+    /** The filler hash at the configured cost, so a padding check takes as long as a real one. */
+    private static function filler(): string
+    {
+        return '$2y$'.sprintf('%02d', config('supabase.recovery_code_cost')).'$'.substr(self::FILLER, 7);
     }
 
     public static function normalize(string $input): string

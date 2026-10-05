@@ -60,18 +60,30 @@ export function PlacePhoto({
     </div>
   );
 }
-export function PlaceCardSkeleton() {
+/**
+ * A card-shaped placeholder. The `pick` shape matches the homepage's place cards line for line, so the page below
+ * does not jump down when the catalogue arrives.
+ */
+export function PlaceCardSkeleton({ pick = false }: { pick?: boolean }) {
   return (
     <div
       aria-hidden="true"
-      className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+      className={`overflow-hidden border border-slate-200 bg-white ${pick ? 'rounded-3xl' : 'rounded-2xl'}`}
     >
-      <div className="skeleton h-36" />
-      <div className="space-y-3 p-4">
-        <div className="skeleton h-5 w-3/4 rounded" />
-        <div className="skeleton h-4 w-1/2 rounded" />
-        <div className="skeleton h-11 rounded-xl" />
-      </div>
+      <div className={`skeleton ${pick ? 'h-48' : 'h-36'}`} />
+      {pick ? (
+        <div className="p-5">
+          <div className="skeleton h-4 w-1/4 rounded" />
+          <div className="skeleton mt-2 h-7 w-3/4 rounded" />
+          <div className="skeleton mt-1 h-5 w-1/2 rounded" />
+        </div>
+      ) : (
+        <div className="space-y-3 p-4">
+          <div className="skeleton h-5 w-3/4 rounded" />
+          <div className="skeleton h-4 w-1/2 rounded" />
+          <div className="skeleton h-11 rounded-xl" />
+        </div>
+      )}
     </div>
   );
 }

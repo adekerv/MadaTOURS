@@ -3,19 +3,23 @@
 namespace App\Repositories;
 
 use App\Exceptions\ApiException;
+use App\Http\Resources\PlaceSummaryResource;
 use App\Services\Supabase\SupabaseClient;
 
 class PlaceRepository
 {
     public function __construct(private SupabaseClient $client) {}
 
-    public function published(): array
+    /**
+     * @param  bool  $summary  Leave out the practical details and sources, which only a place's own page shows
+     */
+    public function published(bool $summary = false): array
     {
         // Fetch every page, including catalogues larger than Supabase's default 1,000-row limit.
         $places = [];
         $offset = 0;
         do {
-            $page = $this->client->request('GET', '/rest/v1/mt_places', ['select' => '*', 'published' => 'eq.true', 'order' => 'id.asc', 'limit' => 500, 'offset' => $offset]);
+            $page = $this->client->request('GET', '/rest/v1/mt_places', ['select' => $summary ? PlaceSummaryResource::COLUMNS : '*', 'published' => 'eq.true', 'order' => 'id.asc', 'limit' => 500, 'offset' => $offset]);
             $places = array_merge($places, $page);
             $offset += count($page);
         } while (count($page) === 500);

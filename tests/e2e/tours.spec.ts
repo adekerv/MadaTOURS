@@ -104,6 +104,10 @@ const fillTour = async (page: Page, name: string) => {
     .getByRole('dialog')
     .locator('summary', { hasText: /^\s*Tours\s*$/ })
     .click();
+  // A place visitors cannot go to is not offered, as in the day planner.
+  await expect(
+    page.getByLabel('Add a stop').locator('option', { hasText: 'Cascade Didier' }),
+  ).toHaveCount(0);
   await page.getByLabel('Tour name', { exact: true }).fill(name);
   await page
     .getByLabel('Tour description', { exact: true })
@@ -217,6 +221,37 @@ test('tours stay on the homepage when the network fails after they were loaded',
     await expect(page.getByRole('button', { name: /Offline trip/ })).toBeVisible();
   } finally {
     await page.unroute('**/api/tours');
+    await cleanUp(page, email);
+  }
+});
+
+test('a tour opened before the catalogue arrives waits for it instead of calling its stops unlisted', async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  const email = await signInAsAdmin(page);
+  try {
+    await createTourByApi(page, 'Early trip');
+    await page.goto('/');
+    await expect(page.getByRole('button', { name: /Early trip/ })).toBeVisible();
+    // Next visit the tour list is on the device already, but the catalogue is not (cleared, or never saved) and slow.
+    // The first visit saves the catalogue when it arrives, which can be after the tour card shows; wait for that,
+    // then clear it, or it would be written back after the clearing.
+    await page.waitForFunction(() => localStorage.getItem('madatours:catalogue:v1') !== null);
+    await page.evaluate(() => localStorage.removeItem('madatours:catalogue:v1'));
+    await page.route('**/api/places', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+      await route.continue();
+    });
+    await page.reload();
+    await page.getByRole('button', { name: /Early trip/ }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByText('Loading places…')).toBeVisible();
+    await expect(dialog.getByText('This place is no longer listed')).toHaveCount(0);
+    await expect(dialog.locator('.route-pin')).toHaveCount(2);
+    await expect(dialog.getByText('This place is no longer listed')).toHaveCount(0);
+  } finally {
+    await page.unroute('**/api/places');
     await cleanUp(page, email);
   }
 });

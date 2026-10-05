@@ -38,14 +38,19 @@ export function validationMessage(field: Field, language: Language): string | nu
   return null;
 }
 
-/** Installs the wording on every form in the page; returns the function that removes it. */
+/**
+ * Installs the wording on every form in the page; returns the function that removes it. The message is set while the
+ * browser shows its pop-up and cleared straight after (and on the next edit), so a field whose value is later set in
+ * code is not left invalid by a stale message.
+ */
 export function explainFormErrors(language: Language): () => void {
   const explain = (event: Event) => {
     const field = event.target as Field;
     const message = validationMessage(field, language);
-    if (message) field.setCustomValidity(message);
+    if (!message) return;
+    field.setCustomValidity(message);
+    setTimeout(() => field.setCustomValidity(''), 0);
   };
-  // A message set for a problem must go once the person edits the field, or the field would stay invalid.
   const clear = (event: Event) => (event.target as Field).setCustomValidity?.('');
   document.addEventListener('invalid', explain, true);
   document.addEventListener('input', clear, true);

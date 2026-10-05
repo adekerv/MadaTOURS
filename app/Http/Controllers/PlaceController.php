@@ -18,16 +18,16 @@ class PlaceController extends Controller
 {
     public function __construct(private PlaceRepository $places) {}
 
+    /** The list leaves out the heavy details and sources; ?full=1 keeps them for the admin panel. */
     public function index(NearbyPlacesRequest $request, PlaceSearch $search): JsonResponse
     {
         $nearby = $request->validated();
-        $places = $this->places->published();
+        $full = $request->boolean('full');
+        $places = $this->places->published(summary: ! $full);
         if ($nearby) {
             $places = $search->nearby($places, (float) $nearby['lat'], (float) $nearby['lng'], (float) ($nearby['radius'] ?? 50));
         }
-
-        // The list leaves out the heavy details and sources; ?full=1 keeps them for the admin panel.
-        $resource = $request->boolean('full') ? PlaceResource::class : PlaceSummaryResource::class;
+        $resource = $full ? PlaceResource::class : PlaceSummaryResource::class;
 
         return response()->json($resource::collection($places)->resolve());
     }
@@ -35,7 +35,6 @@ class PlaceController extends Controller
     /** One place with everything, for the place page. */
     public function show(string $place): JsonResponse
     {
-        validator(['id' => $place], ['id' => ['required', 'integer', 'min:1', 'max:9007199254740991']])->validate();
         $row = $this->places->find((int) $place);
         if (! $row) {
             throw new ApiException(404, 'This place could not be found.');

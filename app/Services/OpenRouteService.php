@@ -39,7 +39,6 @@ class OpenRouteService
                 ->post('/v2/directions/driving-car/geojson', [
                     'coordinates' => $coordinates,
                     'instructions' => false,
-                    // A stop a little off the road still gets routed, to the nearest road, instead of failing.
                     'radiuses' => array_fill(0, count($coordinates), -1),
                 ]);
         } catch (\Throwable) {
@@ -52,6 +51,7 @@ class OpenRouteService
         return $this->parse($response->json(), $context);
     }
 
+    /** Keeps five decimals (about a metre), which stores a small line that looks the same. */
     private function parse(mixed $body, array $context): ?array
     {
         $feature = is_array($body) ? ($body['features'][0] ?? null) : null;
@@ -61,7 +61,6 @@ class OpenRouteService
             || ! is_numeric($summary['distance'] ?? null) || ! is_numeric($summary['duration'] ?? null)) {
             return $this->skip('the answer was not a route', $context);
         }
-        // Five decimals is about a metre, which keeps the stored line small without changing how it looks.
         $points = [];
         foreach ($line as $point) {
             $rounded = [round((float) $point[0], 5), round((float) $point[1], 5)];

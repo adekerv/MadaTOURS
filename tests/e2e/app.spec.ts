@@ -457,17 +457,41 @@ for (const language of ['en', 'fr'] as const)
     await dialog.locator('input[type=email]').fill('camille@example.test');
     const password = dialog.locator('input[autocomplete=new-password]');
     await password.fill('short');
+    // The message is only on the field while the browser shows its pop-up, so it is recorded when that happens.
+    await password.evaluate((input: HTMLInputElement) =>
+      input.addEventListener('invalid', () => {
+        (window as unknown as { shown?: string }).shown = input.validationMessage;
+      }),
+    );
     await dialog.getByRole('button', { name: t('Create account'), exact: true }).click();
     // The browser blocks the form and shows this message, in the app's language rather than the browser's.
     await expect
-      .poll(() => password.evaluate((input: HTMLInputElement) => input.validationMessage))
+      .poll(() => page.evaluate(() => (window as unknown as { shown?: string }).shown))
       .toBe(
         translate(language, 'Use at least {min} characters (you have {count}).', {
           min: 12,
           count: 5,
         }),
       );
-    // Editing the field clears the message, so the form can be sent once the password is long enough.
+    // Nothing stays on the field afterwards: a value set later, in code or by typing, makes it valid again.
     await password.fill('a long enough password');
     expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
+  });
+
+for (const width of [320, 390])
+  test(`the home page does not jump when the catalogue arrives at ${width}px`, async ({ page }) => {
+    await page.route('https://api.open-meteo.com/**', (route) => route.abort());
+    await page.route('**/api/places', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      await route.continue();
+    });
+    await page.setViewportSize({ width, height: 700 });
+    await page.goto('/');
+    const button = page.getByRole('button', { name: 'Plan a day', exact: true });
+    const top = () => button.evaluate((node) => node.getBoundingClientRect().top + scrollY);
+    // The placeholders are on screen first, and the cards that replace them take the same room.
+    await expect(page.locator('section[aria-labelledby="island-picks"] article')).toHaveCount(0);
+    const before = await top();
+    await expect(page.locator('section[aria-labelledby="island-picks"] article')).toHaveCount(3);
+    expect(Math.abs((await top()) - before)).toBeLessThanOrEqual(2);
   });

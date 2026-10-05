@@ -38,13 +38,17 @@ export const tripsSchema = z.object({ version: z.literal(1), trips: z.array(trip
 export function travelAllowance(distanceKm: number, legs: number) {
   return Math.ceil(((distanceKm * 1.4) / 30) * 60 + legs * 5);
 }
-export function moveStop(trip: DayTrip, index: number, direction: -1 | 1): DayTrip {
+/** The list with the item at `index` swapped with its neighbour, or the same list when there is nowhere to go. */
+export function moveItem<T>(items: T[], index: number, direction: -1 | 1): T[] {
   const target = index + direction;
-  if (index < 0 || index >= trip.stops.length || target < 0 || target >= trip.stops.length)
-    return trip;
-  const stops = [...trip.stops];
-  [stops[index], stops[target]] = [stops[target], stops[index]];
-  return { ...trip, stops, updatedAt: new Date().toISOString() };
+  if (index < 0 || index >= items.length || target < 0 || target >= items.length) return items;
+  const next = [...items];
+  [next[index], next[target]] = [next[target], next[index]];
+  return next;
+}
+export function moveStop(trip: DayTrip, index: number, direction: -1 | 1): DayTrip {
+  const stops = moveItem(trip.stops, index, direction);
+  return stops === trip.stops ? trip : { ...trip, stops, updatedAt: new Date().toISOString() };
 }
 export function tripSummary(trip: DayTrip, places: Place[]) {
   const byId = new Map(places.map((p) => [p.id, p]));

@@ -100,7 +100,12 @@ test('Tours: admin-only writes, a road route stored once per change, and straigh
     // Everyone reads published tours with the stored line, and nobody triggers routing by reading.
     const listed = await call('/tours');
     assert.equal(listed.status, 200);
-    assert.deepEqual(listed.body[0].route.geometry, created.body.route.geometry);
+    // The list says how long the road is but leaves the line itself for the tour's own page.
+    assert.equal(listed.body[0].route.distanceM, created.body.route.distanceM);
+    assert.ok(!('geometry' in listed.body[0].route));
+    const page = await call(`/tours/${id}`);
+    assert.equal(page.status, 200);
+    assert.deepEqual(page.body.route.geometry, created.body.route.geometry);
     assert.equal((await routing()).requests.length, 1);
 
     // Renaming keeps the road without asking again; changing the stops asks once more.
@@ -118,6 +123,34 @@ test('Tours: admin-only writes, a road route stored once per change, and straigh
     assert.equal(reordered.status, 200);
     assert.equal(reordered.body.routeSource, 'road');
     assert.equal((await routing()).requests.length, 2);
+
+    // Stops that visitors cannot go to are refused before anything is stored or routed.
+    const restricted = (await call('/places?full=1')).body.find(
+      (place: { access: string }) => place.access === 'restricted',
+    );
+    const requestsBefore = (await routing()).requests.length;
+    const refused = await call(
+      '/tours',
+      'POST',
+      { ...tour, stops: [stops[0], { placeId: restricted.id, minutes: 30 }] },
+      'admin',
+    );
+    assert.equal(refused.status, 422);
+    assert.equal(refused.body.error, 'Places with restricted access cannot be part of a tour.');
+    // The database says the same if the API were bypassed.
+    await assert.rejects(
+      app.db.query(
+        `INSERT INTO mt_tours(name,description,stops) VALUES('Direct','A direct insert.','[{"placeId":${first.id},"minutes":30},{"placeId":${restricted.id},"minutes":30}]')`,
+      ),
+      /restricted/,
+    );
+    await assert.rejects(
+      app.db.query(
+        `INSERT INTO mt_tours(name,description,stops) VALUES('Direct','A direct insert.','[{"placeId":${first.id}},{"placeId":${second.id},"minutes":30}]')`,
+      ),
+      /visit time/,
+    );
+    assert.equal((await routing()).requests.length, requestsBefore);
 
     // A routing outage never blocks saving: the tour is stored and has no road line.
     await routing('fail');

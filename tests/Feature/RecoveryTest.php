@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Services\RecoveryCodes;
+use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
@@ -159,5 +161,31 @@ class RecoveryTest extends TestCase
             $this->postJson('/api/auth/'.$route, ['email' => 'a@example.test'])->assertNotFound();
         }
         Http::assertNothingSent();
+    }
+
+    public function test_a_failed_attempt_always_costs_a_full_set_of_checks(): void
+    {
+        $counter = new class extends BcryptHasher
+        {
+            public int $checks = 0;
+
+            public function check($value, $hashedValue, array $options = []): bool
+            {
+                $this->checks++;
+
+                return parent::check($value, $hashedValue, $options);
+            }
+        };
+        Hash::shouldReceive('driver')->with('bcrypt')->andReturn($counter);
+        $others = fn (int $count) => array_map(fn ($i) => ['codeId' => $i + 1, 'userId' => 'a', 'hash' => password_hash('OTHER'.$i, PASSWORD_BCRYPT, ['cost' => 4])], range(0, $count - 1));
+        $service = app(RecoveryCodes::class);
+        // An unknown email, an account with a few codes left and one with all of them take the same work, so the
+        // time a wrong code takes never says whether an account exists or how many codes it has.
+        foreach ([0, 3, 8] as $count) {
+            $counter->checks = 0;
+            Http::fake(['*/rpc/mt_recovery_candidates' => Http::response($others($count))]);
+            $this->assertNull($service->consume('someone@example.test', self::CODE));
+            $this->assertSame(8, $counter->checks, "with {$count} codes");
+        }
     }
 }

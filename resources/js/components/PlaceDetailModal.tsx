@@ -227,7 +227,9 @@ export function PlaceDetailModal({
             </ul>
           </details>
         ) : (
-          <p className="text-sm text-amber-900">{t('Venue details still need verification.')}</p>
+          status === 'ready' && (
+            <p className="text-sm text-amber-900">{t('Venue details still need verification.')}</p>
+          )
         )}
         <p className="text-xs leading-relaxed text-slate-600">
           {place.photoCredit && !showingPlaceholder ? (
