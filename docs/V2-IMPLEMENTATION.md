@@ -21,7 +21,7 @@ Keep Laravel 13, React/TypeScript, Supabase Auth/Postgres/RLS, Capacitor, hash r
 - [x] WP11 Optimistic saves and lightweight motion.
 - [x] WP12 Persisted/system dark mode, including map.
 - [x] Privacy/terms, translations, database/API/browser tests, web/native build checks.
-- [ ] Preview verification and production deployment.
+- [x] Production deployment on Vercel (https://mada-tours.vercel.app; `/api/health` reports Laravel + Supabase).
 
 ## Audit 2026-10-01
 
@@ -34,9 +34,10 @@ Fixed in this pass:
 - `.github/workflows/check.yml` was invalid YAML, so CI could not start.
 - The v2 browser test shared review text across runs and failed after the first viewport.
 
-Still open, owner action required:
-
-- The live Supabase database has none of the v2 schema (no reviews, events, submissions, matches or daily picks tables; no `google_place_id` column). Back up, then run `php artisan migrate --seed --force` with `DB_URL`, or paste `supabase/setup.sql` into the SQL Editor.
+Still open, owner action required (updated 2026-10-07):
+- ~~The live Supabase database has none of the v2 schema.~~ Done: the v2 tables (reviews, comments, check-ins, follows, events, submissions, Google matches, daily picks, listing audits) are live.
+- The October 3–4 schema files (`review-photos.sql`, `recovery.sql`, `tours.sql`) are not yet applied to the live database, so review photos, recovery codes and tours fail there (`/api/tours` returns 503). Apply them in that order in the SQL Editor.
+- The `Application checks` workflow has failed on every push since 28 September (PHP checks and the container start-up check).
 - No browser key (`VITE_GOOGLE_MAPS_API_KEY`) is configured, so the live Google panel cannot load.
 - Set `RECURRING_TASKS_SECRET` on the host and the two GitHub secrets described in DEPLOYMENT.md.
 

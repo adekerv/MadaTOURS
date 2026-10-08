@@ -32,7 +32,7 @@ The generated bundle ID is `com.madatours.app`, a development identifier with ow
 
 ## Release work still required
 
-1. **Production service:** deploy the API and persistent database, run initialization, configure HTTPS/origins, and verify real-device sessions. Configure and verify the supplied email code templates and SMTP before inviting the public.
+1. **Production service:** the API runs on Vercel at https://mada-tours.vercel.app with Supabase. Point native builds at that origin, check HTTPS/origins, and verify real-device sessions. Accounts need no email ([accounts without email](ACCOUNTS-WITHOUT-EMAIL.md)).
 2. **Content:** verify venue identities, coordinates, opening status, hours, ratings, and permissions to use photography. Unsupported ratings and stock photos have been removed. Three licensed photos and field-level sources are included; complete the remaining venue verification.
 3. **Privacy and support:** deploy and verify the implemented bilingual privacy, terms, contact and account-deletion pages. Document email, saved-place storage, session retention, location use, and requests to map/photo/weather providers. Complete App Store privacy disclosures and audit the built app's SDK privacy manifests.
 4. **Store assets:** the retained original icon/splash, bilingual store copy, feature/share artwork and 18 device-size screenshot previews are documented in [the asset pack](../native-assets/store/README.md). Choose age/category settings and capture the signed native build before submission. Regenerate artwork with `npm run mobile:assets` and `npm run store:assets`.
