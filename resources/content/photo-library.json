@@ -18,8 +18,33 @@
       "kind": "photo",
       "emoji": "🤿",
       "tone": "sky",
-      "files": [],
-      "credits": {}
+      "files": ["diving-1-v1.webp", "diving-2-v1.webp"],
+      "credits": {
+        "diving-1-v1.webp": {
+          "basis": "stock",
+          "author": "NEOM",
+          "title": "A scuba diver swims over a colorful coral reef",
+          "caption": "A scuba diver swims over a colorful coral reef",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-scuba-diver-swims-over-a-colorful-coral-reef-_tDdlCJIwOA",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        },
+        "diving-2-v1.webp": {
+          "basis": "commons",
+          "author": "Dr. Ondřej Havelka (cestovatel)",
+          "title": "Scuba Diver",
+          "caption": "Scuba Diver",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Scuba_Diver.jpg",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Commons file page on 2026-10-12: CC BY-SA 4.0, no restriction templates."
+        }
+      }
     },
     {
       "key": "catamaran",
@@ -28,8 +53,21 @@
       "kind": "photo",
       "emoji": "⛵",
       "tone": "sky",
-      "files": [],
-      "credits": {}
+      "files": ["catamaran-1-v1.webp"],
+      "credits": {
+        "catamaran-1-v1.webp": {
+          "basis": "stock",
+          "author": "Flo Plouch",
+          "title": "White catamaran sailing on bright turquoise water",
+          "caption": "White catamaran sailing on bright turquoise water",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/white-catamaran-sailing-on-bright-turquoise-water-GhzT_k307cU",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "creole-food",
@@ -58,8 +96,33 @@
       "kind": "photo",
       "emoji": "🚤",
       "tone": "cyan",
-      "files": [],
-      "credits": {}
+      "files": ["boat-islets-1-v1.webp", "boat-islets-2-v1.webp"],
+      "credits": {
+        "boat-islets-1-v1.webp": {
+          "basis": "stock",
+          "author": "Ibrahim Shabil",
+          "title": "A boat races towards an island in turquoise waters",
+          "caption": "A boat races towards an island in turquoise waters",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-boat-races-towards-an-island-in-turquoise-waters-RKMVOSGWMC8",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        },
+        "boat-islets-2-v1.webp": {
+          "basis": "commons",
+          "author": "© Jérémie Silvestro / Wikimedia Commons",
+          "title": "Tubuai depuis le motu Mitiha 2",
+          "caption": "Tubuai depuis le motu Mitiha 2",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tubuai_depuis_le_motu_Mitiha_2.jpg",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Commons file page on 2026-10-12: CC BY-SA 4.0, no restriction templates."
+        }
+      }
     },
     {
       "key": "heritage",
@@ -88,8 +151,33 @@
       "kind": "photo",
       "emoji": "💆",
       "tone": "violet",
-      "files": [],
-      "credits": {}
+      "files": ["spa-1-v1.webp", "spa-2-v1.webp"],
+      "credits": {
+        "spa-1-v1.webp": {
+          "basis": "stock",
+          "author": "engin akyurt",
+          "title": "Person with hot stones at spa",
+          "caption": "Person with hot stones at spa",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/person-with-hot-stones-at-spa-ZbzYDboN7fg",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        },
+        "spa-2-v1.webp": {
+          "basis": "stock",
+          "author": "Simon HUMLER",
+          "title": "A woman getting a back massage at a spa",
+          "caption": "A woman getting a back massage at a spa",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-woman-getting-a-back-massage-at-a-spa--AakIaAPV0w",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "kitesurf",
@@ -132,8 +220,33 @@
       "kind": "photo",
       "emoji": "🛶",
       "tone": "emerald",
-      "files": [],
-      "credits": {}
+      "files": ["mangrove-kayak-1-v1.webp", "mangrove-kayak-2-v1.webp"],
+      "credits": {
+        "mangrove-kayak-1-v1.webp": {
+          "basis": "stock",
+          "author": "Amos K",
+          "title": "Person paddling red kayak through mangroves",
+          "caption": "Person paddling red kayak through mangroves",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/person-paddling-red-kayak-through-mangroves-UwsTg7Saruk",
+          "modified": "cropped, resized, lightly smoothed",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        },
+        "mangrove-kayak-2-v1.webp": {
+          "basis": "stock",
+          "author": "Choum Khalifa",
+          "title": "Colorful kayaks and a person by mangrove trees",
+          "caption": "Colorful kayaks and a person by mangrove trees",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/colorful-kayaks-and-a-person-by-mangrove-trees-ojTJSj1PfNM",
+          "modified": "cropped to the left two-thirds, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "fine-dining",
@@ -152,8 +265,33 @@
       "kind": "photo",
       "emoji": "🐬",
       "tone": "sky",
-      "files": [],
-      "credits": {}
+      "files": ["dolphins-1-v1.webp", "dolphins-2-v1.webp"],
+      "credits": {
+        "dolphins-1-v1.webp": {
+          "basis": "stock",
+          "author": "Talia Cohen",
+          "title": "Three dolphins swimming in blue water",
+          "caption": "Three dolphins swimming in blue water",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/three-dolphins-swimming-in-blue-water-i5FsBOLsB50",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        },
+        "dolphins-2-v1.webp": {
+          "basis": "stock",
+          "author": "Will Rust",
+          "title": "A group of dolphins swimming in the ocean",
+          "caption": "A group of dolphins swimming in the ocean",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-group-of-dolphins-swimming-in-the-ocean-pZ12QTwLBAs",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "grilled-fish",
@@ -182,8 +320,21 @@
       "kind": "photo",
       "emoji": "🛥️",
       "tone": "sky",
-      "files": [],
-      "credits": {}
+      "files": ["boat-coast-1-v1.webp"],
+      "credits": {
+        "boat-coast-1-v1.webp": {
+          "basis": "stock",
+          "author": "Filipe Nobre",
+          "title": "Small orange boat near rocky cliff",
+          "caption": "Small orange boat near rocky cliff",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/small-orange-boat-near-rocky-cliff-ZI_QP3_7vAQ",
+          "modified": "cropped, resized, lightly smoothed",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "beach-dark",
@@ -202,8 +353,21 @@
       "kind": "photo",
       "emoji": "🐠",
       "tone": "cyan",
-      "files": [],
-      "credits": {}
+      "files": ["snorkel-1-v1.webp"],
+      "credits": {
+        "snorkel-1-v1.webp": {
+          "basis": "stock",
+          "author": "Zunnoon Ahmed",
+          "title": "A woman snorkeling with a school of fish",
+          "caption": "A woman snorkeling with a school of fish",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-woman-snorkeling-with-a-school-of-fish-np5FePVgH7Q",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "boat-hire",
@@ -222,8 +386,21 @@
       "kind": "photo",
       "emoji": "🛶",
       "tone": "cyan",
-      "files": [],
-      "credits": {}
+      "files": ["kayak-1-v1.webp"],
+      "credits": {
+        "kayak-1-v1.webp": {
+          "basis": "stock",
+          "author": "Hugh Whyte",
+          "title": "Couple paddling a clear kayak on turquoise water",
+          "caption": "Couple paddling a clear kayak on turquoise water",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/couple-paddling-a-clear-kayak-on-turquoise-water-XoGf_ujoAog",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "jetski",
@@ -232,8 +409,21 @@
       "kind": "photo",
       "emoji": "🌊",
       "tone": "sky",
-      "files": [],
-      "credits": {}
+      "files": ["jetski-1-v1.webp"],
+      "credits": {
+        "jetski-1-v1.webp": {
+          "basis": "stock",
+          "author": "Mateusz Klein",
+          "title": "A person on a jet ski in the middle of the ocean",
+          "caption": "A person on a jet ski in the middle of the ocean",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-person-on-a-jet-ski-in-the-middle-of-the-ocean-jz9VgRHyEFc",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "orchard",
@@ -292,8 +482,21 @@
       "kind": "photo",
       "emoji": "🏄",
       "tone": "sky",
-      "files": [],
-      "credits": {}
+      "files": ["surf-1-v1.webp"],
+      "credits": {
+        "surf-1-v1.webp": {
+          "basis": "stock",
+          "author": "Jeremy Bishop",
+          "title": "Man surfing during daytime",
+          "caption": "Man surfing during daytime",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/man-surfing-during-daytime-pikyGuAmwpM",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "paddle",
@@ -302,8 +505,33 @@
       "kind": "photo",
       "emoji": "🏄",
       "tone": "cyan",
-      "files": [],
-      "credits": {}
+      "files": ["paddle-1-v1.webp", "paddle-2-v1.webp"],
+      "credits": {
+        "paddle-1-v1.webp": {
+          "basis": "stock",
+          "author": "Chelsea Gates",
+          "title": "Stand-up paddler on clear turquoise shallows",
+          "caption": "Stand-up paddler on clear turquoise shallows",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/oSVU3rZx1EM",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        },
+        "paddle-2-v1.webp": {
+          "basis": "stock",
+          "author": "Klara Kulikova",
+          "title": "Paddlers in silhouette at sunset",
+          "caption": "Paddlers in silhouette at sunset",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/RpxjGRWMKO8",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "yole",
@@ -322,8 +550,21 @@
       "kind": "photo",
       "emoji": "🏞️",
       "tone": "cyan",
-      "files": [],
-      "credits": {}
+      "files": ["waterfall-1-v1.webp"],
+      "credits": {
+        "waterfall-1-v1.webp": {
+          "basis": "stock",
+          "author": "Ben Guerin",
+          "title": "Waterfalls surrounded with green leafed trees during daytime",
+          "caption": "Waterfalls surrounded with green leafed trees during daytime",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/waterfalls-surrounded-with-green-leafed-trees-during-daytime-NWrye3NRrKw",
+          "modified": "cropped, resized, lightly smoothed",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "canyoning",
@@ -332,8 +573,21 @@
       "kind": "photo",
       "emoji": "🧗",
       "tone": "forest",
-      "files": [],
-      "credits": {}
+      "files": ["canyoning-1-v1.webp"],
+      "credits": {
+        "canyoning-1-v1.webp": {
+          "basis": "stock",
+          "author": "Han-Hsing Tu",
+          "title": "A man in a helmet is rapping a waterfall",
+          "caption": "A man in a helmet is rapping a waterfall",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-man-in-a-helmet-is-rapping-a-waterfall-K7xhZvei_EI",
+          "modified": "cropped, resized, lightly smoothed",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "garden",
@@ -382,8 +636,21 @@
       "kind": "photo",
       "emoji": "🍫",
       "tone": "amber",
-      "files": [],
-      "credits": {}
+      "files": ["cacao-1-v1.webp"],
+      "credits": {
+        "cacao-1-v1.webp": {
+          "basis": "stock",
+          "author": "Aleksandar Popovski",
+          "title": "Cocoa pods hanging from a tree branch",
+          "caption": "Cocoa pods hanging from a tree branch",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/cocoa-pods-hanging-from-a-tree-branch-sFCOat9rphk",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "local-produce",
@@ -442,8 +709,21 @@
       "kind": "photo",
       "emoji": "🏄",
       "tone": "indigo",
-      "files": [],
-      "credits": {}
+      "files": ["foil-1-v1.webp"],
+      "credits": {
+        "foil-1-v1.webp": {
+          "basis": "stock",
+          "author": "Will Haddock",
+          "title": "Man foil surfing on a calm blue ocean",
+          "caption": "Man foil surfing on a calm blue ocean",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/man-foil-surfing-on-a-calm-blue-ocean--i4YMG-UuaE",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "parasail",
@@ -452,8 +732,21 @@
       "kind": "photo",
       "emoji": "🪂",
       "tone": "sky",
-      "files": [],
-      "credits": {}
+      "files": ["parasail-1-v1.webp"],
+      "credits": {
+        "parasail-1-v1.webp": {
+          "basis": "stock",
+          "author": "Nabit Photos",
+          "title": "A person is parasailing over the ocean with a boat",
+          "caption": "A person is parasailing over the ocean with a boat",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-person-is-parasailing-over-the-ocean-with-a-boat-GFORPUwDshI",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "wakeboard",
@@ -462,8 +755,21 @@
       "kind": "photo",
       "emoji": "🏄",
       "tone": "indigo",
-      "files": [],
-      "credits": {}
+      "files": ["wakeboard-1-v1.webp"],
+      "credits": {
+        "wakeboard-1-v1.webp": {
+          "basis": "stock",
+          "author": "Luke Bender",
+          "title": "Person wake boarding on body of water",
+          "caption": "Person wake boarding on body of water",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/person-wake-boarding-on-body-of-water-TzHl80vMzdk",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "fishing",
@@ -472,8 +778,21 @@
       "kind": "photo",
       "emoji": "🎣",
       "tone": "sky",
-      "files": [],
-      "credits": {}
+      "files": ["fishing-1-v1.webp"],
+      "credits": {
+        "fishing-1-v1.webp": {
+          "basis": "stock",
+          "author": "Aristos Aristidou",
+          "title": "A fishing rod on a boat in the ocean",
+          "caption": "A fishing rod on a boat in the ocean",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-fishing-rod-on-a-boat-in-the-ocean-g5Ss3o7-Rsc",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "marina",
@@ -532,8 +851,21 @@
       "kind": "photo",
       "emoji": "🧘",
       "tone": "violet",
-      "files": [],
-      "credits": {}
+      "files": ["yoga-1-v1.webp"],
+      "credits": {
+        "yoga-1-v1.webp": {
+          "basis": "stock",
+          "author": "Gustavo Sanches",
+          "title": "A person standing in the water doing a yoga pose",
+          "caption": "A person standing in the water doing a yoga pose",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-person-standing-in-the-water-doing-a-yoga-pose-soOJbyfkllo",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "flight",
@@ -642,8 +974,21 @@
       "kind": "photo",
       "emoji": "🍨",
       "tone": "rose",
-      "files": [],
-      "credits": {}
+      "files": ["ice-cream-1-v1.webp"],
+      "credits": {
+        "ice-cream-1-v1.webp": {
+          "basis": "stock",
+          "author": "Shelley Johnson",
+          "title": "A scoop of vibrant pink sorbet in a white bowl",
+          "caption": "A scoop of vibrant pink sorbet in a white bowl",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/a-scoop-of-vibrant-pink-sorbet-in-a-white-bowl-UR9HktuHHtk",
+          "modified": "cropped above the printed paper, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "skydiving",
@@ -662,8 +1007,21 @@
       "kind": "photo",
       "emoji": "🪂",
       "tone": "orange",
-      "files": [],
-      "credits": {}
+      "files": ["paragliding-1-v1.webp"],
+      "credits": {
+        "paragliding-1-v1.webp": {
+          "basis": "stock",
+          "author": "Pacha パチャ Shot's",
+          "title": "Person paragliding",
+          "caption": "Person paragliding",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/person-paragliding-mDiA-Vg0bGc",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "cycling",
@@ -692,8 +1050,21 @@
       "kind": "photo",
       "emoji": "🎾",
       "tone": "yellow",
-      "files": [],
-      "credits": {}
+      "files": ["tennis-1-v1.webp"],
+      "credits": {
+        "tennis-1-v1.webp": {
+          "basis": "stock",
+          "author": "Ryan Searle",
+          "title": "Aerial photo of tennis court surrounded with trees",
+          "caption": "Aerial photo of tennis court surrounded with trees",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/aerial-photo-of-tennis-court-surrounded-with-trees-qjrjJnFypa0",
+          "modified": "cropped, resized, lightly smoothed",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "adventure-park",
@@ -712,8 +1083,21 @@
       "kind": "photo",
       "emoji": "🎯",
       "tone": "emerald",
-      "files": [],
-      "credits": {}
+      "files": ["paintball-1-v1.webp"],
+      "credits": {
+        "paintball-1-v1.webp": {
+          "basis": "stock",
+          "author": "Dmitriy Tyukov",
+          "title": "Man wearing mask holding paintball gun during daytime",
+          "caption": "Man wearing mask holding paintball gun during daytime",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/man-wearing-mask-holding-paintball-gun-during-daytime--s54WNv_3UM",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "karting",

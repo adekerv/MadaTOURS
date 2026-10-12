@@ -37,7 +37,7 @@ export function creditsMarkdown(entries = readLibrary()) {
       const credit = entry.credits[file];
       const provenance = credit.ai
         ? `AI-generated for MadaTours (${credit.retrievedAt}). ${credit.caption}. Labelled “AI-generated image · not this place”. Prompt: ${credit.prompt ?? 'not recorded'}`
-        : `${credit.author}, [${credit.title ?? credit.caption}](<${credit.sourceUrl}>), [${credit.license}](${credit.licenseUrl}). Retrieved ${credit.retrievedAt}; ${credit.modified ?? 'unmodified'}.`;
+        : `${credit.author}, [${credit.title ?? credit.caption}](<${credit.sourceUrl}>), [${credit.license}](${credit.licenseUrl}). Retrieved ${credit.retrievedAt}; ${credit.modified ?? 'unmodified'}.${credit.note ? ` ${credit.note}` : ''}`;
       return `| ${file} | ${cell(entry.key)} | ${cell(provenance)} |`;
     }),
   );
@@ -48,7 +48,7 @@ export function creditsMarkdown(entries = readLibrary()) {
     '',
     'These images illustrate an activity or a landscape. They never show the listed venue or another named place, and the app labels each one “Illustrative photo · not this place” (AI images: “AI-generated image · not this place”). Subjects without a file show an icon tile instead.',
     '',
-    'Stock photos are used under the Unsplash License or the Pexels License, downloaded, re-encoded and served from this folder. Keep the credits when redistributing.',
+    'Stock photos are used under the Unsplash License or the Pexels License, and Wikimedia Commons photos under the licence named on each row. All are downloaded, re-encoded and served from this folder. Keep the credits, and the share-alike terms of CC BY-SA files, when redistributing.',
     '',
     '| File | Subject | Provenance and licence |',
     '| ---- | ------- | ---------------------- |',

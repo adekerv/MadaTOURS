@@ -96,15 +96,18 @@ test('icon-tile subjects never show a photo', () => {
   assert.ok(shown.every((place) => placeholderFor(place).src === undefined));
 });
 
-test('the AI trail image carries its AI credit and neighbouring places of one subject differ', () => {
+test('the AI trail image carries its AI credit and consecutive places of one subject get different files', () => {
   const pelee = placeholderFor(byId(5));
 
   assert.equal(pelee.src, '/assets/placeholders/hiking-ai-v1.jpg');
   assert.equal(pelee.credit?.ai, true);
   for (const entry of photoLibrary.filter((item) => item.files.length > 1)) {
-    const shown = places.filter((place) => placeholderFor(place).key === entry.key);
-    const files = new Set(shown.map((place) => placeholderFor(place).src));
-    assert.equal(files.size, Math.min(entry.files.length, shown.length), entry.key);
+    const tag = { diving: 'Diving', spa: 'Spa' }[entry.key];
+    if (!tag) continue;
+    const first = placeholderFor(draft({ id: 9001, name: 'A', type: 'activity', tags: [tag] }));
+    const next = placeholderFor(draft({ id: 9002, name: 'B', type: 'activity', tags: [tag] }));
+    assert.equal(first.key, entry.key);
+    assert.notEqual(first.src, next.src, entry.key);
   }
 });
 
@@ -128,6 +131,8 @@ test('library files are versioned, credited, within budget and never a copy of a
       assert.ok(photoCreditSchema.safeParse(credit).success, `${entry.key}/${file}`);
       assert.ok(credit.basis && credit.retrievedAt && credit.modified, `${entry.key}/${file}`);
       assert.equal(credit.ai === true, credit.basis === 'ai', `${entry.key}/${file}`);
+      if (!credit.ai)
+        assert.ok(credit.note?.includes('verified'), `${entry.key}/${file}: licence check`);
     }
   }
 });

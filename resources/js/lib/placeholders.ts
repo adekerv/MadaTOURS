@@ -18,8 +18,8 @@ export interface LibraryEntry {
   emoji: string;
   tone: PinTone;
   files: string[];
-  /** One credit per file. An AI image also records the prompt it was generated from. */
-  credits: Record<string, PhotoCredit & { prompt?: string }>;
+  /** One credit per file, with how its licence was checked. An AI image also records its prompt. */
+  credits: Record<string, PhotoCredit & { prompt?: string; note?: string }>;
 }
 export interface Placeholder {
   key: string;
@@ -30,7 +30,8 @@ export interface Placeholder {
   src?: string;
   credit?: PhotoCredit;
 }
-export const photoLibrary = library.entries as LibraryEntry[];
+/** Checked by tests/placeholders.test.ts: labels, kinds, files and every credit. */
+export const photoLibrary = library.entries as unknown as LibraryEntry[];
 const byKey = new Map(photoLibrary.map((entry) => [entry.key, entry]));
 const overrides = subjects as Record<string, string>;
 export const placeholderPath = (file: string) => `/assets/placeholders/${file}`;
