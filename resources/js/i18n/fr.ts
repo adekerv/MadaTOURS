@@ -9,14 +9,6 @@ export const french: Record<string, string> = {
     'Le traitement des photos est temporairement indisponible. Réessayez plus tard.',
   'The verification could not be completed. Please request a new code.':
     'La vérification n’a pas abouti. Demandez un nouveau code.',
-  'Hiking · AI illustration': 'Randonnée · illustration IA',
-  'Seafood · AI illustration': 'Poisson · illustration IA',
-  'Restaurant · AI illustration': 'Restaurant · illustration IA',
-  'MadaTours · AI-generated illustration': 'MadaTours · illustration générée par IA',
-  'Beach · illustrative photo': 'Plage · photo illustrative',
-  'Culture · illustrative photo': 'Culture · photo illustrative',
-  'Nature · illustrative photo': 'Nature · photo illustrative',
-  'Box-Off-Dreams, Julie · Public domain': 'Box-Off-Dreams, Julie · domaine public',
   'Photo license': 'Licence de la photo',
   'Community: {rating} / 5 ({count})': 'Communauté : {rating} / 5 ({count})',
   'Email verified': 'Adresse e-mail vérifiée',
@@ -197,7 +189,6 @@ export const french: Record<string, string> = {
   'Stops reordered. Your first stop stays the same.':
     'Étapes réorganisées. Votre première étape reste inchangée.',
   'Étang des Salines landscape': 'Paysage de l’étang des Salines',
-  'Photo unavailable': 'Photo indisponible',
   'Martinique scenery · illustrative photo': 'Paysage de Martinique · photo d’illustration',
   'Discover freely. An account keeps your favorites with you across devices.':
     'Explorez librement. Un compte conserve vos favoris sur tous vos appareils.',
@@ -867,8 +858,6 @@ export const french: Record<string, string> = {
   'Source hours': 'Horaires de la source',
   'Updated: {date}': 'Mis à jour : {date}',
   'Highest community rating': 'Meilleure note de la communauté',
-  'Illustrative images include AI-generated hiking, seafood and terrace scenes; they do not depict the listed venue.':
-    'Les illustrations comprennent des scènes de randonnée, de fruits de mer et de terrasse générées par IA ; elles ne représentent pas le lieu indiqué.',
   'Choose a JPEG, PNG or WebP image under 15 MB.':
     'Choisissez une image JPEG, PNG ou WebP de moins de 15 Mo.',
   'Submission sent. You will see the moderation decision here.':
@@ -1070,4 +1059,8 @@ export const french: Record<string, string> = {
   'Weather, map and route data:': 'Données météo, cartographiques et d’itinéraire :',
   'Change your name, email address and recovery codes, or delete your account.':
     'Modifiez votre nom, votre adresse e-mail et vos codes de récupération, ou supprimez votre compte.',
+  'Illustrative photo · not this place': 'Photo d’illustration · ne montre pas ce lieu',
+  'AI-generated image · not this place': 'Image générée par IA · ne montre pas ce lieu',
+  'Places without their own photo show an icon tile or a labelled illustrative photo of the activity: free-licence stock, or one AI-generated trail scene. These never show the listed venue, and each one is credited on its place page.':
+    'Les lieux sans photo propre affichent une vignette avec une icône ou une photo d’illustration de l’activité, signalée comme telle : photo sous licence libre, ou une scène de sentier générée par IA. Elles ne montrent jamais le lieu présenté et chacune est créditée sur la fiche du lieu.',
 };

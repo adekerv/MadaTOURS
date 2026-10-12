@@ -18,7 +18,7 @@
         },
         {
           "title": "Photos with context",
-          "body": "Venue photographs show their source credits. Missing photos use category illustrations: licensed landscape photographs or labeled AI-generated hiking, seafood and terrace scenes. These illustrations do not depict the listed venue. Approved community photographs are credited to their contributors. Google photographs and their attributions are displayed by Google’s Places UI Kit."
+          "body": "Venue photographs show their source credits. A place without its own photo shows an icon tile, or a free-licence stock photo of the activity with the badge “Illustrative photo · not this place”; one AI-generated trail scene carries its own AI label. Illustrative photos never show the listed venue or another named place, and each is credited on the place page. Approved community photographs are credited to their contributors. Google photographs and their attributions are displayed by Google’s Places UI Kit."
         }
       ]
     },
@@ -138,7 +138,7 @@
         },
         {
           "title": "Des photos avec leur contexte",
-          "body": "Les photos des lieux affichent leurs crédits. Les photos manquantes sont remplacées par des illustrations de catégorie : paysages sous licence ou scènes de randonnée, de fruits de mer et de terrasse générées par IA et signalées comme telles. Elles ne représentent pas le lieu indiqué. Les photos communautaires approuvées mentionnent leur auteur. Les photos Google et leurs crédits sont affichés par Places UI Kit de Google."
+          "body": "Les photos des lieux affichent leurs crédits. Un lieu sans photo propre affiche une vignette avec une icône, ou une photo de l’activité sous licence libre avec la mention « Photo d’illustration · ne montre pas ce lieu » ; une scène de sentier générée par IA porte sa propre mention IA. Les photos d’illustration ne montrent jamais le lieu présenté ni un autre lieu nommé, et chacune est créditée sur la fiche du lieu. Les photos communautaires approuvées mentionnent leur auteur. Les photos Google et leurs crédits sont affichés par Places UI Kit de Google."
         }
       ]
     },

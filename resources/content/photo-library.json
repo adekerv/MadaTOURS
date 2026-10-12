@@ -1,0 +1,799 @@
+{
+  "note": "Image library for places without their own photo. kind=photo shows a labelled illustrative photo once files exist; kind=tile always shows an icon tile. Files live in public/assets/placeholders/ with versioned names. Edit this file, then run npm run photos:credits.",
+  "entries": [
+    {
+      "key": "beach-white",
+      "labelEn": "Beach",
+      "labelFr": "Plage",
+      "kind": "photo",
+      "emoji": "🏖️",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "diving",
+      "labelEn": "Scuba diving",
+      "labelFr": "Plongée sous-marine",
+      "kind": "photo",
+      "emoji": "🤿",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "catamaran",
+      "labelEn": "Catamaran cruise",
+      "labelFr": "Sortie en catamaran",
+      "kind": "photo",
+      "emoji": "⛵",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "creole-food",
+      "labelEn": "Creole food",
+      "labelFr": "Cuisine créole",
+      "kind": "tile",
+      "emoji": "🍛",
+      "tone": "ember",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "beach-restaurant",
+      "labelEn": "Beach restaurant",
+      "labelFr": "Restaurant de plage",
+      "kind": "tile",
+      "emoji": "🍹",
+      "tone": "rose",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "boat-islets",
+      "labelEn": "Islets & white shallows",
+      "labelFr": "Îlets et fonds blancs",
+      "kind": "photo",
+      "emoji": "🚤",
+      "tone": "cyan",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "heritage",
+      "labelEn": "Heritage site",
+      "labelFr": "Site patrimonial",
+      "kind": "tile",
+      "emoji": "🏛️",
+      "tone": "amber",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "rum",
+      "labelEn": "Rum distillery",
+      "labelFr": "Distillerie de rhum",
+      "kind": "tile",
+      "emoji": "🥃",
+      "tone": "gold",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "spa",
+      "labelEn": "Spa & massage",
+      "labelFr": "Spa et massage",
+      "kind": "photo",
+      "emoji": "💆",
+      "tone": "violet",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "kitesurf",
+      "labelEn": "Kitesurfing",
+      "labelFr": "Kitesurf",
+      "kind": "photo",
+      "emoji": "🪁",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "hiking",
+      "labelEn": "Rainforest hike",
+      "labelFr": "Randonnée en forêt tropicale",
+      "kind": "photo",
+      "emoji": "🥾",
+      "tone": "forest",
+      "files": ["hiking-ai-v1.jpg"],
+      "credits": {
+        "hiking-ai-v1.jpg": {
+          "basis": "ai",
+          "author": "MadaTours",
+          "title": "Tropical volcanic hiking path (AI-generated)",
+          "caption": "AI-generated rainforest trail; no real location",
+          "license": "AI-generated · no licence claimed",
+          "licenseUrl": "https://github.com/adekerv/MadaTOURS/blob/main/public/assets/placeholders/CREDITS.md",
+          "sourceUrl": "https://github.com/adekerv/MadaTOURS/blob/main/public/assets/placeholders/CREDITS.md",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-09-29",
+          "ai": true,
+          "prompt": "Landscape 3:2 editorial photograph-like illustration of a lush tropical volcanic mountain hiking path, layers of green hills, soft clouds and ferns. Early-morning natural light, warm earth tones, no people/signs/text/logos. Generic Caribbean vegetation, not a named real venue; readable at thumbnail size. Generated with the built-in OpenAI image-generation tool on 29 September 2026."
+        }
+      }
+    },
+    {
+      "key": "mangrove-kayak",
+      "labelEn": "Mangrove kayak",
+      "labelFr": "Kayak dans la mangrove",
+      "kind": "photo",
+      "emoji": "🛶",
+      "tone": "emerald",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "fine-dining",
+      "labelEn": "Fine dining",
+      "labelFr": "Gastronomique",
+      "kind": "tile",
+      "emoji": "🍽️",
+      "tone": "purple",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "dolphins",
+      "labelEn": "Dolphin watching",
+      "labelFr": "Observation des dauphins",
+      "kind": "photo",
+      "emoji": "🐬",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "grilled-fish",
+      "labelEn": "Grilled fish & seafood",
+      "labelFr": "Poisson grillé et fruits de mer",
+      "kind": "tile",
+      "emoji": "🐟",
+      "tone": "orange",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "restaurant",
+      "labelEn": "Restaurant",
+      "labelFr": "Restaurant",
+      "kind": "tile",
+      "emoji": "🍴",
+      "tone": "ember",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "boat-coast",
+      "labelEn": "Coastal boat trip",
+      "labelFr": "Balade en bateau sur la côte",
+      "kind": "photo",
+      "emoji": "🛥️",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "beach-dark",
+      "labelEn": "Black-sand beach",
+      "labelFr": "Plage de sable noir",
+      "kind": "photo",
+      "emoji": "🌋",
+      "tone": "amber",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "snorkel",
+      "labelEn": "Snorkelling",
+      "labelFr": "Randonnée palmée",
+      "kind": "photo",
+      "emoji": "🐠",
+      "tone": "cyan",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "boat-hire",
+      "labelEn": "Boat hire",
+      "labelFr": "Location de bateau",
+      "kind": "photo",
+      "emoji": "🚤",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "kayak",
+      "labelEn": "Sea kayak",
+      "labelFr": "Kayak de mer",
+      "kind": "photo",
+      "emoji": "🛶",
+      "tone": "cyan",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "jetski",
+      "labelEn": "Jet ski",
+      "labelFr": "Jet-ski",
+      "kind": "photo",
+      "emoji": "🌊",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "orchard",
+      "labelEn": "Farm visit",
+      "labelFr": "Visite de ferme",
+      "kind": "photo",
+      "emoji": "🥭",
+      "tone": "leaf",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "quad",
+      "labelEn": "Quad & buggy",
+      "labelFr": "Quad et buggy",
+      "kind": "photo",
+      "emoji": "🏍️",
+      "tone": "emerald",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "beach-wild",
+      "labelEn": "Wild Atlantic beach",
+      "labelFr": "Plage sauvage atlantique",
+      "kind": "photo",
+      "emoji": "🌊",
+      "tone": "cyan",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "sailboat",
+      "labelEn": "Sailing yacht",
+      "labelFr": "Voilier",
+      "kind": "photo",
+      "emoji": "⛵",
+      "tone": "indigo",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "bbq-donut",
+      "labelEn": "BBQ donut boat",
+      "labelFr": "Bateau BBQ donut",
+      "kind": "tile",
+      "emoji": "🍢",
+      "tone": "orange",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "surf",
+      "labelEn": "Surfing",
+      "labelFr": "Surf",
+      "kind": "photo",
+      "emoji": "🏄",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "paddle",
+      "labelEn": "Stand-up paddle",
+      "labelFr": "Stand-up paddle",
+      "kind": "photo",
+      "emoji": "🏄",
+      "tone": "cyan",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "yole",
+      "labelEn": "Yole ronde sailing",
+      "labelFr": "Yole ronde",
+      "kind": "tile",
+      "emoji": "⛵",
+      "tone": "gold",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "waterfall",
+      "labelEn": "Waterfall",
+      "labelFr": "Cascade",
+      "kind": "photo",
+      "emoji": "🏞️",
+      "tone": "cyan",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "canyoning",
+      "labelEn": "Canyoning",
+      "labelFr": "Canyoning",
+      "kind": "photo",
+      "emoji": "🧗",
+      "tone": "forest",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "garden",
+      "labelEn": "Tropical garden",
+      "labelFr": "Jardin tropical",
+      "kind": "photo",
+      "emoji": "🌺",
+      "tone": "leaf",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "island-road",
+      "labelEn": "Island tour",
+      "labelFr": "Excursion autour de l'île",
+      "kind": "photo",
+      "emoji": "🚐",
+      "tone": "emerald",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "sugar-cane",
+      "labelEn": "Sugar-cane estate",
+      "labelFr": "Habitation sucrière",
+      "kind": "photo",
+      "emoji": "🌾",
+      "tone": "leaf",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "bele",
+      "labelEn": "Bèlè",
+      "labelFr": "Bèlè",
+      "kind": "tile",
+      "emoji": "🥁",
+      "tone": "amber",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "cacao",
+      "labelEn": "Cacao & chocolate",
+      "labelFr": "Cacao et chocolat",
+      "kind": "photo",
+      "emoji": "🍫",
+      "tone": "amber",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "local-produce",
+      "labelEn": "Local products",
+      "labelFr": "Produits locaux",
+      "kind": "photo",
+      "emoji": "🫙",
+      "tone": "orange",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "cocktails",
+      "labelEn": "Cocktail bar",
+      "labelFr": "Bar à cocktails",
+      "kind": "tile",
+      "emoji": "🍸",
+      "tone": "violet",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "burger",
+      "labelEn": "Burgers",
+      "labelFr": "Burgers",
+      "kind": "tile",
+      "emoji": "🍔",
+      "tone": "orange",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "beach-lagoon",
+      "labelEn": "Lagoon beach",
+      "labelFr": "Plage de lagon",
+      "kind": "photo",
+      "emoji": "🏝️",
+      "tone": "cyan",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "dinghy",
+      "labelEn": "Sailing lessons",
+      "labelFr": "École de voile",
+      "kind": "photo",
+      "emoji": "⛵",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "foil",
+      "labelEn": "E-foil / wing foil",
+      "labelFr": "E-foil / wingfoil",
+      "kind": "photo",
+      "emoji": "🏄",
+      "tone": "indigo",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "parasail",
+      "labelEn": "Parasailing",
+      "labelFr": "Parachute ascensionnel",
+      "kind": "photo",
+      "emoji": "🪂",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "wakeboard",
+      "labelEn": "Wakeboarding",
+      "labelFr": "Wakeboard",
+      "kind": "photo",
+      "emoji": "🏄",
+      "tone": "indigo",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "fishing",
+      "labelEn": "Sport fishing",
+      "labelFr": "Pêche au gros",
+      "kind": "photo",
+      "emoji": "🎣",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "marina",
+      "labelEn": "Marina",
+      "labelFr": "Marina",
+      "kind": "photo",
+      "emoji": "⚓",
+      "tone": "indigo",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "rainforest",
+      "labelEn": "Rainforest",
+      "labelFr": "Forêt tropicale",
+      "kind": "photo",
+      "emoji": "🌳",
+      "tone": "forest",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "mangrove-forest",
+      "labelEn": "Mangrove & lagoon",
+      "labelFr": "Mangrove et étang",
+      "kind": "photo",
+      "emoji": "🌿",
+      "tone": "emerald",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "coast-view",
+      "labelEn": "Coastal viewpoint",
+      "labelFr": "Point de vue côtier",
+      "kind": "photo",
+      "emoji": "🌅",
+      "tone": "orange",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "art",
+      "labelEn": "Artist studio",
+      "labelFr": "Atelier d'artiste",
+      "kind": "tile",
+      "emoji": "🎨",
+      "tone": "violet",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "yoga",
+      "labelEn": "Yoga",
+      "labelFr": "Yoga",
+      "kind": "photo",
+      "emoji": "🧘",
+      "tone": "violet",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "flight",
+      "labelEn": "Scenic flight",
+      "labelFr": "Vol panoramique",
+      "kind": "photo",
+      "emoji": "🛩️",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "horse",
+      "labelEn": "Horse riding",
+      "labelFr": "Équitation",
+      "kind": "photo",
+      "emoji": "🐎",
+      "tone": "amber",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "bowling",
+      "labelEn": "Bowling & laser game",
+      "labelFr": "Bowling et laser game",
+      "kind": "photo",
+      "emoji": "🎳",
+      "tone": "indigo",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "cinema",
+      "labelEn": "Cinema",
+      "labelFr": "Cinéma",
+      "kind": "photo",
+      "emoji": "🎬",
+      "tone": "crimson",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "sushi",
+      "labelEn": "Sushi",
+      "labelFr": "Sushi",
+      "kind": "tile",
+      "emoji": "🍣",
+      "tone": "red",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "cafe",
+      "labelEn": "Café & bakery",
+      "labelFr": "Café et boulangerie",
+      "kind": "tile",
+      "emoji": "☕",
+      "tone": "amber",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "pool",
+      "labelEn": "Swimming pool",
+      "labelFr": "Piscine",
+      "kind": "photo",
+      "emoji": "🏊",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "vanilla",
+      "labelEn": "Vanilla",
+      "labelFr": "Vanille",
+      "kind": "photo",
+      "emoji": "🌱",
+      "tone": "leaf",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "pastry",
+      "labelEn": "Artisan biscuits",
+      "labelFr": "Biscuiterie artisanale",
+      "kind": "photo",
+      "emoji": "🍪",
+      "tone": "gold",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "cooking",
+      "labelEn": "Cooking class",
+      "labelFr": "Atelier cuisine",
+      "kind": "photo",
+      "emoji": "🧑‍🍳",
+      "tone": "ember",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "ice-cream",
+      "labelEn": "Artisan ice cream",
+      "labelFr": "Glacier artisanal",
+      "kind": "photo",
+      "emoji": "🍨",
+      "tone": "rose",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "skydiving",
+      "labelEn": "Skydiving",
+      "labelFr": "Parachutisme",
+      "kind": "photo",
+      "emoji": "🪂",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "paragliding",
+      "labelEn": "Paragliding",
+      "labelFr": "Parapente",
+      "kind": "photo",
+      "emoji": "🪂",
+      "tone": "orange",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "cycling",
+      "labelEn": "E-bike tour",
+      "labelFr": "Balade à vélo électrique",
+      "kind": "photo",
+      "emoji": "🚲",
+      "tone": "emerald",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "golf",
+      "labelEn": "Golf",
+      "labelFr": "Golf",
+      "kind": "photo",
+      "emoji": "⛳",
+      "tone": "leaf",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "tennis",
+      "labelEn": "Tennis",
+      "labelFr": "Tennis",
+      "kind": "photo",
+      "emoji": "🎾",
+      "tone": "yellow",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "adventure-park",
+      "labelEn": "Treetop adventure park",
+      "labelFr": "Parc accrobranche",
+      "kind": "tile",
+      "emoji": "🌲",
+      "tone": "forest",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "paintball",
+      "labelEn": "Paintball",
+      "labelFr": "Paintball",
+      "kind": "photo",
+      "emoji": "🎯",
+      "tone": "emerald",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "karting",
+      "labelEn": "Go-karting",
+      "labelFr": "Karting",
+      "kind": "photo",
+      "emoji": "🏎️",
+      "tone": "emerald",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "zoo",
+      "labelEn": "Zoo",
+      "labelFr": "Zoo",
+      "kind": "photo",
+      "emoji": "🦜",
+      "tone": "leaf",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "steak",
+      "labelEn": "Steakhouse",
+      "labelFr": "Grill / steakhouse",
+      "kind": "tile",
+      "emoji": "🥩",
+      "tone": "deepRed",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "mezze",
+      "labelEn": "Lebanese",
+      "labelFr": "Libanais",
+      "kind": "tile",
+      "emoji": "🧆",
+      "tone": "gold",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "brazilian",
+      "labelEn": "Brazilian",
+      "labelFr": "Brésilien",
+      "kind": "tile",
+      "emoji": "🍖",
+      "tone": "yellow",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "bowl",
+      "labelEn": "Healthy bowls",
+      "labelFr": "Bowls",
+      "kind": "tile",
+      "emoji": "🥗",
+      "tone": "leaf",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "restricted",
+      "labelEn": "Access restricted",
+      "labelFr": "Accès interdit",
+      "kind": "tile",
+      "emoji": "⚠️",
+      "tone": "red",
+      "files": [],
+      "credits": {}
+    },
+    {
+      "key": "activity",
+      "labelEn": "Activity",
+      "labelFr": "Activité",
+      "kind": "tile",
+      "emoji": "🧭",
+      "tone": "sky",
+      "files": [],
+      "credits": {}
+    }
+  ]
+}

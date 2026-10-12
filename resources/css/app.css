@@ -574,6 +574,21 @@ summary {
   background: inherit;
   transform: translateX(-50%) rotate(45deg);
 }
+/* Places without a photo: the subject's icon on its pin colour, readable in light and dark mode. */
+.place-tile {
+  background: color-mix(in srgb, var(--pin) 16%, var(--surface-card));
+  color: color-mix(in srgb, var(--pin) 50%, var(--text-primary));
+}
+.place-tile-icon {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pin) 24%, var(--surface-card));
+  font-size: 1.75rem;
+  line-height: 1;
+}
 .map-pill-emoji {
   display: grid;
   flex: none;

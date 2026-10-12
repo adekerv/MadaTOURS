@@ -4,6 +4,7 @@ import copy from '../../../content/information.json';
 import { useI18n } from '../../i18n/I18nProvider';
 import { LanguageSelect } from '../ui/LanguageSelect';
 import { SiteFooter } from '../ui/SiteFooter';
+import { photoLibrary } from '../../lib/placeholders';
 export type InformationRoute = keyof typeof copy.en;
 export const contactEmail = 'adejkervin@protonmail.com';
 export function InformationPage({
@@ -51,7 +52,7 @@ export function InformationPage({
               <h2 className="text-xl font-bold">{t('Photo credits')}</h2>
               <p className="mt-3 text-sm text-slate-600">
                 {t(
-                  'Illustrative images include AI-generated hiking, seafood and terrace scenes; they do not depict the listed venue.',
+                  'Places without their own photo show an icon tile or a labelled illustrative photo of the activity: free-licence stock, or one AI-generated trail scene. These never show the listed venue, and each one is credited on its place page.',
                 )}
               </p>
               <ul className="mt-3 space-y-3 text-sm">
@@ -106,6 +107,40 @@ export function InformationPage({
                     CC BY-SA 4.0
                   </a>
                 </li>
+                {photoLibrary.flatMap((entry) =>
+                  entry.files.map((file) => {
+                    const credit = entry.credits[file];
+                    return (
+                      <li key={file}>
+                        {language === 'fr' ? entry.labelFr : entry.labelEn} ·{' '}
+                        {credit.ai ? (
+                          t('AI-generated image · not this place')
+                        ) : (
+                          <>
+                            {credit.author} ·{' '}
+                            <a
+                              href={credit.sourceUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex min-h-11 items-center text-orange-800 underline"
+                            >
+                              {t('Photo source')}
+                            </a>{' '}
+                            ·{' '}
+                            <a
+                              href={credit.licenseUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex min-h-11 items-center text-orange-800 underline"
+                            >
+                              {credit.license}
+                            </a>
+                          </>
+                        )}
+                      </li>
+                    );
+                  }),
+                )}
               </ul>
               <p className="mt-2 text-xs text-slate-600">{t('Displayed cropped to fit.')}</p>
             </section>

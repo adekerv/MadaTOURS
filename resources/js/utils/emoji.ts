@@ -1,5 +1,27 @@
 import { Place } from '../types';
 
+/** Pin colours, shared by map pins and the icon tiles of places without a photo. */
+export const pinPalette = {
+  red: '#dc2626',
+  deepRed: '#b91c1c',
+  yellow: '#eab308',
+  orange: '#f97316',
+  violet: '#8b5cf6',
+  sky: '#0284c7',
+  rose: '#f43f5e',
+  purple: '#7c3aed',
+  ember: '#ea580c',
+  crimson: '#e11d48',
+  indigo: '#4f46e5',
+  emerald: '#059669',
+  cyan: '#06b6d4',
+  forest: '#15803d',
+  amber: '#b45309',
+  gold: '#d97706',
+  leaf: '#10b981',
+} as const;
+export type PinTone = keyof typeof pinPalette;
+
 export interface PlaceTheme {
   emoji: string;
   color: string;
@@ -21,7 +43,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🍣',
-        color: '#dc2626', // Sushi Red
+        color: pinPalette.red, // Sushi Red
         bgColor: '#fef2f2',
         borderColor: '#fee2e2',
       };
@@ -29,7 +51,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     if (name.includes('hippopotamus') || tags.includes('steakhouse')) {
       return {
         emoji: '🥩',
-        color: '#b91c1c', // Steak Deep Red
+        color: pinPalette.deepRed, // Steak Deep Red
         bgColor: '#fef2f2',
         borderColor: '#fee2e2',
       };
@@ -42,7 +64,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🍟',
-        color: '#eab308', // Fast food yellow
+        color: pinPalette.yellow, // Fast food yellow
         bgColor: '#fef9c3',
         borderColor: '#fef08a',
       };
@@ -50,7 +72,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     if (name.includes('bokay') || name.includes('bkb') || name.includes('chicken')) {
       return {
         emoji: '🍔',
-        color: '#f97316', // Burger orange
+        color: pinPalette.orange, // Burger orange
         bgColor: '#fff7ed',
         borderColor: '#ffedd5',
       };
@@ -58,7 +80,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     if (name.includes('fredo')) {
       return {
         emoji: '🎶', // Live music and food
-        color: '#8b5cf6', // Indigo/violet for musical cafe
+        color: pinPalette.violet, // Indigo/violet for musical cafe
         bgColor: '#f5f3ff',
         borderColor: '#ede9fe',
       };
@@ -66,7 +88,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     if (name.includes('dunette')) {
       return {
         emoji: '⛵', // Dunette pontoon beach bar
-        color: '#0284c7', // Sky Blue
+        color: pinPalette.sky, // Sky Blue
         bgColor: '#f0f9ff',
         borderColor: '#e0f2fe',
       };
@@ -80,7 +102,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🦞',
-        color: '#f97316', // Vibrant Orange
+        color: pinPalette.orange, // Vibrant Orange
         bgColor: '#fff7ed',
         borderColor: '#ffedd5',
       };
@@ -94,7 +116,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🍹',
-        color: '#f43f5e', // Rose/Pink Beach cocktail
+        color: pinPalette.rose, // Rose/Pink Beach cocktail
         bgColor: '#fff1f2',
         borderColor: '#ffe4e6',
       };
@@ -107,7 +129,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🍽️',
-        color: '#7c3aed', // Purple Fine Dining
+        color: pinPalette.purple, // Purple Fine Dining
         bgColor: '#f5f3ff',
         borderColor: '#eee1ff',
       };
@@ -121,14 +143,14 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🍛',
-        color: '#ea580c', // Creole Curry/Warm Orange
+        color: pinPalette.ember, // Creole Curry/Warm Orange
         bgColor: '#fff7ed',
         borderColor: '#ffedd5',
       };
     }
     return {
       emoji: '🍴',
-      color: '#ea580c', // Default Restaurant Orange
+      color: pinPalette.ember, // Default Restaurant Orange
       bgColor: '#fff7ed',
       borderColor: '#ffedd5',
     };
@@ -143,7 +165,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🎬',
-        color: '#e11d48', // Vibrant Rose/Red for movie cinema
+        color: pinPalette.crimson, // Vibrant Rose/Red for movie cinema
         bgColor: '#fff1f2',
         borderColor: '#ffe4e6',
       };
@@ -151,7 +173,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     if (tags.includes('bowling') || name.includes('bowling') || name.includes('plaza')) {
       return {
         emoji: '🎳',
-        color: '#4f46e5', // Deep Indigo bowling
+        color: pinPalette.indigo, // Deep Indigo bowling
         bgColor: '#eef2ff',
         borderColor: '#e0e7ff',
       };
@@ -164,7 +186,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🏎️',
-        color: '#059669', // Emerald Racing GP
+        color: pinPalette.emerald, // Emerald Racing GP
         bgColor: '#ecfdf5',
         borderColor: '#d1fae5',
       };
@@ -172,7 +194,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     if (tags.includes('laser tag') || name.includes('laser') || tags.includes('arcade')) {
       return {
         emoji: '👾',
-        color: '#8b5cf6', // Neon Violet for arcades & lasers
+        color: pinPalette.violet, // Neon Violet for arcades & lasers
         bgColor: '#f5f3ff',
         borderColor: '#ede9fe',
       };
@@ -180,7 +202,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     if (tags.includes('waterfall') || name.includes('waterfall') || name.includes('cascade')) {
       return {
         emoji: '🏞️',
-        color: '#06b6d4', // Vibrant Cyan waterfall
+        color: pinPalette.cyan, // Vibrant Cyan waterfall
         bgColor: '#ecfeff',
         borderColor: '#cffafe',
       };
@@ -193,7 +215,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🏖️',
-        color: '#0284c7', // Sky Blue beach
+        color: pinPalette.sky, // Sky Blue beach
         bgColor: '#f0f9ff',
         borderColor: '#e0f2fe',
       };
@@ -208,7 +230,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🥾',
-        color: '#15803d', // Forest Green hiking
+        color: pinPalette.forest, // Forest Green hiking
         bgColor: '#f0fdf4',
         borderColor: '#dcfce7',
       };
@@ -223,7 +245,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🏛️',
-        color: '#b45309', // Amber Museum/Historical Pillar
+        color: pinPalette.amber, // Amber Museum/Historical Pillar
         bgColor: '#fef3c7',
         borderColor: '#fde68a',
       };
@@ -235,7 +257,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🥃',
-        color: '#d97706', // Rich Gold Rum glass
+        color: pinPalette.gold, // Rich Gold Rum glass
         bgColor: '#fffbeb',
         borderColor: '#fef3c7',
       };
@@ -249,7 +271,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     ) {
       return {
         emoji: '🌿',
-        color: '#10b981', // Natural Emerald herb leaf
+        color: pinPalette.leaf, // Natural Emerald herb leaf
         bgColor: '#f0fdf4',
         borderColor: '#dcfce7',
       };
@@ -258,7 +280,7 @@ export function getPlaceTheme(place: Place): PlaceTheme {
     // Catch-all activity
     return {
       emoji: '🏄',
-      color: '#0284c7', // Aquatic Ocean Sea Blue
+      color: pinPalette.sky, // Aquatic Ocean Sea Blue
       bgColor: '#f0f9ff',
       borderColor: '#e0f2fe',
     };

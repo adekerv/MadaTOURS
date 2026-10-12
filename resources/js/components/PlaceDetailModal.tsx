@@ -12,7 +12,7 @@ import { GooglePlacePanel } from './ui/GooglePlacePanel';
 import { useI18n } from '../i18n/I18nProvider';
 import { PlacePhoto } from './ui/PlacePhoto';
 import type { Place, User } from '../types';
-import { placeholderFor, creditLine } from '../lib/placeholders';
+import { placeholderFor } from '../lib/placeholders';
 import { placeFacts, telHref } from '../lib/place-details';
 import { usePlaceDetail } from '../hooks/usePlaceDetail';
 import { PlaceCommunity } from './community/PlaceCommunity';
@@ -239,7 +239,7 @@ export function PlaceDetailModal({
                 href={place.photoCredit.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline"
+                className="inline-flex min-h-11 items-center underline"
               >
                 {place.photoCredit.author}
               </a>{' '}
@@ -248,44 +248,35 @@ export function PlaceDetailModal({
                 href={place.photoCredit.licenseUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline"
+                className="inline-flex min-h-11 items-center underline"
               >
                 {place.photoCredit.license}
               </a>{' '}
               ·{' '}
             </>
+          ) : illustrative.credit?.ai ? (
+            <>{t('AI-generated image · not this place')} · </>
           ) : (
-            creditLine(illustrative) && (
+            illustrative.credit && (
               <>
-                {t('Photo')}: {t(creditLine(illustrative)!)}
-                {illustrative.source && (
-                  <>
-                    {' '}
-                    ·{' '}
-                    <a
-                      className="underline"
-                      href={illustrative.source}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('Photo source')}
-                    </a>
-                  </>
-                )}
-                {illustrative.license && (
-                  <>
-                    {' '}
-                    ·{' '}
-                    <a
-                      className="underline"
-                      href={illustrative.license}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('Photo license')}
-                    </a>
-                  </>
-                )}{' '}
+                {t('Illustrative photo · not this place')} · {t('Photo')}:{' '}
+                <a
+                  href={illustrative.credit.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 items-center underline"
+                >
+                  {illustrative.credit.author}
+                </a>{' '}
+                ·{' '}
+                <a
+                  href={illustrative.credit.licenseUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 items-center underline"
+                >
+                  {illustrative.credit.license}
+                </a>{' '}
                 ·{' '}
               </>
             )

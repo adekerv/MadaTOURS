@@ -1,4 +1,4 @@
-import type { PlaceDetails } from './lib/content';
+import type { PhotoCredit, PlaceDetails } from './lib/content';
 export interface Place {
   id: number;
   name: string;
@@ -10,13 +10,7 @@ export interface Place {
   descriptionFr?: string;
   access?: 'unknown' | 'open' | 'restricted';
   sources?: { url: string; title: string; checkedAt: string; fields: string[] }[];
-  photoCredit?: {
-    author: string;
-    license: string;
-    sourceUrl: string;
-    licenseUrl: string;
-    caption: string;
-  };
+  photoCredit?: PhotoCredit;
   distance?: number;
   rating?: number;
   communityRating?: number;

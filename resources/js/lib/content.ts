@@ -12,7 +12,14 @@ export const photoCreditSchema = z.object({
   sourceUrl: https,
   licenseUrl: https,
   caption: z.string().max(300),
+  /** How the right to show the file was obtained: a Commons licence, a stock licence, an owner's permission or AI. */
+  basis: z.enum(['commons', 'stock', 'permission', 'ai']).optional(),
+  title: z.string().max(300).optional(),
+  modified: z.string().max(100).optional(),
+  retrievedAt: z.iso.date().optional(),
+  ai: z.boolean().optional(),
 });
+export type PhotoCredit = z.infer<typeof photoCreditSchema>;
 
 const text = (max: number) => z.string().trim().min(1).max(max);
 const onHost = (hosts: string[]) =>
