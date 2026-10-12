@@ -43,7 +43,11 @@ export async function encodeWebp(
             const url = canvas.toDataURL('image/webp', q);
             const bytes = Math.ceil(((url.length - 'data:image/webp;base64,'.length) * 3) / 4);
             if (bytes <= maxBytes)
-              return { base64: url.split(',')[1], quality: Math.round(q * 100), smoothed: blur > 0 };
+              return {
+                base64: url.split(',')[1],
+                quality: Math.round(q * 100),
+                smoothed: blur > 0,
+              };
           }
         }
         return null;
