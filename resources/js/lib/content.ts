@@ -18,6 +18,8 @@ export const photoCreditSchema = z.object({
   modified: z.string().max(100).optional(),
   retrievedAt: z.iso.date().optional(),
   ai: z.boolean().optional(),
+  /** Attribution text the author asked for on Commons, kept verbatim. */
+  attribution: z.string().max(300).optional(),
 });
 export type PhotoCredit = z.infer<typeof photoCreditSchema>;
 

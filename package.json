@@ -45,7 +45,9 @@
     "coastline:build": "node --import tsx scripts/build-coastline.ts",
     "store:assets": "node --import tsx scripts/generate-share-assets.ts",
     "store:screenshots": "node --import tsx scripts/capture-store-screenshots.ts",
-    "photos:credits": "node --import tsx scripts/photo-credits.ts"
+    "photos:credits": "node --import tsx scripts/photo-credits.ts",
+    "photos:find": "node --import tsx scripts/find-commons-photos.ts",
+    "photos:apply": "node --import tsx scripts/apply-photos.ts"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
