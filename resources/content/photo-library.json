@@ -18,7 +18,7 @@
       "kind": "photo",
       "emoji": "🤿",
       "tone": "sky",
-      "files": ["diving-1-v1.webp", "diving-2-v1.webp"],
+      "files": ["diving-1-v1.webp", "diving-2-v1.webp", "diving-3-v1.webp"],
       "credits": {
         "diving-1-v1.webp": {
           "basis": "stock",
@@ -43,6 +43,18 @@
           "modified": "cropped, resized",
           "retrievedAt": "2026-10-12",
           "note": "Licence verified on the Commons file page on 2026-10-12: CC BY-SA 4.0, no restriction templates."
+        },
+        "diving-3-v1.webp": {
+          "basis": "commons",
+          "author": "NOAA",
+          "title": "NOAA diver over reef north coast Tutuila 2023",
+          "caption": "NOAA diver over reef north coast Tutuila 2023",
+          "license": "Public domain",
+          "licenseUrl": "https://commons.wikimedia.org/wiki/File:NOAA_diver_over_reef_north_coast_Tutuila_2023.png",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:NOAA_diver_over_reef_north_coast_Tutuila_2023.png",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Commons file page on 2026-10-12: PD-USGov-NOAA, a US federal government work."
         }
       }
     },
@@ -96,7 +108,12 @@
       "kind": "photo",
       "emoji": "🚤",
       "tone": "cyan",
-      "files": ["boat-islets-1-v1.webp", "boat-islets-2-v1.webp"],
+      "files": [
+        "boat-islets-1-v1.webp",
+        "boat-islets-2-v1.webp",
+        "boat-islets-3-v1.webp",
+        "boat-islets-4-v1.webp"
+      ],
       "credits": {
         "boat-islets-1-v1.webp": {
           "basis": "stock",
@@ -121,6 +138,30 @@
           "modified": "cropped, resized",
           "retrievedAt": "2026-10-12",
           "note": "Licence verified on the Commons file page on 2026-10-12: CC BY-SA 4.0, no restriction templates."
+        },
+        "boat-islets-3-v1.webp": {
+          "basis": "stock",
+          "author": "Mohamed Nashah",
+          "title": "Aerial photography of blue boat on seashore",
+          "caption": "Aerial photography of blue boat on seashore",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/aerial-photography-of-blue-boat-on-seashore-_r0YF9kK-Kc",
+          "modified": "cropped, resized, lightly smoothed",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        },
+        "boat-islets-4-v1.webp": {
+          "basis": "stock",
+          "author": "Muhammadh Saamy",
+          "title": "Aerial view of white boat on sea during daytime",
+          "caption": "Aerial view of white boat on sea during daytime",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/aerial-view-of-white-boat-on-sea-during-daytime-gi_YO3crYQw",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
         }
       }
     },
@@ -186,8 +227,45 @@
       "kind": "photo",
       "emoji": "🪁",
       "tone": "sky",
-      "files": [],
-      "credits": {}
+      "files": ["kitesurf-1-v1.webp", "kitesurf-2-v1.webp", "kitesurf-3-v1.webp"],
+      "credits": {
+        "kitesurf-1-v1.webp": {
+          "basis": "stock",
+          "author": "Catalina Saiu",
+          "title": "Kitesurfer jumping against sunset over the ocean",
+          "caption": "Kitesurfer jumping against sunset over the ocean",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/kitesurfer-jumping-against-sunset-over-the-ocean-liUs43bayHE",
+          "modified": "cropped to drop industrial structures on the horizon, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        },
+        "kitesurf-2-v1.webp": {
+          "basis": "stock",
+          "author": "Bernd Dittrich",
+          "title": "Kiteboarder gliding across turquoise ocean water",
+          "caption": "Kiteboarder gliding across turquoise ocean water",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/kiteboarder-gliding-across-turquoise-ocean-water-LQb3GgLB99o",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        },
+        "kitesurf-3-v1.webp": {
+          "basis": "stock",
+          "author": "Sofie D.",
+          "title": "Silhouette of a person kitesurfing on choppy water",
+          "caption": "Silhouette of a person kitesurfing on choppy water",
+          "license": "Unsplash License",
+          "licenseUrl": "https://unsplash.com/license",
+          "sourceUrl": "https://unsplash.com/photos/silhouette-of-a-person-kitesurfing-on-choppy-water-O9XsDo9R_bQ",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified on the Unsplash photo page on 2026-10-12: free to use under the Unsplash License, not Unsplash+."
+        }
+      }
     },
     {
       "key": "hiking",
@@ -616,8 +694,21 @@
       "kind": "photo",
       "emoji": "🌾",
       "tone": "leaf",
-      "files": [],
-      "credits": {}
+      "files": ["sugar-cane-1-v1.webp"],
+      "credits": {
+        "sugar-cane-1-v1.webp": {
+          "basis": "stock",
+          "author": "Atlantic Ambience",
+          "title": "Green and Brown Plantation Under Blue Sky",
+          "caption": "Green and Brown Plantation Under Blue Sky",
+          "license": "Pexels License",
+          "licenseUrl": "https://www.pexels.com/license/",
+          "sourceUrl": "https://www.pexels.com/photo/green-and-brown-plantation-under-blue-sky-11466855/",
+          "modified": "cropped, resized",
+          "retrievedAt": "2026-10-12",
+          "note": "Licence verified from the Pexels photo page on 2026-10-12: Pexels License."
+        }
+      }
     },
     {
       "key": "bele",

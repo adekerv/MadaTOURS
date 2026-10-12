@@ -50,6 +50,8 @@ export function creditsMarkdown(entries = readLibrary()) {
     '',
     'Stock photos are used under the Unsplash License or the Pexels License, and Wikimedia Commons photos under the licence named on each row. All are downloaded, re-encoded and served from this folder. Keep the credits, and the share-alike terms of CC BY-SA files, when redistributing.',
     '',
+    'Accepted licences: CC0, CC BY, CC BY-SA, the Unsplash License (not Unsplash+), the Pexels License, and public domain worldwide or as a US federal government work (PD-USGov, such as NOAA). Files that are public domain in the United States only because their copyright expired are excluded.',
+    '',
     '| File | Subject | Provenance and licence |',
     '| ---- | ------- | ---------------------- |',
     ...rows,

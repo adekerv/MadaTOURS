@@ -96,19 +96,47 @@ test('icon-tile subjects never show a photo', () => {
   assert.ok(shown.every((place) => placeholderFor(place).src === undefined));
 });
 
-test('the AI trail image carries its AI credit and consecutive places of one subject get different files', () => {
+test('the AI trail image carries its AI credit', () => {
   const pelee = placeholderFor(byId(5));
 
   assert.equal(pelee.src, '/assets/placeholders/hiking-ai-v1.jpg');
   assert.equal(pelee.credit?.ai, true);
-  for (const entry of photoLibrary.filter((item) => item.files.length > 1)) {
-    const tag = { diving: 'Diving', spa: 'Spa' }[entry.key];
-    if (!tag) continue;
-    const first = placeholderFor(draft({ id: 9001, name: 'A', type: 'activity', tags: [tag] }));
-    const next = placeholderFor(draft({ id: 9002, name: 'B', type: 'activity', tags: [tag] }));
-    assert.equal(first.key, entry.key);
-    assert.notEqual(first.src, next.src, entry.key);
+});
+
+test('every subject with several files uses all of them, in turn by place id', () => {
+  const multi = photoLibrary.filter((entry) => entry.files.length > 1);
+
+  assert.ok(multi.length > 0);
+  for (const entry of multi) {
+    const ids = Object.entries(subjects)
+      .filter(([, key]) => key === entry.key)
+      .map(([id]) => Number(id))
+      .sort((a, b) => a - b);
+    const shown = ids.map((id) => placeholderFor(byId(id)).src);
+    assert.ok(ids.length >= entry.files.length, entry.key);
+    assert.deepEqual(
+      new Set(shown),
+      new Set(entry.files.map((file) => `/assets/placeholders/${file}`)),
+      entry.key,
+    );
+    assert.equal(shown[0], `/assets/placeholders/${entry.files[0]}`, entry.key);
+    assert.equal(shown[1], `/assets/placeholders/${entry.files[1]}`, entry.key);
   }
+});
+
+test('places outside the subject map still spread across the subject files', () => {
+  const diving = photoLibrary.find((entry) => entry.key === 'diving')!;
+
+  const shown = new Set(
+    Array.from(
+      { length: 30 },
+      (_, index) =>
+        placeholderFor(draft({ id: 9001 + index, name: 'A', type: 'activity', tags: ['Diving'] }))
+          .src,
+    ),
+  );
+
+  assert.equal(shown.size, diving.files.length);
 });
 
 test('library files are versioned, credited, within budget and never a copy of a place photo', () => {
@@ -133,6 +161,18 @@ test('library files are versioned, credited, within budget and never a copy of a
       assert.equal(credit.ai === true, credit.basis === 'ai', `${entry.key}/${file}`);
       if (!credit.ai)
         assert.ok(credit.note?.includes('verified'), `${entry.key}/${file}: licence check`);
+      assert.match(
+        credit.license,
+        /^(CC0|CC BY [0-9.]+|CC BY-SA [0-9.]+|Public domain|Unsplash License|Pexels License|AI-generated · no licence claimed)$/,
+        `${entry.key}/${file}: licence`,
+      );
+      // Public domain only worldwide or as a US federal work, never US-only because a copyright expired.
+      if (credit.license === 'Public domain')
+        assert.match(
+          credit.note ?? '',
+          /PD-USGov|worldwide/,
+          `${entry.key}/${file}: public domain basis`,
+        );
     }
   }
 });

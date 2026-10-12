@@ -35,6 +35,15 @@ export const photoLibrary = library.entries as unknown as LibraryEntry[];
 const byKey = new Map(photoLibrary.map((entry) => [entry.key, entry]));
 const overrides = subjects as Record<string, string>;
 export const placeholderPath = (file: string) => `/assets/placeholders/${file}`;
+/** Each mapped place's position among its subject's places sorted by id, so a subject's files are dealt out in turn. */
+const ranks = new Map<number, number>();
+const placesBySubject = new Map<string, number[]>();
+for (const [id, key] of Object.entries(overrides))
+  placesBySubject.set(key, [...(placesBySubject.get(key) ?? []), Number(id)]);
+for (const ids of placesBySubject.values())
+  ids.sort((a, b) => a - b).forEach((id, rank) => ranks.set(id, rank));
+/** A stable spread for places outside the map (Knuth's multiplicative hash). */
+const spread = (id: number) => Math.imul(id, 2654435761) >>> 0;
 
 /** Exact catalogue tags, most specific first. Tags are compared after `normalizeSearch`. */
 const activityTags: [string, string][] = [
@@ -160,7 +169,8 @@ export function placeholderFor(place: Place): Placeholder {
     color: pinPalette[entry.tone],
   };
   if (entry.kind !== 'photo' || !entry.files.length) return shown;
-  // Neighbouring cards of one subject differ, and a place always gets the same variant.
-  const file = entry.files[place.id % entry.files.length];
+  // Round-robin within the subject, so every file is used; a place always gets the same one.
+  const rank = overrides[String(place.id)] === entry.key ? ranks.get(place.id) : undefined;
+  const file = entry.files[(rank ?? spread(place.id)) % entry.files.length];
   return { ...shown, src: placeholderPath(file), credit: entry.credits[file] };
 }
