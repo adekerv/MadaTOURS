@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import type { Plugin } from 'vite';
+import { libraryFiles } from './photo-library.ts';
 export function offlineShell(): Plugin {
   return {
     name: 'madatours-offline-shell',
@@ -20,9 +21,7 @@ export function offlineShell(): Plugin {
           '/build/offline.html',
           '/favicon.svg',
           '/theme.js',
-          ...['beach', 'hiking', 'seafood', 'restaurant', 'nature', 'culture'].map(
-            (name) => `/assets/placeholders/${name}.jpg`,
-          ),
+          ...libraryFiles().map((file) => `/assets/placeholders/${file}`),
           ...Object.keys(bundle)
             .filter((name) => !name.endsWith('.map'))
             .map((name) => `/build/${name}`),
