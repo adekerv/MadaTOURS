@@ -1049,4 +1049,7 @@ export const english: Record<string, string> = {
   'Every stop must be a place that is listed.': 'Every stop must be a place that is listed.',
   'Places with restricted access cannot be part of a tour.':
     'Places with restricted access cannot be part of a tour.',
+  'Weather, map and route data:': 'Weather, map and route data:',
+  'Change your name, email address and recovery codes, or delete your account.':
+    'Change your name, email address and recovery codes, or delete your account.',
 };

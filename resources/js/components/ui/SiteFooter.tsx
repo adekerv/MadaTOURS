@@ -1,5 +1,15 @@
 import { useI18n } from '../../i18n/I18nProvider';
-export function SiteFooter({ onSignup }: { onSignup?: () => void }) {
+/**
+ * Account links appear only for a signed-in visitor. Deleting an account lives in Account settings; the public
+ * "Delete your account" page stays reachable at its address (app stores ask for one) and from the Privacy page.
+ */
+export function SiteFooter({
+  onSignup,
+  signedIn = false,
+}: {
+  onSignup?: () => void;
+  signedIn?: boolean;
+}) {
   const { t } = useI18n();
   return (
     <footer className="site-footer mt-8 border-t border-slate-200 py-7 text-sm text-slate-600">
@@ -21,8 +31,7 @@ export function SiteFooter({ onSignup }: { onSignup?: () => void }) {
             ['contact', 'Contact'],
             ['privacy', 'Privacy Policy'],
             ['terms', 'Terms'],
-            ['settings', 'Account settings'],
-            ['delete-account', 'Delete account'],
+            ...(signedIn ? [['settings', 'Account settings']] : []),
           ].map(([page, label]) => (
             <a key={page} href={`#${page}`} className="inline-flex min-h-11 items-center underline">
               {t(label)}
@@ -31,7 +40,7 @@ export function SiteFooter({ onSignup }: { onSignup?: () => void }) {
         </nav>
       </div>
       <div className="mt-5 flex flex-wrap items-center gap-x-3">
-        <span>{t('Weather and map data:')}</span>
+        <span>{t('Weather, map and route data:')}</span>
         <a
           className="inline-flex min-h-11 items-center underline"
           href="https://open-meteo.com/"
@@ -67,6 +76,7 @@ export function SiteFooter({ onSignup }: { onSignup?: () => void }) {
         >
           openrouteservice
         </a>
+        <span aria-hidden="true">·</span>
         <a className="inline-flex min-h-11 items-center underline" href="#about">
           {t('Photo credits')}
         </a>

@@ -84,7 +84,7 @@ for (const language of ['en', 'fr'] as const)
         path: `test-results/ux-${test.info().project.name}-${language}-${width}-planner.png`,
       });
       await page.keyboard.press('Escape');
-      await page.getByRole('link', { name: t('About'), exact: true }).click();
+      await page.getByRole('link', { name: t('Contact'), exact: true }).click();
       await page.getByLabel(t('Place name'), { exact: true }).fill('Jardin test');
       await page.getByLabel(t('Town'), { exact: true }).fill('Saint-Pierre');
       await page.getByLabel(t('Source link'), { exact: true }).fill('https://example.com/place');

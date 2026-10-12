@@ -185,7 +185,8 @@ export function Homepage({
         </nav>
       </header>
       <main id="main-content" tabIndex={-1}>
-        <OnboardingHint onPlan={onPlanDay} />
+        {/* "No account needed" is for guests. It stays while the session loads, so a guest's page never jumps. */}
+        {!user && <OnboardingHint onPlan={onPlanDay} />}
         {user && (
           <p className="mt-6 break-words text-center text-lg font-semibold text-orange-800">
             {t('Welcome, {name}.', { name: user.name })}
@@ -445,7 +446,7 @@ export function Homepage({
       </main>
       <Tours places={places} placesLoading={catalogueLoading} />
       <MustGo places={places} catalogueLoading={catalogueLoading} />
-      <SiteFooter onSignup={user ? undefined : onSignup} />
+      <SiteFooter onSignup={user ? undefined : onSignup} signedIn={!!user} />
     </div>
   );
 }

@@ -34,7 +34,7 @@ export function SettingsPage({
         <p className="text-xs font-semibold uppercase tracking-widest text-orange-700">MADATOURS</p>
         <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{t('Account settings')}</h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
-          {t('Change your name and email address, or delete your account.')}
+          {t('Change your name, email address and recovery codes, or delete your account.')}
         </p>
         {sessionLoading ? (
           <p role="status" className="mt-8 text-slate-600">

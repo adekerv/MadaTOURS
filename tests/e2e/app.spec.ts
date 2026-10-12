@@ -495,3 +495,38 @@ for (const width of [320, 390])
     await expect(page.locator('section[aria-labelledby="island-picks"] article')).toHaveCount(3);
     expect(Math.abs((await top()) - before)).toBeLessThanOrEqual(2);
   });
+
+test('account links and the guest introduction show only where they belong', async ({ page }) => {
+  await page.route('https://api.open-meteo.com/**', (route) => route.abort());
+  await page.goto('/');
+  const footer = page.locator('footer');
+  // Guests: no account links in the footer, and the "no account needed" introduction.
+  await expect(footer.getByRole('link', { name: 'Delete account' })).toHaveCount(0);
+  await expect(footer.getByRole('link', { name: 'Account settings' })).toHaveCount(0);
+  await expect(page.getByText('Your island guide, no account needed')).toBeVisible();
+  // The public deletion page stays reachable from Privacy (app stores ask for one).
+  await page.goto('/#privacy');
+  await expect(page.getByRole('main').getByRole('link', { name: 'Delete account' })).toBeVisible();
+
+  const email = `footer-${Date.now()}@example.test`;
+  await page.request.post('/api/auth/register', {
+    headers: { 'X-MadaTours-Client': '1' },
+    data: { name: 'Footer', email, password: 'Footer browser password 42' },
+  });
+  await page.goto('/');
+  await expect(page.getByText(/Welcome|Footer/).first()).toBeVisible();
+  // Signed in: settings is in the footer, deletion is not, and the guest introduction is gone.
+  await expect(footer.getByRole('link', { name: 'Account settings' })).toBeVisible();
+  await expect(footer.getByRole('link', { name: 'Delete account' })).toHaveCount(0);
+  await expect(page.getByText('Your island guide, no account needed')).toHaveCount(0);
+  // Deleting the account is on the settings page, and its footer does not link back to itself.
+  await footer.getByRole('link', { name: 'Account settings' }).click();
+  await expect(page.getByRole('heading', { name: 'Delete your account' })).toBeVisible();
+  await expect(page.locator('footer').getByRole('link', { name: 'Account settings' })).toHaveCount(
+    0,
+  );
+  await page.request.delete('/api/account', {
+    headers: { 'X-MadaTours-Client': '1' },
+    data: { password: 'Footer browser password 42', confirmation: email },
+  });
+});

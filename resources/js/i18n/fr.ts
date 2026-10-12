@@ -1067,4 +1067,7 @@ export const french: Record<string, string> = {
   'Every stop must be a place that is listed.': 'Chaque étape doit être un lieu référencé.',
   'Places with restricted access cannot be part of a tour.':
     'Les lieux à accès restreint ne peuvent pas faire partie d’un circuit.',
+  'Weather, map and route data:': 'Données météo, cartographiques et d’itinéraire :',
+  'Change your name, email address and recovery codes, or delete your account.':
+    'Modifiez votre nom, votre adresse e-mail et vos codes de récupération, ou supprimez votre compte.',
 };

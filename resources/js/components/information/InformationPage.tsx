@@ -109,7 +109,6 @@ export function InformationPage({
               </ul>
               <p className="mt-2 text-xs text-slate-600">{t('Displayed cropped to fit.')}</p>
             </section>
-            <SuggestionForm />
           </>
         )}
         {page === 'contact' && (
@@ -132,7 +131,7 @@ export function InformationPage({
           </a>
         )}
       </main>
-      <SiteFooter />
+      <SiteFooter signedIn={signedIn} />
     </div>
   );
 }
