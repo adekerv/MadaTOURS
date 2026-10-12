@@ -15,8 +15,9 @@ const only = new Set((args[0]?.slice(6) ?? '').split(',').filter(Boolean).map(Nu
 const userAgent = 'MadaTours link check (+https://github.com/adekerv/MadaTOURS)';
 const parkedWords =
   /domain (name )?(is |may be )?for sale|buy this domain|ce domaine est à vendre|domaine à vendre|parked (free|domain)|this domain is parked|sedoparking|dan\.com|afternic|hugedomains|domain parking/i;
+// "casino" alone is too common here (the Trois-Îlets casino, address landmarks), so only clear gambling-site terms count.
 const gamblingWords =
-  /\b(casino|slot gacor|judi online|togel|sportsbook|paris sportifs en ligne|betting site)\b/i;
+  /\b(online casino|casino en ligne|slot gacor|slot online|judi online|togel|bandar|sportsbook|paris sportifs en ligne|betting site)\b/i;
 /** The last two labels of a host, enough to tell martinique.org from another site for the hosts in this catalogue. */
 const siteOf = (host: string) =>
   host
