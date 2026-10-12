@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-10-12",
+  "source": "reports/photo-audit-2026-10-12 (manual review of each listing's description and sources)",
+  "fixes": [
+    {
+      "id": 299,
+      "name": "Simobey",
+      "field": "tags",
+      "from": ["Fishing"],
+      "to": ["Boat Trip"],
+      "why": "Tagged Fishing, but the listing describes boat trips to the white shallows and the mangrove."
+    },
+    {
+      "id": 306,
+      "name": "Tropic Notic",
+      "field": "tags",
+      "from": ["Kayak"],
+      "to": ["Boat Trip"],
+      "why": "Tagged Kayak, but the business hires out no-licence motorboats."
+    },
+    {
+      "id": 311,
+      "name": "Wil Rid",
+      "field": "tags",
+      "from": ["Sailing"],
+      "to": ["Water Sports", "Jetboard", "Kitesurf"],
+      "why": "Tagged Sailing, but the school teaches and rents wing foil, e-foil, e-surf, kite and kite foil."
+    },
+    {
+      "id": 241,
+      "name": "Ile Aux Kayaks",
+      "field": "location",
+      "from": "Fort-de-France",
+      "to": "Le Robert",
+      "why": "The outings run along the shores of Le Robert, where the map point already is."
+    }
+  ]
+}

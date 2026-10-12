@@ -37,6 +37,7 @@
     "admin:create": "php artisan admin:create",
     "catalogue:sync-seed": "node --import tsx scripts/sync-seed.ts",
     "places:apply": "node --import tsx scripts/apply-listing.ts",
+    "places:fix": "node --import tsx scripts/apply-place-fixes.ts",
     "sources:apply": "node --import tsx scripts/apply-sources.ts",
     "places:audit": "node --import tsx scripts/audit-places.ts",
     "sources:extract": "node --import tsx scripts/extract-sources.ts",
