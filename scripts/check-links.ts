@@ -2,8 +2,8 @@ import { writeFile } from 'node:fs/promises';
 import { loadPlaces, today } from './lib/place-sources';
 /**
  * Follows every place's website and source links and reports the ones that need a person: a redirect to another
- * domain, a parked or for-sale domain, a gambling redirect, or a 4xx/5xx answer. It reads only; nothing is written
- * to the catalogue.
+ * domain, a parked or for-sale domain, a gambling redirect, or a 4xx/5xx answer. A network error on this side is
+ * reported as unknown, never as dead. It reads only; nothing is written to the catalogue.
  *   npm run links:check                 every place (live database when configured, else the seed)
  *   npm run links:check -- --ids=16,280 only these places
  * The report goes to reports/link-check-<date>.csv.
@@ -32,6 +32,8 @@ type LinkResult = {
   url: string;
   status: number | null;
   finalUrl: string;
+  /** `unknown` is a network error on this machine's side: the site may well be up, so it is never reported as dead. */
+  state: 'ok' | 'problem' | 'unknown';
   problem: string;
 };
 async function check(url: string) {
@@ -90,6 +92,7 @@ for (let index = 0; index < links.length; index += 4) {
       batch.map(async ({ place, kind, url }) => {
         try {
           const result = await check(url);
+          const problem = problemOf(url, result);
           return {
             id: place.id,
             name: place.name,
@@ -97,7 +100,8 @@ for (let index = 0; index < links.length; index += 4) {
             url,
             status: result.status,
             finalUrl: result.finalUrl,
-            problem: problemOf(url, result),
+            state: problem ? ('problem' as const) : ('ok' as const),
+            problem,
           };
         } catch (error) {
           return {
@@ -107,7 +111,8 @@ for (let index = 0; index < links.length; index += 4) {
             url,
             status: null,
             finalUrl: url,
-            problem: `No answer: ${error instanceof Error ? error.message : String(error)}`,
+            state: 'unknown' as const,
+            problem: `Unknown, network error from this machine: ${error instanceof Error ? error.message : String(error)}`,
           };
         }
       }),
@@ -116,12 +121,13 @@ for (let index = 0; index < links.length; index += 4) {
   if ((index / 4) % 25 === 0) console.log(`${Math.min(index + 4, links.length)}/${links.length}`);
   await new Promise((resolve) => setTimeout(resolve, 500));
 }
-const flagged = results.filter((result) => result.problem);
+const flagged = results.filter((result) => result.state !== 'ok');
+const unknown = flagged.filter((result) => result.state === 'unknown').length;
 const cell = (value: unknown) => `"${String(value ?? '').replaceAll('"', '""')}"`;
 const csv = [
-  'id,name,kind,url,status,final_url,problem',
+  'id,name,kind,url,status,final_url,state,problem',
   ...flagged.map((row) =>
-    [row.id, row.name, row.kind, row.url, row.status, row.finalUrl, row.problem]
+    [row.id, row.name, row.kind, row.url, row.status, row.finalUrl, row.state, row.problem]
       .map(cell)
       .join(','),
   ),
@@ -129,5 +135,5 @@ const csv = [
 const path = `reports/link-check-${today()}.csv`;
 await writeFile(path, `${csv}\n`);
 console.log(
-  `${flagged.length} of ${results.length} links need a look. Report: ${path}. Nothing was changed.`,
+  `${flagged.length - unknown} of ${results.length} links need a look, and ${unknown} could not be reached from this machine (state unknown, not dead). Report: ${path}. Nothing was changed.`,
 );

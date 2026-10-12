@@ -1,0 +1,57 @@
+{
+  "checkedAt": "2026-10-12",
+  "source": "npm run links:check on 2026-10-12, with each tourism-board page and redirect target checked by hand",
+  "fixes": [
+    {
+      "id": 95,
+      "name": "Distillerie Hardy",
+      "field": "website",
+      "from": "https://www.reference-rhum.com/G-Hardy-54",
+      "to": null,
+      "why": "The link returns 404, and Martinique Tourisme still lists only that address. No official site was found; the distillery's Facebook page, already on the listing, stays."
+    },
+    {
+      "id": 104,
+      "name": "Habdaphai",
+      "field": "website",
+      "from": "https://habdaphai-art-performance.business.site/",
+      "to": null,
+      "why": "The link returns 404: it was a Google Business Profile site, a service Google shut down in 2024. Martinique Tourisme still lists only that address."
+    },
+    {
+      "id": 124,
+      "name": "Qv Tropicale",
+      "field": "website",
+      "from": "https://www.qv-tropicale.com/",
+      "to": null,
+      "why": "The link returns 404, and Martinique Tourisme still lists only that address. No other official site was found."
+    },
+    {
+      "id": 127,
+      "name": "Rhums Baie Des Trésors - Habitation Le Galion",
+      "field": "website",
+      "from": "https://www.baiedestresors.mq/",
+      "to": "https://baiedestresors.com/",
+      "evidence": "https://baiedestresors.com/",
+      "why": "The old address redirects to baiedestresors.com, whose page is titled “Baie des Trésors”."
+    },
+    {
+      "id": 259,
+      "name": "Le Mantou",
+      "field": "website",
+      "from": "https://www.decouverte-martinique.fr/",
+      "to": "https://www.lemantou.fr/fr/",
+      "evidence": "https://www.lemantou.fr/fr/",
+      "why": "The old address redirects to lemantou.fr, whose page is titled “Le Mantou - Découverte Martinique”."
+    },
+    {
+      "id": 314,
+      "name": "Zone2Glisse",
+      "field": "website",
+      "from": "https://www.zone2glisse.fr/",
+      "to": "https://zone2glisse.wixsite.com/martinique",
+      "evidence": "https://zone2glisse.wixsite.com/martinique",
+      "why": "The old address redirects to this Wix page, titled “Sortie Bateau | Zone 2 Glisse | Martinique”."
+    }
+  ]
+}
