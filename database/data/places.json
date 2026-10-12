@@ -805,10 +805,7 @@
           "url": "https://www.martinique.org/fr/que-faire/sports-et-decouvertes-terre/acrokart-racing-bowling",
           "checkedAt": "2026-10-02"
         },
-        "website": {
-          "url": "https://www.martinique.org/fr/que-faire/sports-et-decouvertes-terre/acrokart-racing-bowling",
-          "checkedAt": "2026-10-02"
-        },
+        "website": { "url": "https://acrokart.fr/", "checkedAt": "2026-10-12" },
         "hoursText": {
           "url": "https://www.martinique.org/fr/que-faire/sports-et-decouvertes-terre/acrokart-racing-bowling",
           "checkedAt": "2026-10-02"
@@ -830,7 +827,7 @@
         "Espèces",
         "Virement bancaire"
       ],
-      "website": "https://www.acrokart.com/",
+      "website": "https://acrokart.fr/",
       "hoursText": "Mardi : À partir de 18h00, À partir de 00h00\nMercredi : À partir de 18h00, À partir de 00h00\nJeudi : À partir de 18h00, À partir de 00h00\nVendredi : À partir de 18h00, À partir de 00h00\nSamedi : À partir de 15h00, À partir de 00h00\nDimanche : À partir de 15h00, À partir de 21h00",
       "languages": ["Anglais", "Français"],
       "priceRange": "19–25 €"
@@ -5087,10 +5084,6 @@
           "url": "https://www.martinique.org/fr/bars-restaurants/restaurants/ti-payot",
           "checkedAt": "2026-10-02"
         },
-        "website": {
-          "url": "https://www.martinique.org/fr/bars-restaurants/restaurants/ti-payot",
-          "checkedAt": "2026-10-02"
-        },
         "services": {
           "url": "https://www.martinique.org/fr/bars-restaurants/restaurants/ti-payot",
           "checkedAt": "2026-10-02"
@@ -5108,7 +5101,6 @@
       "phone": "+596 596 69 07 38",
       "address": "1, Allée des raisiniers, Plage de Grande Anse, 97217 Les Anses-D'Arlet",
       "payment": ["Cartes bancaires", "Chèques vacances", "Espèces"],
-      "website": "https://plongeepassion.com/",
       "services": ["Point wifi"],
       "languages": ["Anglais", "Espagnol", "Français"],
       "priceRange": "15–23 €"
@@ -18841,10 +18833,6 @@
           "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/martinique-wake-park",
           "checkedAt": "2026-10-02"
         },
-        "website": {
-          "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/martinique-wake-park",
-          "checkedAt": "2026-10-02"
-        },
         "facebook": {
           "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/martinique-wake-park",
           "checkedAt": "2026-10-02"
@@ -18861,7 +18849,6 @@
       "phone": "+596 596 69 46 21",
       "address": "Domaine Chateau Gaillard, 97229 Les Trois-Ilets",
       "payment": ["Cartes bancaires", "Chèques vacances", "Virement bancaire"],
-      "website": "https://www.martiniquewakepark.com/",
       "facebook": "https://www.facebook.com/martiniquewakepark",
       "languages": ["Anglais", "Français"],
       "priceRange": "7–26 €"
