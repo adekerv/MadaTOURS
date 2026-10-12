@@ -417,7 +417,19 @@
       }
     ],
     "access": "unknown",
-    "published": true
+    "published": true,
+    "image": "/photos/5-montagne-pelee.webp",
+    "photo_credit": {
+      "author": "Vincent B (https://www.geodiversite.net/auteur466)",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Crater_and_Summit_Domes_of_Mont_Pel%C3%A9e_on_Martinique.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "caption": "Montagne Pelée",
+      "basis": "commons",
+      "title": "Crater and Summit Domes of Mont Pelée on Martinique.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
+    }
   },
   {
     "id": 6,
@@ -429,13 +441,17 @@
     "description": "A long stretch of white sand edged with coconut palms in Sainte-Anne, often named Martinique's most beautiful beach. It is very busy at weekends. A few snack stands sell food, and picnic tables sit in the shade along the shore.",
     "description_fr": "À Sainte-Anne, une grande plage de sable blanc et de cocotiers, régulièrement présentée comme l’une des plus belles de l’île. Le week-end, elle attire beaucoup de monde. Des snacks sont installés à proximité et des tables de pique-nique ont été placées à l’ombre.",
     "tags": ["Beach", "Relaxation", "Family", "Swimming"],
-    "image": "/photos/salines.jpg",
+    "image": "/photos/6-plage-des-salines.webp",
     "photo_credit": {
-      "author": "Hervé NICOLAS",
-      "caption": "Salines · 2016",
+      "author": "Sapakagadewmoinjadiw",
       "license": "CC BY-SA 4.0",
-      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Etang_des_Salines_(Martinique).jpg",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Salines_Beach.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Plage des Salines",
+      "basis": "commons",
+      "title": "Salines Beach.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     },
     "sources": [
       {
@@ -525,7 +541,19 @@
       }
     ],
     "access": "unknown",
-    "published": true
+    "published": true,
+    "image": "/photos/9-presqu-ile-de-la-caravelle.webp",
+    "photo_credit": {
+      "author": "Sapakagadewmoinjadiw",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caravelle_Natural_reserve.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Presqu'île de la Caravelle",
+      "basis": "commons",
+      "title": "Caravelle Natural reserve.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
+    }
   },
   {
     "id": 10,
@@ -675,7 +703,19 @@
       { "day": 6, "opens": 840, "closes": 1050 }
     ],
     "hours_source": "https://www.martinique.org/fr/que-faire/sites-naturels-publics/la-savane-des-esclaves",
-    "hours_updated_at": "2026-10-03T01:31:35.791512+00:00"
+    "hours_updated_at": "2026-10-03T01:31:35.791512+00:00",
+    "image": "/photos/11-la-savane-des-esclaves.webp",
+    "photo_credit": {
+      "author": "Thérèse Gaigé",
+      "license": "CC0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:La_Savane_des_Esclaves_(Les_Trois-%C3%8Elets,_Martinique)_-_28.jpg",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "caption": "La Savane des Esclaves",
+      "basis": "commons",
+      "title": "La Savane des Esclaves (Les Trois-Îlets, Martinique) - 28.jpg",
+      "modified": "cropped, resized, lightly smoothed",
+      "retrievedAt": "2026-10-12"
+    }
   },
   {
     "id": 12,
@@ -1890,7 +1930,19 @@
       { "day": 6, "opens": 570, "closes": 1020 }
     ],
     "hours_source": "https://www.martinique.org/fr/bars-restaurants/restaurants/habitation-ceron",
-    "hours_updated_at": "2026-10-03T01:31:38.973297+00:00"
+    "hours_updated_at": "2026-10-03T01:31:38.973297+00:00",
+    "image": "/photos/33-habitation-ceron.webp",
+    "photo_credit": {
+      "author": "WCOMFR",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:LE_PRECHEUR.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Habitation Ceron",
+      "basis": "commons",
+      "title": "LE PRECHEUR.jpg",
+      "modified": "cropped, resized, lightly smoothed",
+      "retrievedAt": "2026-10-12"
+    }
   },
   {
     "id": 34,
@@ -6899,7 +6951,19 @@
       { "day": 6, "opens": 600, "closes": 1020 }
     ],
     "hours_source": "https://www.martinique.org/fr/que-faire/culture-patrimoine/distillerie-depaz",
-    "hours_updated_at": "2026-10-03T01:31:53.287043+00:00"
+    "hours_updated_at": "2026-10-03T01:31:53.287043+00:00",
+    "image": "/photos/94-distillerie-depaz.webp",
+    "photo_credit": {
+      "author": "Dalia Del Arte",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Habitation_DEPAZ_(2).jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Distillerie Depaz",
+      "basis": "commons",
+      "title": "Habitation DEPAZ (2).jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
+    }
   },
   {
     "id": 95,
@@ -7027,6 +7091,18 @@
       "payment": ["Cartes bancaires", "Espèces"],
       "website": "https://www.maisonlamauny.com/",
       "languages": ["Anglais", "Français"]
+    },
+    "image": "/photos/96-distillerie-maison-la-mauny.webp",
+    "photo_credit": {
+      "author": "Tux-Man",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:La_Mauny_001.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "caption": "Distillerie Maison La Mauny",
+      "basis": "commons",
+      "title": "La Mauny 001.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -7099,6 +7175,18 @@
       "facebook": "https://www.facebook.com/rhumneissonofficiel",
       "instagram": "https://instagram.com/rhums_neisson",
       "languages": ["Anglais", "Français"]
+    },
+    "image": "/photos/97-distillerie-neisson.webp",
+    "photo_credit": {
+      "author": "Aude Lazaro ArcheOn",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Chai_de_la_distillerie_Neisson.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Distillerie Neisson",
+      "basis": "commons",
+      "title": "Chai de la distillerie Neisson.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -7250,7 +7338,19 @@
       { "day": 6, "opens": 540, "closes": 1020 }
     ],
     "hours_source": "https://www.martinique.org/fr/que-faire/culture-patrimoine/distillerie-trois-rivieres",
-    "hours_updated_at": "2026-10-03T01:31:54.263899+00:00"
+    "hours_updated_at": "2026-10-03T01:31:54.263899+00:00",
+    "image": "/photos/99-distillerie-trois-rivieres.webp",
+    "photo_credit": {
+      "author": "G21designz",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Distillerie_Trois-Rivieres_Maritinique.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Distillerie Trois Rivieres",
+      "basis": "commons",
+      "title": "Distillerie Trois-Rivieres Maritinique.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
+    }
   },
   {
     "id": 100,
@@ -7805,7 +7905,19 @@
       { "day": 6, "opens": 540, "closes": 1020 }
     ],
     "hours_source": "https://www.martinique.org/fr/que-faire/sites-naturels-publics/jardin-remarquable-de-lhabitation-saint-etienne",
-    "hours_updated_at": "2026-10-03T01:31:55.818922+00:00"
+    "hours_updated_at": "2026-10-03T01:31:55.818922+00:00",
+    "image": "/photos/106-habitation-saint-etienne.webp",
+    "photo_credit": {
+      "author": "Thérèse Gaigé",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Maison_du_Ma%C3%AEtre.JPG",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Habitation Saint-Etienne",
+      "basis": "commons",
+      "title": "Maison du Maître.JPG",
+      "modified": "cropped, resized, lightly smoothed",
+      "retrievedAt": "2026-10-12"
+    }
   },
   {
     "id": 107,
@@ -8244,6 +8356,18 @@
       "instagram": "https://instagram.com/peyinordmartinique",
       "languages": ["Anglais", "Français"],
       "accessibility": "Déficience moteur"
+    },
+    "image": "/photos/113-le-marche-couvert.webp",
+    "photo_credit": {
+      "author": "WCOMFR",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:SAINT_PIERRE_MARCHE_(1).jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Le Marché Couvert",
+      "basis": "commons",
+      "title": "SAINT PIERRE MARCHE (1).jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -8454,6 +8578,18 @@
       "facebook": "https://www.facebook.com/profile.php",
       "instagram": "https://instagram.com/saintpierre_art_histoire",
       "languages": ["Anglais", "Français"]
+    },
+    "image": "/photos/116-le-theatre.webp",
+    "photo_credit": {
+      "author": "Otto Von Viani",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Th%C3%A9%C3%A2tre_de_Saint-Pierre_en_Martinique.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Le Théâtre",
+      "basis": "commons",
+      "title": "Théâtre de Saint-Pierre en Martinique.jpg",
+      "modified": "cropped, resized, lightly smoothed",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -8508,6 +8644,18 @@
       "payment": ["Cartes bancaires", "Espèces"],
       "facebook": "https://www.facebook.com/profile.php",
       "instagram": "https://instagram.com/peyinordmartinique"
+    },
+    "image": "/photos/117-l-eglise-du-fort.webp",
+    "photo_credit": {
+      "author": "Enrevseluj",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:%C3%89glise_du_Fort_de_Saint-Pierre_2.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "L'église Du Fort",
+      "basis": "commons",
+      "title": "Église du Fort de Saint-Pierre 2.jpg",
+      "modified": "cropped, resized, lightly smoothed",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -8562,6 +8710,18 @@
       "payment": ["Cartes bancaires", "Espèces"],
       "facebook": "https://www.facebook.com/profile.php",
       "instagram": "https://instagram.com/peyinordmartinique"
+    },
+    "image": "/photos/118-les-bureaux-du-genie-civil.webp",
+    "photo_credit": {
+      "author": "Stabbur's Master",
+      "license": "CC BY-SA 2.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Martinique_-_St._Pierre_-_Les_Bureaux_du_Genie_-_51062915138.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "caption": "Les Bureaux Du Génie Civil",
+      "basis": "commons",
+      "title": "Martinique - St. Pierre - Les Bureaux du Genie - 51062915138.jpg",
+      "modified": "cropped, resized, lightly smoothed",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -8768,7 +8928,19 @@
       { "day": 6, "opens": 540, "closes": 1080 }
     ],
     "hours_source": "https://www.martinique.org/fr/que-faire/culture-patrimoine/memorial-de-la-catastrophe-de-1902-musee-frank-perret",
-    "hours_updated_at": "2026-10-03T01:31:58.068497+00:00"
+    "hours_updated_at": "2026-10-03T01:31:58.068497+00:00",
+    "image": "/photos/121-memorial-de-la-catastrophe-de-1902-musee-frank-a.webp",
+    "photo_credit": {
+      "author": "Jean-Louis Lascoux",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mus%C3%A9e_Franck_Alvord_Perret.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "caption": "Mémorial De La Catastrophe De 1902 - Musée Frank A. Perret",
+      "basis": "commons",
+      "title": "Musée Franck Alvord Perret.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
+    }
   },
   {
     "id": 122,
@@ -9283,6 +9455,18 @@
         }
       },
       "address": "Quartier Durand, 97212 Saint-Joseph"
+    },
+    "image": "/photos/129-coeur-bouliki.webp",
+    "photo_credit": {
+      "author": "Arn",
+      "license": "CC BY 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mahogany_grandes_feuilles.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "caption": "Coeur Bouliki",
+      "basis": "commons",
+      "title": "Mahogany grandes feuilles.jpg",
+      "modified": "cropped, resized, lightly smoothed",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -9676,6 +9860,18 @@
         }
       },
       "address": "97250 Le Precheur"
+    },
+    "image": "/photos/137-anse-ceron.webp",
+    "photo_credit": {
+      "author": "Thérèse Gaigé",
+      "license": "CC0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anse_C%C3%A9ron_(Le_Pr%C3%AAcheur,_Martinique)_-_02.jpg",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "caption": "Anse Ceron",
+      "basis": "commons",
+      "title": "Anse Céron (Le Prêcheur, Martinique) - 02.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -9706,6 +9902,18 @@
         }
       },
       "address": "97250 Le Precheur"
+    },
+    "image": "/photos/138-anse-couleuvre.webp",
+    "photo_credit": {
+      "author": "Thérèse Gaigé",
+      "license": "CC0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anse_Couleuvre_(Le_Pr%C3%AAcheur,_Martinique)_-_01.jpg",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "caption": "Anse Couleuvre",
+      "basis": "commons",
+      "title": "Anse Couleuvre (Le Prêcheur, Martinique) - 01.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -9796,6 +10004,19 @@
         }
       },
       "address": "97217 Les Anses-D'Arlet"
+    },
+    "image": "/photos/141-anse-dufour.webp",
+    "photo_credit": {
+      "author": "ydecaseneuve",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anse_Dufour_-_panoramio.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "caption": "Anse Dufour",
+      "basis": "commons",
+      "title": "Anse Dufour - panoramio.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12",
+      "attribution": "ydecaseneuve"
     }
   },
   {
@@ -9826,6 +10047,18 @@
         }
       },
       "address": "97211 Riviere-Pilote"
+    },
+    "image": "/photos/142-anse-figuier.webp",
+    "photo_credit": {
+      "author": "Patrice78500",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Plage_de_Anse_Figuier.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Anse Figuier",
+      "basis": "commons",
+      "title": "Plage de Anse Figuier.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -9886,6 +10119,19 @@
         }
       },
       "address": "97229 Les Trois-Ilets"
+    },
+    "image": "/photos/144-anse-a-l-ane.webp",
+    "photo_credit": {
+      "author": "ydecaseneuve",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anse_de_l%27ane_-_panoramio.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "caption": "Anse A L'ane",
+      "basis": "commons",
+      "title": "Anse de l'ane - panoramio.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12",
+      "attribution": "ydecaseneuve"
     }
   },
   {
@@ -9916,6 +10162,19 @@
         }
       },
       "address": "Tartane, 97220 La Trinité"
+    },
+    "image": "/photos/145-anse-l-etang.webp",
+    "photo_credit": {
+      "author": "cazah",
+      "license": "CC BY 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anse_L%27Etang_-_panoramio.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "caption": "Anse L'etang",
+      "basis": "commons",
+      "title": "Anse L'Etang - panoramio.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12",
+      "attribution": "cazah"
     }
   },
   {
@@ -9946,6 +10205,18 @@
         }
       },
       "address": "97228 Sainte-Luce"
+    },
+    "image": "/photos/146-anse-mabouya.webp",
+    "photo_credit": {
+      "author": "Patrice78500",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anse_Mabouya_vue_cot%C3%A9_sud.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Anse Mabouya",
+      "basis": "commons",
+      "title": "Anse Mabouya vue coté sud.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -10006,6 +10277,18 @@
         }
       },
       "address": "97227 Sainte-Anne"
+    },
+    "image": "/photos/148-anse-meunier.webp",
+    "photo_credit": {
+      "author": "Hervé NICOLAS",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anse_Meunier_1_-_Etang_des_Salines_(Martinique).jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Anse Meunier",
+      "basis": "commons",
+      "title": "Anse Meunier 1 - Etang des Salines (Martinique).jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -10036,6 +10319,18 @@
         }
       },
       "address": "97227 Sainte-Anne"
+    },
+    "image": "/photos/149-anse-michel.webp",
+    "photo_credit": {
+      "author": "Sapakagadewmoinjadiw",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ilet_Chevalier.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Anse Michel",
+      "basis": "commons",
+      "title": "Ilet Chevalier.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -10066,6 +10361,19 @@
         }
       },
       "address": "97229 Les Trois-Ilets"
+    },
+    "image": "/photos/150-anse-mitan.webp",
+    "photo_credit": {
+      "author": "Radosław Botev",
+      "license": "CC BY 3.0 pl",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anse_Mitan_beach_(1)_2008.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/pl/deed.en",
+      "caption": "Anse Mitan",
+      "basis": "commons",
+      "title": "Anse Mitan beach (1) 2008.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12",
+      "attribution": "Radosław Botev"
     }
   },
   {
@@ -10096,6 +10404,19 @@
         }
       },
       "address": "Anses D'arlet, 97217 Les Anses-D'Arlet"
+    },
+    "image": "/photos/151-anse-noire.webp",
+    "photo_credit": {
+      "author": "ydecaseneuve",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anse_Noire_(plage_de_sable_noir)_-_panoramio.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "caption": "Anse Noire",
+      "basis": "commons",
+      "title": "Anse Noire (plage de sable noir) - panoramio.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12",
+      "attribution": "ydecaseneuve"
     }
   },
   {
@@ -10126,6 +10447,18 @@
         }
       },
       "address": "97280 Le Vauclin"
+    },
+    "image": "/photos/152-anse-petit-macabou.webp",
+    "photo_credit": {
+      "author": "Enrevseluj",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Plage_de_Petite_Anse_Macabou.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Anse Petit Macabou",
+      "basis": "commons",
+      "title": "Plage de Petite Anse Macabou.jpg",
+      "modified": "cropped, resized, lightly smoothed",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -10156,6 +10489,18 @@
         }
       },
       "address": "97227 Sainte-Anne"
+    },
+    "image": "/photos/153-anse-trabaud.webp",
+    "photo_credit": {
+      "author": "Patrice78500",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Anse_Trabaud_-_vue_en_direction_de_la_Pointe_d%27Enfer.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Anse Trabaud",
+      "basis": "commons",
+      "title": "Anse Trabaud - vue en direction de la Pointe d'Enfer.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -10216,6 +10561,18 @@
         }
       },
       "address": "97290 Le Marin"
+    },
+    "image": "/photos/155-cap-macre.webp",
+    "photo_credit": {
+      "author": "Sapakagadewmoinjadiw",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cap_macr%C3%A9_beach,_Le_Marin.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Cap Macre",
+      "basis": "commons",
+      "title": "Cap macré beach, Le Marin.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -10348,6 +10705,18 @@
         }
       },
       "address": "97228 Sainte-Luce"
+    },
+    "image": "/photos/158-corps-de-garde.webp",
+    "photo_credit": {
+      "author": "Patrice78500",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Plage_de_Corps_de_Garde.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Corps De Garde",
+      "basis": "commons",
+      "title": "Plage de Corps de Garde.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -10517,6 +10886,19 @@
         }
       },
       "address": "97217 Les Anses-D'Arlet"
+    },
+    "image": "/photos/163-grande-anse-d-arlet.webp",
+    "photo_credit": {
+      "author": "www.sklepik-maja.com",
+      "license": "CC BY 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Grand_Anse_martinique_-_panoramio.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "caption": "Grande Anse D'arlet",
+      "basis": "commons",
+      "title": "Grand Anse martinique - panoramio.jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12",
+      "attribution": "www.sklepik-maja.com"
     }
   },
   {
@@ -10998,6 +11380,18 @@
         }
       },
       "address": "Morne Vert, 97224 Le Carbet"
+    },
+    "image": "/photos/172-les-pitons-du-carbet.webp",
+    "photo_credit": {
+      "author": "Georges-Michel Granville",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Vue_panoramique_de_la_chaine_des_pitons_du_Carbet_(MARTINIQUE).jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Les Pitons Du Carbet",
+      "basis": "commons",
+      "title": "Vue panoramique de la chaine des pitons du Carbet (MARTINIQUE).jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -11033,6 +11427,18 @@
       },
       "phone": "+596 596 58 69 98",
       "address": "97230 Sainte-Marie"
+    },
+    "image": "/photos/173-l-ilet-sainte-marie-et-son-tombolo.webp",
+    "photo_credit": {
+      "author": "Mickaël BRUNO",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tombolo_a%C3%A9rien.jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "L'îlet Sainte Marie Et Son Tombolo",
+      "basis": "commons",
+      "title": "Tombolo aérien.jpg",
+      "modified": "cropped, resized, lightly smoothed",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -11305,6 +11711,18 @@
         }
       },
       "address": "97280 Le Vauclin"
+    },
+    "image": "/photos/180-pointe-faula.webp",
+    "photo_credit": {
+      "author": "Olivier.jarfas",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Plage-de-pointe-faula.JPG",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Pointe Faula",
+      "basis": "commons",
+      "title": "Plage-de-pointe-faula.JPG",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -11335,6 +11753,18 @@
         }
       },
       "address": "97227 Sainte-Anne"
+    },
+    "image": "/photos/181-pointe-marin.webp",
+    "photo_credit": {
+      "author": "Riba",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Pointe_Marin.JPG",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "caption": "Pointe Marin",
+      "basis": "commons",
+      "title": "Pointe Marin.JPG",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -11395,6 +11825,18 @@
         }
       },
       "address": "97220 La Trinité"
+    },
+    "image": "/photos/183-tartane.webp",
+    "photo_credit": {
+      "author": "Thérèse Gaigé",
+      "license": "CC0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Barques_de_p%C3%AAche_(Plage_de_Tartane,_Martinique).jpg",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "caption": "Tartane",
+      "basis": "commons",
+      "title": "Barques de pêche (Plage de Tartane, Martinique).jpg",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
     }
   },
   {
@@ -11567,7 +12009,19 @@
       { "day": 6, "opens": 540, "closes": 1080 }
     ],
     "hours_source": "https://www.martinique.org/fr/que-faire/sites-naturels-publics/zoo-de-martinique-habitation-anse-latouche",
-    "hours_updated_at": "2026-10-03T01:32:08.052444+00:00"
+    "hours_updated_at": "2026-10-03T01:32:08.052444+00:00",
+    "image": "/photos/185-zoo-de-martinique-habitation-anse-latouche.webp",
+    "photo_credit": {
+      "author": "Jean-Louis Lascoux",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ruine_de_la_maison_du_ma%C3%AEtre.JPG",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "caption": "Zoo De Martinique-Habitation Anse Latouche",
+      "basis": "commons",
+      "title": "Ruine de la maison du maître.JPG",
+      "modified": "cropped, resized",
+      "retrievedAt": "2026-10-12"
+    }
   },
   {
     "id": 186,
