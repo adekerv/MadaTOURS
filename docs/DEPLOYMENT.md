@@ -53,7 +53,7 @@ Event expiry, photo cleanup, official-source refresh, Google Place ID matching a
 - Hosts that sleep when idle, such as the free Render plan, also need the external trigger. Set `RECURRING_TASKS_SECRET` to a random value of at least 32 characters, for example `openssl rand -hex 32`. Then add the repository secrets `MADATOURS_TASKS_URL` (the API origin, no trailing slash) and `MADATOURS_TASKS_SECRET` (the same value). The `Recurring tasks` GitHub workflow calls `POST /api/internal/tasks` every 15 minutes.
 - Without a secret the endpoint returns 404. Traditional servers can instead run `php artisan schedule:run` from cron every minute.
 
-Google matching spend is capped per day in the database by `GOOGLE_MATCH_DAILY_LIMIT` (default 10, maximum 100).
+Google matching spend is capped per day in the database by `GOOGLE_MATCH_DAILY_LIMIT` (default 10, maximum 100). Each run of the daily task matches up to `GOOGLE_MATCH_BATCH` places (default 10, maximum 50); keep it at or below the daily limit. With both at 50, every published place is matched in about a week.
 
 ## Sessions, cache and scaling
 

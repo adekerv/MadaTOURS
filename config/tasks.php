@@ -11,7 +11,7 @@ return [
         'events:expire' => 5,
         'photos:cleanup' => 60,
         'sources:refresh' => 60,
-        'google:match --limit=10' => 60,
+        'google:match' => 60,
         'places:rank' => 1440,
     ],
 ];

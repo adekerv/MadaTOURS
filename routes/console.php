@@ -26,8 +26,9 @@ Artisan::command('photos:cleanup', function (SubmissionPhotos $photos) {
 Artisan::command('sources:refresh {--limit=3}', function (SourceIngestion $sources) {
     $this->info('Checked '.$sources->run((int) $this->option('limit')).' official sources.');
 });
-Artisan::command('google:match {--limit=3}', function (GoogleMatcher $matcher) {
-    $this->info('Processed '.$matcher->run((int) $this->option('limit')).' matches.');
+Artisan::command('google:match {--limit= : Places per run; defaults to GOOGLE_MATCH_BATCH}', function (GoogleMatcher $matcher) {
+    $limit = $this->option('limit');
+    $this->info('Processed '.$matcher->run($limit === null ? null : (int) $limit).' matches.');
 });
 Artisan::command('places:rank', function (SupabaseClient $client) {
     $client->request('POST', '/rest/v1/rpc/mt_refresh_daily_picks', admin: true);

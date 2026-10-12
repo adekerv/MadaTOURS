@@ -12,13 +12,16 @@ class GoogleMatcher
 {
     public function __construct(private SupabaseClient $db) {}
 
-    public function run(int $limit = 3): int
+    /**
+     * Matches up to one batch of due places (GOOGLE_MATCH_BATCH, at most 50), within the shared daily request limit.
+     */
+    public function run(?int $limit = null): int
     {
         if (! config('enrichment.google_key')) {
             throw new ApiException(503, 'Google matching is not configured yet.');
         }
         $this->db->request('POST', '/rest/v1/rpc/mt_queue_google_matches', admin: true);
-        $rows = $this->db->request('GET', '/rest/v1/mt_google_matches', ['status' => 'in.(pending,error)', 'next_check_at' => 'lte.'.now()->toIso8601String(), 'order' => 'next_check_at.asc', 'limit' => min(10, max(1, $limit))], admin: true);
+        $rows = $this->db->request('GET', '/rest/v1/mt_google_matches', ['status' => 'in.(pending,error)', 'next_check_at' => 'lte.'.now()->format('Y-m-d\TH:i:s.uP'), 'order' => 'next_check_at.asc', 'limit' => min(50, max(1, $limit ?? config('enrichment.google_batch')))], admin: true);
         $count = 0;
         foreach ($rows as $row) {
             if (! $this->db->request('POST', '/rest/v1/rpc/mt_claim_google_request', ['daily_limit' => config('enrichment.google_daily_limit')], admin: true)) {

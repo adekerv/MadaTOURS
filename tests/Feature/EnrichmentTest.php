@@ -69,6 +69,21 @@ class EnrichmentTest extends TestCase
         $this->assertFalse($matcher->confident($place, array_replace($candidate, ['displayName' => ['text' => 'Jardin de Balata restaurant']])));
     }
 
+    public function test_google_run_takes_the_configured_batch_and_counts_places_queued_this_second_as_due(): void
+    {
+        config(['enrichment.google_key' => 'private-test-key', 'enrichment.google_batch' => 25, 'supabase.url' => 'https://project.supabase.co', 'supabase.publishable_key' => 'public', 'supabase.secret_key' => 'secret']);
+        Http::preventStrayRequests();
+        Http::fake(['*/rpc/mt_queue_google_matches*' => Http::response([]), '*/mt_google_matches*' => Http::response([])]);
+
+        $configured = app(GoogleMatcher::class)->run();
+        $capped = app(GoogleMatcher::class)->run(80);
+
+        $this->assertSame(0, $configured + $capped);
+        $listed = Http::recorded(fn ($request) => $request->method() === 'GET' && str_contains($request->url(), '/mt_google_matches'))->map(fn ($pair) => $pair[0]->data());
+        $this->assertSame(['25', '50'], $listed->pluck('limit')->map(fn ($limit) => (string) $limit)->all());
+        $this->assertMatchesRegularExpression('/^lte\.\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{6}[+-]\d\d:\d\d$/', $listed->first()['next_check_at']);
+    }
+
     public function test_google_ambiguous_match_goes_to_review_and_does_not_publish(): void
     {
         config(['enrichment.google_key' => 'private-test-key', 'supabase.url' => 'https://project.supabase.co', 'supabase.publishable_key' => 'public', 'supabase.secret_key' => 'secret']);
