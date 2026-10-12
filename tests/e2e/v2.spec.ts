@@ -157,7 +157,7 @@ for (const language of ['en', 'fr'] as Language[])
       .fill('A community cultural place by the sea, with a small exhibition and a shaded terrace.');
     await dialog
       .getByLabel(t('Upload your photo'), { exact: true })
-      .setInputFiles('public/assets/placeholders/culture.jpg');
+      .setInputFiles('tests/fixtures/submission-photo.jpg');
     await expect(dialog.getByAltText(t('Your submission photo preview'))).toBeVisible();
     await dialog
       .getByLabel(
