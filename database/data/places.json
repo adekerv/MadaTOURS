@@ -15809,7 +15809,7 @@
     "type": "activity",
     "lat": 14.6519621,
     "lng": -60.8906075,
-    "location": "Fort-de-France",
+    "location": "Le Robert",
     "description": "Sea-kayak outings along the shores of Le Robert, to discover the water environment, the mangrove and its ecosystem, the white shallows and marine life. Guided or independent.",
     "description_fr": "Du kayak de mer sur les rives du Robert, avec ou sans guide, pour découvrir autrement le littoral : mangrove et son écosystème, fonds blancs et faune marine.",
     "tags": ["Kayak"],
@@ -20272,7 +20272,7 @@
     "location": "Le Vauclin",
     "description": "Boat trips on turquoise water to see the white shallows, the mangrove and landscapes, in two formulas, including a day-long sea outing that visits the mangrove.",
     "description_fr": "Des escapades en bateau sur des eaux turquoise pour découvrir les fonds blancs, la mangrove et de beaux paysages, en deux formules, dont une journée de balade en mer qui passe par la mangrove.",
-    "tags": ["Fishing"],
+    "tags": ["Boat Trip"],
     "sources": [
       {
         "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/simobey",
@@ -20791,7 +20791,7 @@
     "location": "Le Robert",
     "description": "Self-guided hire of no-licence motorboats and quality water-craft in the bay of Le Robert, presented as the most beautiful bay of the Antilles, for solo travellers, families or friends.",
     "description_fr": "Location libre, sans accompagnateur, de bateaux à moteur sans permis et d’engins nautiques de qualité dans la baie du Robert, présentée comme la plus belle baie des Antilles, en solo, en famille ou entre amis.",
-    "tags": ["Kayak"],
+    "tags": ["Boat Trip"],
     "sources": [
       {
         "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/tropic-notic",
@@ -21143,7 +21143,7 @@
     "location": "Les Trois-Îlets",
     "description": "A school and centre for innovative water sports at the Village de la Poterie in Les Trois-Îlets, offering supervised lessons and rentals in wing foil, e-foil and e-surf, plus kite, kite foil and wingfoil equipment hire.",
     "description_fr": "Une école et un centre de sports nautiques innovants au Village de la Poterie, aux Trois-Îlets : cours et locations encadrés de wing foil, e-foil et e-surf, ainsi que location de matériel de kite, kite foil et wingfoil.",
-    "tags": ["Sailing"],
+    "tags": ["Water Sports", "Jetboard", "Kitesurf"],
     "sources": [
       {
         "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/wil-rid",

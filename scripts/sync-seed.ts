@@ -19,6 +19,8 @@ const fields = [
   'listing_status',
   'archived',
   'published',
+  'image',
+  'photo_credit',
 ] as const;
 const args = process.argv.slice(2);
 if (args.some((arg) => arg !== '--write'))
