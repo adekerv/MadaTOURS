@@ -4,11 +4,12 @@ import {
   ExternalLink,
   Globe,
   Heart,
+  Images,
   Navigation,
   Phone,
   TriangleAlert,
 } from 'lucide-react';
-import { GooglePlacePanel } from './ui/GooglePlacePanel';
+import { canEmbedGoogle, GooglePlacePanel, googleMapsLink } from './ui/GooglePlacePanel';
 import { useI18n } from '../i18n/I18nProvider';
 import { PlacePhoto } from './ui/PlacePhoto';
 import type { Place, User } from '../types';
@@ -46,6 +47,7 @@ export function PlaceDetailModal({
   const { t, language } = useI18n();
   const { place, status } = usePlaceDetail(listed);
   const [failedPhoto, setFailedPhoto] = useState('');
+  const [googleRequest, setGoogleRequest] = useState(0);
   const showingPlaceholder = !place.image || failedPhoto === place.image;
   const illustrative = placeholderFor(place);
   const facts = placeFacts(place, language);
@@ -83,6 +85,27 @@ export function PlaceDetailModal({
           className="h-44 overflow-hidden rounded-2xl sm:h-64"
           onOriginalError={() => setFailedPhoto(place.image || '')}
         />
+        {showingPlaceholder &&
+          (canEmbedGoogle(place) ? (
+            <button
+              className={`secondary-button ${action} w-full sm:w-auto`}
+              onClick={() => setGoogleRequest((count) => count + 1)}
+            >
+              <Images size={18} aria-hidden="true" />
+              {t('See photos on Google')}
+            </button>
+          ) : (
+            <a
+              href={googleMapsLink(place)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`secondary-button ${action} w-full sm:w-auto`}
+            >
+              <Images size={18} aria-hidden="true" />
+              {t('See photos on Google')}
+              <span className="sr-only">{t('(opens in a new tab)')}</span>
+            </a>
+          ))}
         {place.listingStatus === 'needs_review' && (
           <p
             role="note"
@@ -172,7 +195,11 @@ export function PlaceDetailModal({
             {t('Map points are approximate. Confirm the entrance with the venue.')}
           </p>
         </section>
-        <GooglePlacePanel key={`${place.id}:${language}`} place={place} />
+        <GooglePlacePanel
+          key={`${place.id}:${language}`}
+          place={place}
+          openRequest={googleRequest}
+        />
         <PlaceCommunity
           key={`${place.id}:${user?.id || 'guest'}`}
           placeId={place.id}

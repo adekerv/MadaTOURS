@@ -94,8 +94,25 @@ test('a place with source facts shows each one, with real contact details and no
   await expect(dialog.getByRole('heading', { name: 'Place comments' })).toHaveCount(0);
   // Tags sit directly under the type and town, above the photo.
   const tags = dialog.getByRole('list', { name: 'Place tags' });
-  const photo = dialog.locator('img').first();
+  // A place without its own photo shows an icon tile, which is an image to assistive technology too.
+  const photo = dialog.getByRole('img').first();
   expect((await tags.boundingBox())!.y).toBeLessThan((await photo.boundingBox())!.y);
+});
+test('a place without its own photo links to its Google photos, and a place with one does not', async ({
+  page,
+}) => {
+  await stubCatalogue(page);
+  const tiled = await open(page, 'Le Petibonum');
+  await expect(tiled.getByRole('link', { name: /^See photos on Google/ })).toHaveAttribute(
+    'href',
+    'https://www.google.com/maps/search/?api=1&query=Le%20Petibonum%20Martinique',
+  );
+  await page.keyboard.press('Escape');
+  const photographed = await open(page, 'Jardin de Balata');
+  await expect(
+    photographed.getByRole('img', { name: 'Jardin de Balata', exact: true }),
+  ).toBeVisible();
+  await expect(photographed.getByRole('link', { name: /^See photos on Google/ })).toHaveCount(0);
 });
 test('a place without contact facts offers no empty slots, falls back to older text, and notes unconfirmed details', async ({
   page,

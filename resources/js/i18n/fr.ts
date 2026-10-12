@@ -1063,4 +1063,5 @@ export const french: Record<string, string> = {
   'AI-generated image · not this place': 'Image générée par IA · ne montre pas ce lieu',
   'Places without their own photo show an icon tile or a labelled illustrative photo of the activity: free-licence stock, or one AI-generated trail scene. These never show the listed venue, and each one is credited on its place page.':
     'Les lieux sans photo propre affichent une vignette avec une icône ou une photo d’illustration de l’activité, signalée comme telle : photo sous licence libre, ou une scène de sentier générée par IA. Elles ne montrent jamais le lieu présenté et chacune est créditée sur la fiche du lieu.',
+  'See photos on Google': 'Voir les photos sur Google',
 };

@@ -1045,4 +1045,5 @@ export const english: Record<string, string> = {
   'AI-generated image · not this place': 'AI-generated image · not this place',
   'Places without their own photo show an icon tile or a labelled illustrative photo of the activity: free-licence stock, or one AI-generated trail scene. These never show the listed venue, and each one is credited on its place page.':
     'Places without their own photo show an icon tile or a labelled illustrative photo of the activity: free-licence stock, or one AI-generated trail scene. These never show the listed venue, and each one is credited on its place page.',
+  'See photos on Google': 'See photos on Google',
 };

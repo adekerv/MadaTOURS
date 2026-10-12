@@ -4,21 +4,40 @@ import { useI18n } from '../../i18n/I18nProvider';
 import { useTheme } from '../../hooks/useTheme';
 import type { Place } from '../../types';
 
-export function GooglePlacePanel({ place }: { place: Place }) {
+const apiOrigin = () =>
+  Capacitor.isNativePlatform() ? import.meta.env.VITE_API_URL : window.location.origin;
+/** Google's own panel can be embedded only for a matched place, with a browser key and an API origin. */
+export const canEmbedGoogle = (place: Place) =>
+  Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY && apiOrigin() && place.googlePlaceId);
+export const googleMapsLink = (place: Place) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name} Martinique`)}${place.googlePlaceId ? `&query_place_id=${encodeURIComponent(place.googlePlaceId)}` : ''}`;
+
+/** `openRequest` lets a button elsewhere on the page open the panel; nothing loads from Google before a click. */
+export function GooglePlacePanel({
+  place,
+  openRequest = 0,
+}: {
+  place: Place;
+  openRequest?: number;
+}) {
   const { t, language } = useI18n();
   const { dark } = useTheme();
   const frame = useRef<HTMLIFrameElement>(null);
+  const section = useRef<HTMLElement>(null);
   const [opened, setOpened] = useState(false);
   const [retry, setRetry] = useState(0);
   const [status, setStatus] = useState('loading');
   const [height, setHeight] = useState(460);
   const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const apiOrigin = Capacitor.isNativePlatform()
-    ? import.meta.env.VITE_API_URL
-    : window.location.origin;
-  const canEmbed = Boolean(key && apiOrigin && place.googlePlaceId);
-  const origin = apiOrigin ? new URL(apiOrigin).origin : window.location.origin;
-  const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name} Martinique`)}${place.googlePlaceId ? `&query_place_id=${encodeURIComponent(place.googlePlaceId)}` : ''}`;
+  const canEmbed = canEmbedGoogle(place);
+  const origin = apiOrigin() ? new URL(apiOrigin()).origin : window.location.origin;
+  const link = googleMapsLink(place);
+  useEffect(() => {
+    if (!openRequest || !canEmbed) return;
+    setStatus('loading');
+    setOpened(true);
+    section.current?.scrollIntoView({ block: 'start' });
+  }, [openRequest, canEmbed]);
   function initialize() {
     frame.current?.contentWindow?.postMessage(
       { type: 'madatours-google-init', key, placeId: place.googlePlaceId, language, dark },
@@ -54,6 +73,7 @@ export function GooglePlacePanel({ place }: { place: Place }) {
   }, [dark, origin]);
   return (
     <section
+      ref={section}
       className="space-y-3 rounded-2xl border border-orange-200 p-4"
       aria-label={t('Google photos, ratings and hours')}
     >
