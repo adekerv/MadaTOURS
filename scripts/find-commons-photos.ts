@@ -166,6 +166,8 @@ for (const row of audit) {
         (file.width >= file.height ? 0 : 150);
       return { candidate, file, distance, score };
     })
+    // A name match photographed far away is a homonym, such as a church in mainland France.
+    .filter(({ distance }) => distance === undefined || distance <= 20000)
     .sort((a, b) => a.score - b.score)
     .slice(0, 8);
   const rejected =
