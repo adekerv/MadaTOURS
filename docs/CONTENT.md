@@ -2,7 +2,9 @@
 
 The catalogue contains 364 records: 354 public (72 restaurants and 282 activities) and 10 drafts. The September 24 expansion added 337 source-backed public entries across 29 communes. Each published record has a source URL, a check date, and a list of the fields supported by that source. A source supporting a name or address does not establish all other details. Coordinates remain approximate; confirm the entrance with the venue.
 
-Unsupported numerical ratings, stock photographs and unverified opening hours were removed. Only source-backed hours for Habitation Clément and Jardin de Balata remain. Three actual location photographs are bundled with attribution; see [photo credits](../public/photos/CREDITS.md). Other places use neutral placeholders until suitable venue photos are obtained.
+Unsupported numerical ratings and unverified opening hours were removed. Only source-backed hours for Habitation Clément and Jardin de Balata remain. Three actual location photographs are bundled with attribution; see [photo credits](../public/photos/CREDITS.md).
+
+Stock photographs are used again, but solely as labelled illustrations. A place without its own photo shows either an icon tile or a free-licence stock photo of its activity or landscape, badged “Illustrative photo · not this place” (AI images: “AI-generated image · not this place”). A stock photo is never presented as a venue's photo and never shows a recognisable named place. Restaurants, heritage sites, distilleries, yole, bèlè and art keep icon tiles until the place's own photo is obtained. Each place's subject is set in `resources/content/photo-subjects.json`; the images, labels and credits are in `resources/content/photo-library.json` (see [photo library credits](../public/assets/placeholders/CREDITS.md)).
 
 ## Specific corrections
 

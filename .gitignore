@@ -35,3 +35,4 @@ android/local.properties
 /.phpunit.cache/
 /.phpunit.result.cache
 reports/listing-audit-*.json
+/reports/photo-audit-*/candidates/
