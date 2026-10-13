@@ -1,0 +1,4 @@
+id,name,kind,url,status,final_url,state,problem
+"33","Habitation Ceron","website","https://www.habitation-ceron.com/","200","https://www.habitation-ceron.com/","problem","Looks like a parked or for-sale domain"
+"127","Rhums Baie Des Trésors - Habitation Le Galion","website","https://www.baiedestresors.mq/","200","https://baiedestresors.com/","problem","Redirects to another domain: baiedestresors.com"
+"234","Dsc Plongée Martinique","website","https://dscplongee.com/","200","https://dscplongee.wpcomstaging.com/","problem","Redirects to another domain: dscplongee.wpcomstaging.com"

@@ -1,0 +1,1034 @@
+{
+  "generated": "2026-10-12",
+  "note": "key = image key used by resources/content/photo-library.json; default = photo | tile; candidates are UNVERIFIED leads (check licence, faces, logos, recognisable places before use)",
+  "library": [
+    {
+      "key": "beach-white",
+      "label_en": "Beach",
+      "label_fr": "Plage",
+      "places": 24,
+      "default": "photo",
+      "candidates": [],
+      "note": "Commons per-beach photos first; generic stand-in must be an unrecognisable stretch of sand (no landmark, no signage)"
+    },
+    {
+      "key": "diving",
+      "label_en": "Scuba diving",
+      "label_fr": "Plongée sous-marine",
+      "places": 24,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-scuba-diver-swims-over-a-colorful-coral-reef-_tDdlCJIwOA",
+          "author": "NEOM",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/a-scuba-diver-swims-over-a-coral-reef-FXJf8y_cZA0",
+          "author": "NEOM",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "Need 3–4 variants (23 clubs). Diver seen from behind/far = no identifiable face"
+    },
+    {
+      "key": "catamaran",
+      "label_en": "Catamaran cruise",
+      "label_fr": "Sortie en catamaran",
+      "places": 21,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/white-catamaran-sailing-on-bright-turquoise-water-GhzT_k307cU",
+          "author": "Flo Plouch",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "Need 3–4 variants (21 operators); no boat names/logos visible"
+    },
+    {
+      "key": "creole-food",
+      "label_en": "Creole food",
+      "label_fr": "Cuisine créole",
+      "places": 21,
+      "default": "tile",
+      "candidates": [],
+      "note": "Restaurants: tile until the owner's own photo (critics: no stock/AI food that over-promises)"
+    },
+    {
+      "key": "beach-restaurant",
+      "label_en": "Beach restaurant",
+      "label_fr": "Restaurant de plage",
+      "places": 19,
+      "default": "tile",
+      "candidates": [
+        {
+          "url": "https://www.pexels.com/photo/white-table-and-chairs-on-beside-the-beach-10833363/",
+          "author": "Manos Orfanos",
+          "site": "Pexels"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "boat-islets",
+      "label_en": "Islets & white shallows",
+      "label_fr": "Îlets et fonds blancs",
+      "places": 18,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-boat-races-towards-an-island-in-turquoise-waters-RKMVOSGWMC8",
+          "author": "Ibrahim Shabil",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/boats-on-clear-turquoise-water-2F5-JhFqmLw",
+          "author": "Olha Koshubynska",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "Best real source: CMT photothèque \"fonds blancs\" (Atlantic side) once licensed"
+    },
+    {
+      "key": "heritage",
+      "label_en": "Heritage site",
+      "label_fr": "Site patrimonial",
+      "places": 17,
+      "default": "tile",
+      "candidates": [],
+      "note": "All 17 are named sites: Commons per site (check panorama rule for recent works). Tile meanwhile"
+    },
+    {
+      "key": "rum",
+      "label_en": "Rum distillery",
+      "label_fr": "Distillerie de rhum",
+      "places": 11,
+      "default": "tile",
+      "candidates": [],
+      "note": "Each distillery is a landmark: Commons per estate + distillery press kits. Never another estate's photo"
+    },
+    {
+      "key": "spa",
+      "label_en": "Spa & massage",
+      "label_fr": "Spa et massage",
+      "places": 11,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/person-with-hot-stones-at-spa-ZbzYDboN7fg",
+          "author": "engin akyurt",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/a-woman-getting-a-back-massage-at-a-spa--AakIaAPV0w",
+          "author": "Simon HUMLER",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "No identifiable face (back/hands only)"
+    },
+    {
+      "key": "kitesurf",
+      "label_en": "Kitesurfing",
+      "label_fr": "Kitesurf",
+      "places": 10,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-man-riding-a-kiteboard-on-top-of-a-body-of-water--Wbw6svyxnI",
+          "author": "julio andres rosario ortiz",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://www.pexels.com/photo/a-woman-in-black-wetsuit-kiteboarding-on-sea-13034353/",
+          "author": "sergk1",
+          "site": "Pexels"
+        }
+      ],
+      "note": "Need 2–3 variants (10 schools)"
+    },
+    {
+      "key": "hiking",
+      "label_en": "Rainforest hike",
+      "label_fr": "Randonnée en forêt tropicale",
+      "places": 10,
+      "default": "photo",
+      "candidates": [],
+      "note": "Keep current AI trail (labelled AI) until Commons/real; Pelée & Pitons get their own Commons photos"
+    },
+    {
+      "key": "mangrove-kayak",
+      "label_en": "Mangrove kayak",
+      "label_fr": "Kayak dans la mangrove",
+      "places": 9,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/person-paddling-red-kayak-through-mangroves-UwsTg7Saruk",
+          "author": "Amos K",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/colorful-kayaks-and-a-person-by-mangrove-trees-ojTJSj1PfNM",
+          "author": "Choum Khalifa",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "fine-dining",
+      "label_en": "Fine dining",
+      "label_fr": "Gastronomique",
+      "places": 8,
+      "default": "tile",
+      "candidates": [
+        {
+          "url": "https://www.pexels.com/photo/elegant-plated-gourmet-dish-with-decorative-edible-flower-35546716/",
+          "author": "Loifotos",
+          "site": "Pexels"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "dolphins",
+      "label_en": "Dolphin watching",
+      "label_fr": "Observation des dauphins",
+      "places": 7,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/three-dolphins-swimming-in-blue-water-i5FsBOLsB50",
+          "author": "Talia Cohen",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/a-group-of-dolphins-swimming-in-the-ocean-pZ12QTwLBAs",
+          "author": "Will Rust",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "Wild dolphins only, no captivity"
+    },
+    {
+      "key": "grilled-fish",
+      "label_en": "Grilled fish & seafood",
+      "label_fr": "Poisson grillé et fruits de mer",
+      "places": 7,
+      "default": "tile",
+      "candidates": [
+        {
+          "url": "https://www.pexels.com/photo/person-cooking-lobsters-on-a-grill-13770174/",
+          "author": "dbaler",
+          "site": "Pexels"
+        }
+      ],
+      "note": "Tile by default; photo only if you choose option B for restaurants"
+    },
+    {
+      "key": "restaurant",
+      "label_en": "Restaurant",
+      "label_fr": "Restaurant",
+      "places": 7,
+      "default": "tile",
+      "candidates": [],
+      "note": ""
+    },
+    {
+      "key": "boat-coast",
+      "label_en": "Coastal boat trip",
+      "label_fr": "Balade en bateau sur la côte",
+      "places": 6,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/small-orange-boat-near-rocky-cliff-ZI_QP3_7vAQ",
+          "author": "Filipe Nobre",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "beach-dark",
+      "label_en": "Black-sand beach",
+      "label_fr": "Plage de sable noir",
+      "places": 5,
+      "default": "photo",
+      "candidates": [],
+      "note": "Commons per-beach; stand-in must be dark sand"
+    },
+    {
+      "key": "snorkel",
+      "label_en": "Snorkelling",
+      "label_fr": "Randonnée palmée",
+      "places": 4,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/woman-snorkeling-in-the-clear-blue-ocean-qrgxg_lLuu4",
+          "author": "Royce Fonseca",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/a-woman-snorkeling-with-a-school-of-fish-np5FePVgH7Q",
+          "author": "Zunnoon Ahmed",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "Check face not identifiable (mask usually hides it)"
+    },
+    {
+      "key": "boat-hire",
+      "label_en": "Boat hire",
+      "label_fr": "Location de bateau",
+      "places": 4,
+      "default": "photo",
+      "candidates": [],
+      "note": "Search \"small motorboat anchored turquoise\""
+    },
+    {
+      "key": "kayak",
+      "label_en": "Sea kayak",
+      "label_fr": "Kayak de mer",
+      "places": 4,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/couple-paddling-a-clear-kayak-on-turquoise-water-XoGf_ujoAog",
+          "author": "Hugh Whyte",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "jetski",
+      "label_en": "Jet ski",
+      "label_fr": "Jet-ski",
+      "places": 4,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/two-men-riding-on-jetski-AZijeluagac",
+          "author": "Ludovic Gauthier",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/a-person-on-a-jet-ski-in-the-middle-of-the-ocean-jz9VgRHyEFc",
+          "author": "Mateusz Klein",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "orchard",
+      "label_en": "Farm visit",
+      "label_fr": "Visite de ferme",
+      "places": 4,
+      "default": "photo",
+      "candidates": [],
+      "note": "Search \"tropical fruit orchard\""
+    },
+    {
+      "key": "quad",
+      "label_en": "Quad & buggy",
+      "label_fr": "Quad et buggy",
+      "places": 4,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-person-riding-an-atv-on-a-dirt-road-AnCaOME-8xg",
+          "author": "Aleksandrs Karevs",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "beach-wild",
+      "label_en": "Wild Atlantic beach",
+      "label_fr": "Plage sauvage atlantique",
+      "places": 3,
+      "default": "photo",
+      "candidates": [],
+      "note": "Commons per-beach"
+    },
+    {
+      "key": "sailboat",
+      "label_en": "Sailing yacht",
+      "label_fr": "Voilier",
+      "places": 3,
+      "default": "photo",
+      "candidates": [],
+      "note": "Search \"sailboat turquoise water\""
+    },
+    {
+      "key": "bbq-donut",
+      "label_en": "BBQ donut boat",
+      "label_fr": "Bateau BBQ donut",
+      "places": 3,
+      "default": "tile",
+      "candidates": [],
+      "note": "No free photo exists; ask one of the 3 operators"
+    },
+    {
+      "key": "surf",
+      "label_en": "Surfing",
+      "label_fr": "Surf",
+      "places": 3,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/person-surfing-oC32cy4x-ZA",
+          "author": "Sincerely Media",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/man-surfing-during-daytime-pikyGuAmwpM",
+          "author": "Jeremy Bishop",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "Surf Up has its own lesson photos online — ask them (surfupmartinique@gmail.com)"
+    },
+    {
+      "key": "paddle",
+      "label_en": "Stand-up paddle",
+      "label_fr": "Stand-up paddle",
+      "places": 3,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/RpxjGRWMKO8",
+          "author": "Klara Kulikova",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/oSVU3rZx1EM",
+          "author": "Chelsea Gates",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "yole",
+      "label_en": "Yole ronde sailing",
+      "label_fr": "Yole ronde",
+      "places": 3,
+      "default": "tile",
+      "candidates": [],
+      "note": "Culturally specific: no stock/AI. Commons \"yole ronde\" photos or CMT, else tile"
+    },
+    {
+      "key": "waterfall",
+      "label_en": "Waterfall",
+      "label_fr": "Cascade",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-small-waterfall-in-the-middle-of-a-forest-4THlw3Ts_e0",
+          "author": "Guillaume Coué",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/waterfalls-surrounded-with-green-leafed-trees-during-daytime-NWrye3NRrKw",
+          "author": "Ben Guerin",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "NOT for Cascade Didier (access prohibited) — warning tile there"
+    },
+    {
+      "key": "canyoning",
+      "label_en": "Canyoning",
+      "label_fr": "Canyoning",
+      "places": 3,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-man-in-a-helmet-is-rapping-a-waterfall-K7xhZvei_EI",
+          "author": "Han-Hsing Tu",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "Tropicanyon has own photos online — ask"
+    },
+    {
+      "key": "garden",
+      "label_en": "Tropical garden",
+      "label_fr": "Jardin tropical",
+      "places": 3,
+      "default": "photo",
+      "candidates": [],
+      "note": "Gardens are landmarks: Commons per garden"
+    },
+    {
+      "key": "island-road",
+      "label_en": "Island tour",
+      "label_fr": "Excursion autour de l'île",
+      "places": 3,
+      "default": "photo",
+      "candidates": [],
+      "note": "Search \"tropical coastal road green hills\""
+    },
+    {
+      "key": "sugar-cane",
+      "label_en": "Sugar-cane estate",
+      "label_fr": "Habitation sucrière",
+      "places": 3,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://www.pexels.com/photo/green-and-brown-plantation-under-blue-sky-11466855/",
+          "author": "freestockpro",
+          "site": "Pexels"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "bele",
+      "label_en": "Bèlè",
+      "label_fr": "Bèlè",
+      "places": 3,
+      "default": "tile",
+      "candidates": [],
+      "note": "Culturally specific: no stock/AI. Ask the associations or commission"
+    },
+    {
+      "key": "cacao",
+      "label_en": "Cacao & chocolate",
+      "label_fr": "Cacao et chocolat",
+      "places": 3,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/cocoa-pods-hanging-from-a-tree-branch-sFCOat9rphk",
+          "author": "Aleksandar Popovski",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "local-produce",
+      "label_en": "Local products",
+      "label_fr": "Produits locaux",
+      "places": 3,
+      "default": "photo",
+      "candidates": [],
+      "note": "Search \"jars of jam market\""
+    },
+    {
+      "key": "cocktails",
+      "label_en": "Cocktail bar",
+      "label_fr": "Bar à cocktails",
+      "places": 3,
+      "default": "tile",
+      "candidates": [],
+      "note": ""
+    },
+    {
+      "key": "burger",
+      "label_en": "Burgers",
+      "label_fr": "Burgers",
+      "places": 3,
+      "default": "tile",
+      "candidates": [
+        {
+          "url": "https://www.pexels.com/photo/burgers-with-fries-on-ceramic-plate-4109233/",
+          "author": "Polina Tankilevitch",
+          "site": "Pexels"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "beach-lagoon",
+      "label_en": "Lagoon beach",
+      "label_fr": "Plage de lagon",
+      "places": 2,
+      "default": "photo",
+      "candidates": [],
+      "note": "Commons per-beach"
+    },
+    {
+      "key": "dinghy",
+      "label_en": "Sailing lessons",
+      "label_fr": "École de voile",
+      "places": 2,
+      "default": "photo",
+      "candidates": [],
+      "note": "Search \"dinghy sailing\""
+    },
+    {
+      "key": "foil",
+      "label_en": "E-foil / wing foil",
+      "label_fr": "E-foil / wingfoil",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/man-foil-surfing-on-a-calm-blue-ocean--i4YMG-UuaE",
+          "author": "Will Haddock",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "parasail",
+      "label_en": "Parasailing",
+      "label_fr": "Parachute ascensionnel",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-person-is-parasailing-over-the-ocean-with-a-boat-GFORPUwDshI",
+          "author": "Joe deSousa",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "wakeboard",
+      "label_en": "Wakeboarding",
+      "label_fr": "Wakeboard",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/person-wake-boarding-on-body-of-water-TzHl80vMzdk",
+          "author": "Luke Bender",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/man-playing-wakeboard-during-daytime-IzWePU8aQBc",
+          "author": "Jack van Tricht",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "fishing",
+      "label_en": "Sport fishing",
+      "label_fr": "Pêche au gros",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-fishing-rod-on-a-boat-in-the-ocean-g5Ss3o7-Rsc",
+          "author": "Aristos Aristidou",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "marina",
+      "label_en": "Marina",
+      "label_fr": "Marina",
+      "places": 2,
+      "default": "photo",
+      "candidates": [],
+      "note": "Both marinas are landmarks: Commons"
+    },
+    {
+      "key": "rainforest",
+      "label_en": "Rainforest",
+      "label_fr": "Forêt tropicale",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-lush-green-forest-filled-with-lots-of-trees-r4zLghHfiWo",
+          "author": "Romain Virtuel",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "mangrove-forest",
+      "label_en": "Mangrove & lagoon",
+      "label_fr": "Mangrove et étang",
+      "places": 2,
+      "default": "photo",
+      "candidates": [],
+      "note": "Landmarks: Commons"
+    },
+    {
+      "key": "coast-view",
+      "label_en": "Coastal viewpoint",
+      "label_fr": "Point de vue côtier",
+      "places": 2,
+      "default": "photo",
+      "candidates": [],
+      "note": "Landmarks: Commons"
+    },
+    {
+      "key": "art",
+      "label_en": "Artist studio",
+      "label_fr": "Atelier d'artiste",
+      "places": 2,
+      "default": "tile",
+      "candidates": [],
+      "note": "Ask the two artists for a photo of their work"
+    },
+    {
+      "key": "yoga",
+      "label_en": "Yoga",
+      "label_fr": "Yoga",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-person-standing-in-the-water-doing-a-yoga-pose-soOJbyfkllo",
+          "author": "Gustavo Sanches",
+          "site": "Unsplash"
+        },
+        {
+          "url": "https://unsplash.com/photos/a-woman-sitting-in-a-yoga-position-on-the-beach-PxOCVsAy5uo",
+          "author": "Alonso Reyes",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "Silhouette / from behind only"
+    },
+    {
+      "key": "flight",
+      "label_en": "Scenic flight",
+      "label_fr": "Vol panoramique",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/an-airplane-flying-over-a-small-island-in-the-middle-of-the-ocean--ojgUmay5h0",
+          "author": "Gregory Atkats",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "horse",
+      "label_en": "Horse riding",
+      "label_fr": "Équitation",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-man-riding-a-horse-on-the-beach-VsLhaM-KOKo",
+          "author": "Michael Starkie",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "bowling",
+      "label_en": "Bowling & laser game",
+      "label_fr": "Bowling et laser game",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-bowling-alley-filled-with-bowling-balls-and-neon-lights-vqypTnALDyw",
+          "author": "Ryan Ancill",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "cinema",
+      "label_en": "Cinema",
+      "label_fr": "Cinéma",
+      "places": 2,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/empty-movie-theater-with-a-lit-screen-dXpJeKIWfGs",
+          "author": "Rapha Wilde",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "sushi",
+      "label_en": "Sushi",
+      "label_fr": "Sushi",
+      "places": 2,
+      "default": "tile",
+      "candidates": [
+        {
+          "url": "https://www.pexels.com/photo/elegant-presentation-of-delicious-crab-and-salmon-sushi-11064619/",
+          "author": "Natan Machado",
+          "site": "Pexels"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "cafe",
+      "label_en": "Café & bakery",
+      "label_fr": "Café et boulangerie",
+      "places": 2,
+      "default": "tile",
+      "candidates": [],
+      "note": ""
+    },
+    {
+      "key": "pool",
+      "label_en": "Swimming pool",
+      "label_fr": "Piscine",
+      "places": 1,
+      "default": "photo",
+      "candidates": [],
+      "note": "Single venue: ask the aquatic centre (public body)"
+    },
+    {
+      "key": "vanilla",
+      "label_en": "Vanilla",
+      "label_fr": "Vanille",
+      "places": 1,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://www.pexels.com/photo/black-beans-on-the-white-surface-4963318/",
+          "author": "Karola G",
+          "site": "Pexels"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "pastry",
+      "label_en": "Artisan biscuits",
+      "label_fr": "Biscuiterie artisanale",
+      "places": 1,
+      "default": "photo",
+      "candidates": [],
+      "note": ""
+    },
+    {
+      "key": "cooking",
+      "label_en": "Cooking class",
+      "label_fr": "Atelier cuisine",
+      "places": 1,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-group-of-people-preparing-food-in-a-kitchen-ANY9TweFHNI",
+          "author": "Sweet Life",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "Check faces"
+    },
+    {
+      "key": "ice-cream",
+      "label_en": "Artisan ice cream",
+      "label_fr": "Glacier artisanal",
+      "places": 1,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-scoop-of-vibrant-pink-sorbet-in-a-white-bowl-UR9HktuHHtk",
+          "author": "Shelley Johnson",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "skydiving",
+      "label_en": "Skydiving",
+      "label_fr": "Parachutisme",
+      "places": 1,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/a-man-skydiving-with-a-parachute-ht1xt4FfmFs",
+          "author": "Kamil Pietrzak",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "paragliding",
+      "label_en": "Paragliding",
+      "label_fr": "Parapente",
+      "places": 1,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/person-paragliding-mDiA-Vg0bGc",
+          "author": "Pacha",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "Martinique Parapente has 16 own flight photos — ask (06 96 18 00 76)"
+    },
+    {
+      "key": "cycling",
+      "label_en": "E-bike tour",
+      "label_fr": "Balade à vélo électrique",
+      "places": 1,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/family-cycling-on-a-sandy-path-lined-with-palm-trees-MURUwMSlA4U",
+          "author": "Adam Juman",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "golf",
+      "label_en": "Golf",
+      "label_fr": "Golf",
+      "places": 1,
+      "default": "photo",
+      "candidates": [],
+      "note": "Single landmark: Commons"
+    },
+    {
+      "key": "tennis",
+      "label_en": "Tennis",
+      "label_fr": "Tennis",
+      "places": 1,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/aerial-photo-of-tennis-court-surrounded-with-trees-qjrjJnFypa0",
+          "author": "Ryan Searle",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "adventure-park",
+      "label_en": "Treetop adventure park",
+      "label_fr": "Parc accrobranche",
+      "places": 1,
+      "default": "tile",
+      "candidates": [],
+      "note": "Ask Lion's Parc"
+    },
+    {
+      "key": "paintball",
+      "label_en": "Paintball",
+      "label_fr": "Paintball",
+      "places": 1,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/man-wearing-mask-holding-paintball-gun-during-daytime--s54WNv_3UM",
+          "author": "Dmitriy Tyukov",
+          "site": "Unsplash"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "karting",
+      "label_en": "Go-karting",
+      "label_fr": "Karting",
+      "places": 1,
+      "default": "photo",
+      "candidates": [
+        {
+          "url": "https://unsplash.com/photos/two-kart-racers-swerving-at-the-race-track-71igRa6JOko",
+          "author": "Garry Zhuang",
+          "site": "Unsplash"
+        }
+      ],
+      "note": "First check Acro'Kart still operates (domain parked)"
+    },
+    {
+      "key": "zoo",
+      "label_en": "Zoo",
+      "label_fr": "Zoo",
+      "places": 1,
+      "default": "photo",
+      "candidates": [],
+      "note": "Single landmark: Commons / ask the zoo"
+    },
+    {
+      "key": "steak",
+      "label_en": "Steakhouse",
+      "label_fr": "Grill / steakhouse",
+      "places": 1,
+      "default": "tile",
+      "candidates": [
+        {
+          "url": "https://www.pexels.com/photo/grilled-steak-with-vegetables-and-mashed-potatoes-33675722/",
+          "author": "Gina Meyers",
+          "site": "Pexels"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "mezze",
+      "label_en": "Lebanese",
+      "label_fr": "Libanais",
+      "places": 1,
+      "default": "tile",
+      "candidates": [],
+      "note": ""
+    },
+    {
+      "key": "brazilian",
+      "label_en": "Brazilian",
+      "label_fr": "Brésilien",
+      "places": 1,
+      "default": "tile",
+      "candidates": [
+        {
+          "url": "https://www.pexels.com/photo/traditional-brazilian-feijoada-with-sides-34234277/",
+          "author": "Beatriz Haiana",
+          "site": "Pexels"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "bowl",
+      "label_en": "Healthy bowls",
+      "label_fr": "Bowls",
+      "places": 1,
+      "default": "tile",
+      "candidates": [
+        {
+          "url": "https://www.pexels.com/photo/vibrant-tropical-poke-bowl-with-green-smoothie-34902493/",
+          "author": "sejio402",
+          "site": "Pexels"
+        }
+      ],
+      "note": ""
+    },
+    {
+      "key": "restricted",
+      "label_en": "Access restricted",
+      "label_fr": "Accès interdit",
+      "places": 1,
+      "default": "tile",
+      "candidates": [],
+      "note": "Warning tile for Cascade Didier (id 7); never an inviting photo"
+    }
+  ]
+}
