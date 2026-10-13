@@ -7011,10 +7011,6 @@
           "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/distillerie-hardy",
           "checkedAt": "2026-10-02"
         },
-        "website": {
-          "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/distillerie-hardy",
-          "checkedAt": "2026-10-02"
-        },
         "facebook": {
           "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/distillerie-hardy",
           "checkedAt": "2026-10-02"
@@ -7027,7 +7023,6 @@
       "phone": "+596 596 58 20 82",
       "address": "Tartane, 97220 La Trinité",
       "payment": ["Cartes bancaires", "Espèces"],
-      "website": "https://www.reference-rhum.com/G-Hardy-54",
       "facebook": "https://www.facebook.com/RhumHardy",
       "languages": ["Anglais", "Français"]
     }
@@ -7685,10 +7680,6 @@
           "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/habdaphai",
           "checkedAt": "2026-10-02"
         },
-        "website": {
-          "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/habdaphai",
-          "checkedAt": "2026-10-02"
-        },
         "languages": {
           "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/habdaphai",
           "checkedAt": "2026-10-02"
@@ -7701,7 +7692,6 @@
       "phone": "+596 696 48 88 62",
       "address": "Port de Plaisance, Bassin Tortue, 97290 Le Marin",
       "payment": ["Chèques bancaires et postaux", "Espèces", "Virement bancaire"],
-      "website": "https://habdaphai-art-performance.business.site/",
       "languages": ["Anglais", "Espagnol", "Français"],
       "priceRange": "80 €"
     }
@@ -9114,10 +9104,6 @@
           "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/qv-tropicale",
           "checkedAt": "2026-10-02"
         },
-        "website": {
-          "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/qv-tropicale",
-          "checkedAt": "2026-10-02"
-        },
         "languages": {
           "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/qv-tropicale",
           "checkedAt": "2026-10-02"
@@ -9129,7 +9115,6 @@
       },
       "address": "Habitation Grand Fonds, Domaine de Belle-Âme, 97240 Le François",
       "payment": ["Cartes bancaires", "Espèces", "Virement bancaire"],
-      "website": "https://www.qv-tropicale.com/",
       "languages": ["Anglais", "Espagnol", "Français"],
       "priceRange": "6–12 €"
     }
@@ -9310,10 +9295,7 @@
           "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/rhums-baie-des-tresors-habitation-le-galion",
           "checkedAt": "2026-10-02"
         },
-        "website": {
-          "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/rhums-baie-des-tresors-habitation-le-galion",
-          "checkedAt": "2026-10-02"
-        },
+        "website": { "url": "https://baiedestresors.com/", "checkedAt": "2026-10-12" },
         "facebook": {
           "url": "https://www.martinique.org/fr/que-faire/culture-patrimoine/rhums-baie-des-tresors-habitation-le-galion",
           "checkedAt": "2026-10-02"
@@ -9329,7 +9311,7 @@
       },
       "address": "Chemin du Galion, 97220 La Trinité",
       "payment": ["Cartes bancaires", "Espèces"],
-      "website": "https://www.baiedestresors.mq/",
+      "website": "https://baiedestresors.com/",
       "facebook": "https://www.facebook.com/rhumbaiedestresors",
       "instagram": "https://instagram.com/baiedestresors",
       "languages": ["Anglais", "Français"]
@@ -17680,10 +17662,7 @@
           "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/le-mantou",
           "checkedAt": "2026-10-02"
         },
-        "website": {
-          "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/le-mantou",
-          "checkedAt": "2026-10-02"
-        },
+        "website": { "url": "https://www.lemantou.fr/fr/", "checkedAt": "2026-10-12" },
         "facebook": {
           "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/le-mantou",
           "checkedAt": "2026-10-02"
@@ -17705,7 +17684,7 @@
         "Espèces",
         "Virement bancaire"
       ],
-      "website": "https://www.decouverte-martinique.fr/",
+      "website": "https://www.lemantou.fr/fr/",
       "facebook": "https://www.facebook.com/LeMantouExcursionMartinique",
       "languages": ["Anglais", "Français"],
       "priceRange": "20–35 €"
@@ -21837,8 +21816,8 @@
           "checkedAt": "2026-10-02"
         },
         "website": {
-          "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/zone2glisse",
-          "checkedAt": "2026-10-02"
+          "url": "https://zone2glisse.wixsite.com/martinique",
+          "checkedAt": "2026-10-12"
         },
         "facebook": {
           "url": "https://www.martinique.org/fr/que-faire/sports-activites-nautiques/zone2glisse",
@@ -21860,7 +21839,7 @@
       "phone": "+596 696 83 97 13",
       "address": "Boulevard Allègre, 97290 Le Marin",
       "payment": ["Cartes bancaires", "Chèques bancaires et postaux"],
-      "website": "https://www.zone2glisse.fr/",
+      "website": "https://zone2glisse.wixsite.com/martinique",
       "facebook": "https://www.facebook.com/zone2glissemartinique",
       "instagram": "https://instagram.com/zone2glissemartinique",
       "languages": ["Anglais", "Français"],
