@@ -13,5 +13,6 @@ return [
         'sources:refresh' => 60,
         'google:match' => 60,
         'places:rank' => 1440,
+        'photos:expire' => 1440,
     ],
 ];

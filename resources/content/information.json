@@ -34,7 +34,7 @@
     },
     "privacy": {
       "title": "Privacy Policy",
-      "intro": "Last updated: September 29, 2026. This policy explains how MadaTours uses information when you browse the website or native app.",
+      "intro": "Last updated: October 13, 2026. This policy explains how MadaTours uses information when you browse the website or native app.",
       "sections": [
         {
           "title": "Who is responsible",
@@ -54,7 +54,7 @@
         },
         {
           "title": "Place submissions and photographs",
-          "body": "Submissions, exact place coordinates and photos are private to the contributor and administrators until approval. Approved entries, descriptions, photos and contributor credit are public. We re-encode uploaded images to remove EXIF metadata, including embedded GPS. Rejections include an in-app reason. Source-ingestion logs are retained for 90 days. Account-related records remain until account deletion or moderation; provider backup retention may differ."
+          "body": "Submissions, exact place coordinates and photos are private to the contributor and administrators until approval. Approved entries, descriptions, photos and contributor credit are public. We re-encode uploaded images to remove EXIF metadata, including embedded GPS. Rejections include an in-app reason. Source-ingestion logs are retained for 90 days. Account-related records remain until account deletion or moderation; provider backup retention may differ. Anyone can report a place photo; a report keeps the place, the photo, the reason, any details and the optional contact you give, and is visible only to administrators. A venue's own photo is published only with the owner's written permission, which we keep privately with the name and role of the person who granted it, a copy of the evidence, the date and any end date. Withdrawing permission removes the photo."
         },
         {
           "title": "Data on your device",
@@ -154,7 +154,7 @@
     },
     "privacy": {
       "title": "Politique de confidentialité",
-      "intro": "Dernière mise à jour : 29 septembre 2026. Cette politique explique l’utilisation des informations sur le site et dans l’application native MadaTours.",
+      "intro": "Dernière mise à jour : 13 octobre 2026. Cette politique explique l’utilisation des informations sur le site et dans l’application native MadaTours.",
       "sections": [
         {
           "title": "Responsable",
@@ -174,7 +174,7 @@
         },
         {
           "title": "Propositions de lieux et photographies",
-          "body": "Les propositions, coordonnées exactes du lieu et photos restent privées entre leur auteur et les administrateurs jusqu’à approbation. Les fiches, descriptions, photos et crédits approuvés sont publics. Les images sont réencodées pour retirer les métadonnées EXIF, dont le GPS intégré. Les refus sont motivés dans l’application. Les journaux de sources sont conservés 90 jours. Les données liées au compte restent jusqu’à sa suppression ou une modération ; les durées des sauvegardes des prestataires peuvent différer."
+          "body": "Les propositions, coordonnées exactes du lieu et photos restent privées entre leur auteur et les administrateurs jusqu’à approbation. Les fiches, descriptions, photos et crédits approuvés sont publics. Les images sont réencodées pour retirer les métadonnées EXIF, dont le GPS intégré. Les refus sont motivés dans l’application. Les journaux de sources sont conservés 90 jours. Les données liées au compte restent jusqu’à sa suppression ou une modération ; les durées des sauvegardes des prestataires peuvent différer. Chacun peut signaler une photo de lieu ; le signalement conserve le lieu, la photo, le motif, les précisions et le contact facultatif que vous indiquez, et seuls les administrateurs y ont accès. La photo propre d’un établissement n’est publiée qu’avec l’autorisation écrite de son responsable, que nous conservons en privé avec le nom et la fonction de la personne qui l’a donnée, une copie de la preuve, la date et l’éventuelle date de fin. Le retrait de l’autorisation supprime la photo."
         },
         {
           "title": "Données sur votre appareil",

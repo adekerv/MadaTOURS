@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ApiException;
+use App\Services\PlacePhotos;
 use App\Services\Sources\PublicSourceClient;
+use App\Services\SubmissionPhotos;
 use App\Services\Supabase\AuthService;
 use App\Services\Supabase\SupabaseClient;
 use Illuminate\Http\JsonResponse;
@@ -33,7 +36,7 @@ class EnrichmentController extends Controller
         return response()->json($data);
     }
 
-    public function store(Request $request, PublicSourceClient $http, string $action): JsonResponse
+    public function store(Request $request, PublicSourceClient $http, SubmissionPhotos $photos, PlacePhotos $placePhotos, string $action): JsonResponse
     {
         Gate::authorize('manage-places');
         $input = $request->validate(match ($action) {
@@ -61,12 +64,20 @@ class EnrichmentController extends Controller
             $rows = $this->db->request('GET', '/rest/v1/mt_source_settings', ['place_id' => 'eq.'.$id, 'limit' => 1], admin: true);
             $photo = $rows[0]['candidate_photo'] ?? null;
             abort_unless($photo, 404);
+            // The photo is copied, re-encoded and self-hosted: never hotlinked from the venue's site.
             try {
-                $http->validate($photo['url']);
+                $bytes = $http->image($photo['url']);
             } catch (RuntimeException) {
-                abort(422);
+                throw new ApiException(422, 'This photo could not be downloaded from its source.');
             }
-            $this->db->request('PATCH', '/rest/v1/mt_places?id=eq.'.$id, ['image' => $photo['url'], 'photo_credit' => ['author' => $input['author'], 'license' => $input['license'], 'sourceUrl' => $photo['source'], 'licenseUrl' => $input['licenseUrl'], 'caption' => '']], admin: true);
+            $jpeg = $photos->sanitize(base64_encode($bytes));
+            $placePhotos->publish($id, $jpeg, [
+                'author' => $input['author'], 'license' => $input['license'], 'licenseUrl' => $input['licenseUrl'], 'sourceUrl' => $photo['source'],
+            ], [
+                // The administrator's rights check is the attestation: who checked, and when, is recorded.
+                'basis' => 'attestation', 'grantor_name' => $input['author'], 'licence_version' => $input['license'],
+                'channel' => 'source_site', 'granted_on' => now()->toDateString(),
+            ], null, $request->user()->id);
             $this->db->request('PATCH', '/rest/v1/mt_source_settings?place_id=eq.'.$id, ['candidate_photo' => null], admin: true);
             $this->db->request('POST', '/rest/v1/mt_source_logs', ['place_id' => $id, 'status' => 'photo_approved'], admin: true);
         }

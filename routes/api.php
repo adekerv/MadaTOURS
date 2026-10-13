@@ -6,6 +6,7 @@ use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\EnrichmentController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\PlaceController;
+use App\Http\Controllers\PlacePhotoController;
 use App\Http\Controllers\RecurringTaskController;
 use App\Http\Controllers\ReviewPhotoController;
 use App\Http\Controllers\SavedPlaceController;
@@ -28,6 +29,8 @@ Route::withoutMiddleware([EncryptCookies::class, AddQueuedCookiesToResponse::cla
     Route::get('places/{place}/community', [CommunityController::class, 'show']);
     // Vercel Cron calls with GET; the GitHub workflow uses POST. Both need the secret.
     Route::match(['get', 'post'], 'internal/tasks', RecurringTaskController::class);
+    // Anyone may report a photo; it needs no session, and a per-place rate limit applies.
+    Route::post('photo-reports', [PlacePhotoController::class, 'report']);
 });
 
 // Allow enough lock time for the bounded, sequential provider calls in auth flows.
@@ -41,6 +44,10 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 });
 Route::middleware('auth:supabase')->group(function () {
     Route::get('moderation/enrichment', [EnrichmentController::class, 'index'])->block(90, 15);
+    Route::get('moderation/place-photos', [PlacePhotoController::class, 'index'])->block(90, 15);
+    Route::post('moderation/place-photos', [PlacePhotoController::class, 'store'])->block(90, 15);
+    Route::post('moderation/place-photos/revoke', [PlacePhotoController::class, 'revoke'])->block(90, 15);
+    Route::post('moderation/photo-reports/{report}', [PlacePhotoController::class, 'resolve'])->whereNumber('report')->block(90, 15);
     Route::post('moderation/enrichment/{action}', [EnrichmentController::class, 'store'])->block(90, 15);
     Route::get('submissions', [SubmissionController::class, 'index'])->block(90, 15);
     Route::post('submissions', [SubmissionController::class, 'store'])->block(90, 15);

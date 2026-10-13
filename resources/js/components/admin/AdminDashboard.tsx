@@ -5,6 +5,7 @@ import type { Place, User } from '../../types';
 import { api, errorMessage } from '../../lib/api';
 import { normalizePlace } from '../../lib/places-utils';
 import { EnrichmentModeration } from './EnrichmentModeration';
+import { OwnerPhotos } from './OwnerPhotos';
 import { SubmissionModeration } from './SubmissionModeration';
 import { CommunityModeration } from './CommunityModeration';
 import { TourManager } from './TourManager';
@@ -138,6 +139,12 @@ export function AdminDashboard({
             {t('Sources and Google matching')}
           </summary>
           <EnrichmentModeration places={places} onChanged={onRefreshPlaces} />
+        </details>
+        <details className="rounded-2xl border border-slate-200 p-4">
+          <summary className="flex min-h-11 cursor-pointer items-center font-semibold">
+            {t('Owner photos and photo reports')}
+          </summary>
+          <OwnerPhotos places={places} onChanged={onRefreshPlaces} />
         </details>
         <details className="rounded-2xl border border-slate-200 p-4">
           <summary className="flex min-h-11 cursor-pointer items-center font-semibold">

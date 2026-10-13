@@ -49,4 +49,27 @@ class PublicSourceClient
             },
         ])->get($url);
     }
+
+    /**
+     * Downloads a candidate photo from a public HTTPS source, with the same address pinning as get(), so it can be
+     * re-encoded and self-hosted instead of hotlinked.
+     */
+    public function image(string $url): string
+    {
+        [$host, $ip] = $this->validate($url);
+        $response = Http::withUserAgent('MadaToursBot/1.0 (+https://mada-tours.vercel.app/#about)')->accept('image/jpeg,image/png,image/webp')->withoutRedirecting()->connectTimeout(5)->timeout(15)->withOptions([
+            'curl' => [CURLOPT_RESOLVE => [$host.':443:'.(str_contains($ip, ':') ? '['.$ip.']' : $ip)]],
+            'progress' => function ($total, $downloaded) {
+                if ($total > 2097152 || $downloaded > 2097152) {
+                    throw new RuntimeException('Photo is too large.');
+                }
+            },
+        ])->get($url);
+        $type = strtolower(trim(explode(';', (string) $response->header('Content-Type'))[0]));
+        if (! $response->successful() || ! in_array($type, ['image/jpeg', 'image/png', 'image/webp'], true) || strlen($response->body()) > 2097152) {
+            throw new RuntimeException('Photo is unavailable.');
+        }
+
+        return $response->body();
+    }
 }

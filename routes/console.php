@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\PlacePhotos;
 use App\Services\RecurringTasks;
 use App\Services\Sources\GoogleMatcher;
 use App\Services\Sources\SourceIngestion;
@@ -29,6 +30,9 @@ Artisan::command('sources:refresh {--limit=3}', function (SourceIngestion $sourc
 Artisan::command('google:match {--limit= : Places per run; defaults to GOOGLE_MATCH_BATCH}', function (GoogleMatcher $matcher) {
     $limit = $this->option('limit');
     $this->info('Processed '.$matcher->run($limit === null ? null : (int) $limit).' matches.');
+});
+Artisan::command('photos:expire', function (PlacePhotos $photos) {
+    $this->info('Took down '.$photos->expire().' photos whose permission expired.');
 });
 Artisan::command('places:rank', function (SupabaseClient $client) {
     $client->request('POST', '/rest/v1/rpc/mt_refresh_daily_picks', admin: true);

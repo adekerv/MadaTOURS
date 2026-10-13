@@ -3,27 +3,19 @@
 namespace App\Services;
 
 use App\Exceptions\ApiException;
+use App\Services\Supabase\StorageClient;
 use App\Services\Supabase\SupabaseClient;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class SubmissionPhotos
 {
-    public function __construct(private SupabaseClient $client) {}
+    public function __construct(private SupabaseClient $client, private ?StorageClient $storage = null) {}
 
     private function storage(): PendingRequest
     {
-        $url = config('supabase.url');
-        $key = config('supabase.secret_key');
-        $localTestServer = app()->environment('testing') && preg_match('#^http://127\.0\.0\.1:[0-9]+$#', $url);
-        if ((! str_starts_with($url, 'https://') && ! $localTestServer) || ! $key) {
-            throw new ApiException(503, 'Photo storage is not configured yet.');
-        }
-        $request = Http::baseUrl($url.'/storage/v1')->withHeaders(['apikey' => $key])->withoutRedirecting()->timeout(15)->connectTimeout(5);
-
-        return str_starts_with($key, 'eyJ') ? $request->withToken($key) : $request;
+        return ($this->storage ??= app(StorageClient::class))->request();
     }
 
     protected function canReencode(): bool

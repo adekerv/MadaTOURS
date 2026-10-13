@@ -18,6 +18,7 @@ import { placeFacts, telHref } from '../lib/place-details';
 import { usePlaceDetail } from '../hooks/usePlaceDetail';
 import { PlaceCommunity } from './community/PlaceCommunity';
 import { PracticalInfo } from './place/PracticalInfo';
+import { PhotoReport } from './place/PhotoReport';
 import { Modal } from './ui/Modal';
 const MiniMap = lazy(() => import('./place/MiniMap'));
 const action = 'flex min-h-11 items-center justify-center gap-2 text-center';
@@ -313,6 +314,13 @@ export function PlaceDetailModal({
             {t('Photo credits')}
           </a>
         </p>
+        {(showingPlaceholder ? illustrative.src : place.image) && (
+          <PhotoReport
+            key={`${place.id}:${showingPlaceholder ? illustrative.src : place.image}`}
+            placeId={place.id}
+            image={(showingPlaceholder ? illustrative.src : place.image)!}
+          />
+        )}
       </div>
     </Modal>
   );
