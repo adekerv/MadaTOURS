@@ -6,7 +6,7 @@ permissions:
   contents: read
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:17
@@ -24,14 +24,14 @@ jobs:
     env:
       MADATOURS_TEST_POSTGRES_URL: postgresql://postgres:test-only@127.0.0.1:5432/madatours_test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
           extensions: curl, mbstring, intl, pdo_pgsql, pdo_sqlite, gd
           tools: composer:v2
           coverage: none
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -49,16 +49,16 @@ jobs:
       - run: npm run test:e2e
       - run: composer audit
       - run: npm audit --omit=dev --audit-level=high
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: browser-test-results
           path: test-results/
 
   container:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: docker build -t madatours-ci .
       - name: Check image extensions in the container
         run: |
@@ -69,6 +69,6 @@ jobs:
           export APP_KEY="base64:$(openssl rand -base64 32)"
           docker run -d --name madatours-ci -p 8080:10000 -e APP_KEY -e APP_URL=http://127.0.0.1:8080 madatours-ci
           trap 'docker logs madatours-ci; docker rm -f madatours-ci' EXIT
-          curl --fail --retry 20 --retry-connrefused --retry-delay 1 http://127.0.0.1:8080/up
+          curl --fail --retry 30 --retry-all-errors --retry-delay 1 http://127.0.0.1:8080/up
           curl --fail http://127.0.0.1:8080/ -o /tmp/madatours-shell.html
           test -s /tmp/madatours-shell.html
