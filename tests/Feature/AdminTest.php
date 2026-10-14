@@ -205,4 +205,16 @@ class AdminTest extends TestCase
         $this->postJson('/api/places', $large)->assertStatus(413);
         $this->postJson('/api/contact', $large)->assertStatus(413);
     }
+
+    public function test_a_stale_session_still_lets_someone_send_a_contact_message(): void
+    {
+        $this->withSession(['supabase' => ['access_token' => 'old', 'refresh_token' => 'gone', 'expires_at' => time() - 10]]);
+        Http::fake([
+            '*/auth/v1/token*' => Http::response(['error_code' => 'refresh_token_not_found'], 400),
+            '*/rpc/mt_check_rate_limit' => Http::response('true'),
+            '*/mt_contact_messages' => Http::response([], 201),
+        ]);
+        $this->postJson('/api/contact', ['name' => 'Gus', 'email' => 'gus@example.test', 'subject' => 'Hello', 'message' => 'A message long enough.'])->assertCreated();
+        Http::assertSent(fn (Request $r) => str_ends_with($r->url(), '/mt_contact_messages') && $r['user_id'] === null);
+    }
 }

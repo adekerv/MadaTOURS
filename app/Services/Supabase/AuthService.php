@@ -20,7 +20,8 @@ class AuthService
                 $session = $this->client->request('POST', '/auth/v1/token?grant_type=refresh_token', ['refresh_token' => $session['refresh_token']]);
                 $this->store($session, false);
             } catch (ApiException $error) {
-                if (in_array($error->status, [400, 401])) {
+                // 403 is a suspended account: it is signed out like an expired session.
+                if (in_array($error->status, [400, 401, 403])) {
                     $this->clear();
                     throw new ApiException(401, 'Please sign in to continue.');
                 }

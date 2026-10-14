@@ -37,12 +37,10 @@ class ContactController extends Controller
         ]);
         $auth->limit('contact', strtolower($input['email']), 3);
         $userId = null;
-        if ($auth->token()) {
-            try {
-                $userId = $auth->user()['id'];
-            } catch (ApiException) {
-                // A guest after all: the message is still welcome.
-            }
+        try {
+            $userId = $auth->token() ? $auth->user()['id'] : null;
+        } catch (ApiException) {
+            // An expired or suspended session counts as a guest: the message is still welcome.
         }
         $client->request('POST', '/rest/v1/mt_contact_messages', [
             'user_id' => $userId, 'name' => $input['name'], 'email' => strtolower($input['email']),
