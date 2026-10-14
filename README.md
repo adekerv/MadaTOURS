@@ -1,5 +1,7 @@
 # MadaTours
 
+![MadaTours: Martinique, at your pace. Places to discover, days to make your own.](public/og-image.png)
+
 A bilingual (French and English) guide to Martinique: 354 published restaurants, beaches, gardens, rum estates and outings on an interactive map, with day planning, curated island tours, reviews and meet-ups.
 
 **Live site: [mada-tours.vercel.app](https://mada-tours.vercel.app)**
