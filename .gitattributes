@@ -1,0 +1,4 @@
+# Generated files: GitHub leaves them out of the language bar and collapses them in diffs.
+supabase/setup.sql linguist-generated=true
+supabase/backup/** linguist-generated=true
+resources/js/lib/martinique-coast.ts linguist-generated=true
