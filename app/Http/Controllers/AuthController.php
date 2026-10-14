@@ -137,7 +137,12 @@ class AuthController extends Controller
     {
         $input = $request->validated();
         $this->auth->limit('auth', $input['email']);
-        $this->auth->authenticate('token?grant_type=password', $input);
+        try {
+            $this->auth->authenticate('token?grant_type=password', $input);
+        } catch (ApiException $error) {
+            // One answer whichever part was wrong, so nobody can learn which addresses have accounts.
+            throw $error->status === 400 ? new ApiException(400, 'Invalid email or password.') : $error;
+        }
 
         return response()->json(['user' => $this->auth->user()]);
     }

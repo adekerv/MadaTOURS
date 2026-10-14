@@ -33,7 +33,7 @@ async function signInAsAdmin(page: Page) {
   const email = `tours-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.test`;
   const signup = await page.request.post('/api/auth/register', {
     headers: client,
-    data: { name: 'Tour admin', email, password },
+    data: { name: 'Tour admin', email, password, password_confirmation: password },
   });
   expect(signup.ok()).toBe(true);
   await page.request.post(`${provider}/__test/admin`, { headers: testHeaders(), data: { email } });

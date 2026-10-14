@@ -41,7 +41,7 @@ test('Laravel API: immediate signup, ownership, roles, recovery, logout, validat
     const signup = await call('/auth/register', 'POST', {
       name: 'Alice',
       email: 'Alice@example.test',
-      password: 'long test password',
+      password: 'long test password', password_confirmation: 'long test password',
       role: 'admin',
     });
     assert.equal(signup.status, 201);
@@ -53,7 +53,7 @@ test('Laravel API: immediate signup, ownership, roles, recovery, logout, validat
     const bobSignup = await call(
       '/auth/register',
       'POST',
-      { name: 'Bob', email: 'bob@example.test', password: 'other test password' },
+      { name: 'Bob', email: 'bob@example.test', password: 'other test password', password_confirmation: 'other test password' },
       'bob',
     );
     const bobCodes: string[] = bobSignup.body.recoveryCodes;

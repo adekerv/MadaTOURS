@@ -55,6 +55,9 @@ class AccountTest extends TestCase
             if (str_ends_with($path, '/rpc/mt_replace_recovery_codes')) {
                 return Http::response('', 204);
             }
+            if (str_ends_with($path, '/rpc/mt_my_activity')) {
+                return Http::response(['meetups' => [], 'requests' => [], 'reviews' => [['id' => 4, 'place_name' => 'Anse Noire']]]);
+            }
             if (str_ends_with($path, '/mt_photo_deletions')) {
                 return Http::response([]);
             }
@@ -239,5 +242,83 @@ class AccountTest extends TestCase
         $this->deleteJson('/api/account', ['confirmation' => 'camille@example.test'])->assertOk();
         $this->assertFalse($this->sent('POST /auth/v1/token'));
         $this->assertTrue($this->sent('DELETE /auth/v1/admin/users/original-user'));
+    }
+
+    public function test_changing_the_password_needs_the_current_one_and_signs_out_other_devices(): void
+    {
+        $this->provider();
+        $this->postJson('/api/account/password', ['currentPassword' => self::PASSWORD, 'password' => 'a brand new password', 'password_confirmation' => 'a brand new password'])
+            ->assertOk()->assertJsonPath('success', true);
+        Http::assertSent(fn (Request $r) => $r->method() === 'PUT' && str_ends_with($r->url(), '/auth/v1/admin/users/original-user') && $r['password'] === 'a brand new password');
+        // The check signed this device in again, so only the other sessions end.
+        Http::assertSent(fn (Request $r) => str_contains($r->url(), '/auth/v1/logout?scope=others') && $r->hasHeader('Authorization', 'Bearer fresh-access'));
+    }
+
+    public function test_a_wrong_current_password_or_a_mismatch_changes_nothing(): void
+    {
+        $this->provider();
+        $this->postJson('/api/account/password', ['currentPassword' => 'not my password', 'password' => 'a brand new password', 'password_confirmation' => 'a brand new password'])
+            ->assertStatus(400)->assertJsonPath('error', 'Incorrect password. Nothing was changed.');
+        $this->postJson('/api/account/password', ['currentPassword' => self::PASSWORD, 'password' => 'a brand new password', 'password_confirmation' => 'a different password'])
+            ->assertStatus(400)->assertJsonPath('error', 'The passwords do not match.');
+        $this->postJson('/api/account/password', ['currentPassword' => self::PASSWORD, 'password' => 'too short', 'password_confirmation' => 'too short'])
+            ->assertStatus(400);
+        $this->assertFalse(collect($this->calls)->contains(fn ($call) => str_starts_with($call, 'PUT /auth/v1/admin/users/')));
+    }
+
+    public function test_google_only_accounts_have_no_password_to_change(): void
+    {
+        $this->provider(['google']);
+        $this->postJson('/api/account/password', ['currentPassword' => 'anything', 'password' => 'a brand new password', 'password_confirmation' => 'a brand new password'])
+            ->assertStatus(409);
+        $this->assertFalse($this->sent('POST /auth/v1/token'));
+    }
+
+    public function test_guests_cannot_change_a_password_or_read_activity(): void
+    {
+        Http::fake();
+        $this->flushSession();
+        $this->postJson('/api/account/password', ['currentPassword' => self::PASSWORD, 'password' => 'a brand new password', 'password_confirmation' => 'a brand new password'])->assertUnauthorized();
+        $this->getJson('/api/account/activity')->assertUnauthorized();
+        Http::assertNothingSent();
+    }
+
+    public function test_activity_is_read_with_the_signed_in_session(): void
+    {
+        $this->provider();
+        $this->getJson('/api/account/activity')->assertOk()->assertJsonPath('reviews.0.place_name', 'Anse Noire');
+        Http::assertSent(fn (Request $r) => str_ends_with($r->url(), '/rpc/mt_my_activity') && $r->hasHeader('Authorization', 'Bearer old-access'));
+    }
+
+    public function test_a_wrong_login_gets_one_answer_whichever_part_was_wrong(): void
+    {
+        $this->provider();
+        $this->flushSession();
+        $this->postJson('/api/auth/login', ['email' => 'camille@example.test', 'password' => 'not my password'])
+            ->assertStatus(400)->assertJsonPath('error', 'Invalid email or password.');
+        $this->postJson('/api/auth/login', ['email' => 'nobody@example.test', 'password' => 'not my password'])
+            ->assertStatus(400)->assertJsonPath('error', 'Invalid email or password.');
+    }
+
+    public function test_a_suspended_account_is_signed_out_and_cannot_sign_in(): void
+    {
+        Http::fake(function (Request $request) {
+            $path = parse_url($request->url(), PHP_URL_PATH);
+            if ($path === '/auth/v1/user') {
+                return Http::response(['id' => 'original-user', 'email' => 'camille@example.test', 'banned_until' => now()->addYear()->toIso8601String()]);
+            }
+            if (str_ends_with($path, '/rpc/mt_check_rate_limit')) {
+                return Http::response('true');
+            }
+            if ($path === '/auth/v1/token') {
+                return Http::response(['error_code' => 'user_banned'], 400);
+            }
+
+            return Http::response([]);
+        });
+        $this->getJson('/api/auth/session')->assertOk()->assertJsonPath('user', null);
+        $this->postJson('/api/account/profile', ['name' => 'Camille'])->assertUnauthorized();
+        $this->postJson('/api/auth/login', ['email' => 'camille@example.test', 'password' => self::PASSWORD])
+            ->assertStatus(403)->assertJsonPath('error', 'This account is suspended. Contact us if you think this is a mistake.');
     }
 }

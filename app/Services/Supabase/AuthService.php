@@ -39,6 +39,11 @@ class AuthService
         }
         // Validate remotely on every protected request; session data never grants a role.
         $user = $this->client->request('GET', '/auth/v1/user', token: $token);
+        // An administrator can suspend an account while it is signed in; its session ends at the next request.
+        if (! empty($user['banned_until']) && strtotime($user['banned_until']) > time()) {
+            $this->clear();
+            throw new ApiException(401, 'This account is suspended. Contact us if you think this is a mistake.');
+        }
         $profiles = $this->client->request('GET', '/rest/v1/mt_profiles', ['select' => 'role,email_verified_at', 'id' => 'eq.'.$user['id']], $token);
         if (empty($profiles)) {
             throw new ApiException(503, 'Your account profile is not available.');

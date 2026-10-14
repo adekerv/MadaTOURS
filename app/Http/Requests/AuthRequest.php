@@ -38,6 +38,9 @@ class AuthRequest extends FormRequest
         if (in_array($action, ['register', 'login', 'recover'])) {
             $rules['password'] = ['required', 'string', 'min:'.($action === 'login' ? 1 : 12), 'max:128'];
         }
+        if ($action === 'register') {
+            $rules['password'][] = 'confirmed';
+        }
 
         return $rules;
     }
@@ -47,6 +50,7 @@ class AuthRequest extends FormRequest
         return [
             'code.required' => 'Enter one of your recovery codes.',
             'code.regex' => 'Enter a recovery code exactly as you saved it, for example K7QM2-WX4TP.',
+            'password.confirmed' => 'The passwords do not match.',
         ];
     }
 }

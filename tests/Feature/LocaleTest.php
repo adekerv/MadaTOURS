@@ -17,7 +17,7 @@ class LocaleTest extends TestCase
     private function register(string $language, array $changes = [])
     {
         return $this->withHeaders(['X-MadaTours-Client' => '1', 'Accept-Language' => $language])
-            ->postJson('/api/auth/register', array_replace(['name' => 'Camille', 'email' => 'camille@example.test', 'password' => 'a long test password'], $changes));
+            ->postJson('/api/auth/register', array_replace(['name' => 'Camille', 'email' => 'camille@example.test', 'password' => 'a long test password', 'password_confirmation' => 'a long test password'], $changes));
     }
 
     public function test_validation_errors_follow_the_language_the_app_sends(): void
@@ -35,7 +35,7 @@ class LocaleTest extends TestCase
     {
         $this->register('fr-FR,fr;q=0.9,en;q=0.8', ['password' => 'court'])->assertJsonPath('error', 'Le champ mot de passe doit contenir au moins 12 caractères.');
         $this->register('de-DE,de;q=0.9', ['password' => 'court'])->assertJsonPath('error', 'The password field must be at least 12 characters.');
-        $this->withHeader('X-MadaTours-Client', '1')->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'camille@example.test', 'password' => 'court'])
+        $this->withHeader('X-MadaTours-Client', '1')->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'camille@example.test', 'password' => 'court', 'password_confirmation' => 'court'])
             ->assertJsonPath('error', 'The password field must be at least 12 characters.');
     }
 

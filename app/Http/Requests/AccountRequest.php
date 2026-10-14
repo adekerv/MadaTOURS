@@ -36,6 +36,10 @@ class AccountRequest extends FormRequest
                 'email' => ['required', 'string', 'email:rfc', 'max:254'],
                 'password' => ['required', 'string', 'max:128'],
             ],
+            'password' => [
+                'currentPassword' => ['required', 'string', 'max:128'],
+                'password' => ['required', 'string', 'min:12', 'max:128', 'confirmed'],
+            ],
             'recoveryCodes' => [
                 'password' => ['required', 'string', 'max:128'],
             ],
@@ -58,6 +62,8 @@ class AccountRequest extends FormRequest
             'email.email' => 'Enter a valid email address.',
             'password.required' => 'Enter your password to confirm.',
             'confirmation.required' => 'Type your email address exactly to confirm.',
+            'currentPassword.required' => 'Enter your current password.',
+            'password.confirmed' => 'The passwords do not match.',
         ];
     }
 }

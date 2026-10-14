@@ -223,7 +223,7 @@ test('admin-created places immediately appear in home search and can be deleted'
   const email = `admin-ui-${Date.now()}@example.test`;
   await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { name: 'Admin', email, password: 'Admin browser password 42' },
+    data: { name: 'Admin', email, password: 'Admin browser password 42', password_confirmation: 'Admin browser password 42' },
   });
   await page.request.post('http://127.0.0.1:3101/__test/admin', {
     headers: { 'X-Test-Token': process.env.MADATOURS_E2E_TOKEN! },
@@ -359,7 +359,7 @@ test('a forgotten password is reset with a recovery code, once, and the new pass
   const email = `recovery-${Date.now()}@example.test`;
   const signup = await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { name: 'Recovery user', email, password: 'Original password 42' },
+    data: { name: 'Recovery user', email, password: 'Original password 42', password_confirmation: 'Original password 42' },
   });
   const codes: string[] = (await signup.json()).recoveryCodes;
   expect(codes).toHaveLength(8);
@@ -511,7 +511,7 @@ test('account links and the guest introduction show only where they belong', asy
   const email = `footer-${Date.now()}@example.test`;
   await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { name: 'Footer', email, password: 'Footer browser password 42' },
+    data: { name: 'Footer', email, password: 'Footer browser password 42', password_confirmation: 'Footer browser password 42' },
   });
   await page.goto('/');
   await expect(page.getByText(/Welcome|Footer/).first()).toBeVisible();

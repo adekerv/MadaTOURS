@@ -23,7 +23,7 @@ async function register(page: Page) {
   const email = `${randomUUID()}@example.test`;
   const response = await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { name, email, password: 'a long test password', language: 'en' },
+    data: { name, email, password: 'a long test password', password_confirmation: 'a long test password', language: 'en' },
   });
   expect(response.status()).toBe(201);
   return { name, email };

@@ -29,14 +29,14 @@ test('Settings: name, language and email changes, and deletion that removes only
       await call('/auth/register', 'POST', {
         name: 'Alice',
         email: 'alice@example.test',
-        password: 'long test password',
+        password: 'long test password', password_confirmation: 'long test password',
       })
     ).body.user;
     const bob = (
       await call(
         '/auth/register',
         'POST',
-        { name: 'Bob', email: 'bob@example.test', password: 'other test password' },
+        { name: 'Bob', email: 'bob@example.test', password: 'other test password', password_confirmation: 'other test password' },
         'bob',
       )
     ).body.user;
@@ -81,7 +81,7 @@ test('Settings: name, language and email changes, and deletion that removes only
     assert.equal(
       (await call('/account/email', 'POST', { email: bob.email, password: 'long test password' }))
         .status,
-      400,
+      409,
     );
     assert.equal((await call('/auth/session')).body.user.email, 'alice@example.test');
     const changed = await call('/account/email', 'POST', {

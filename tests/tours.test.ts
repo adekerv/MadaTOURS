@@ -45,7 +45,7 @@ test('Tours: admin-only writes, a road route stored once per change, and straigh
       const signup = await call(
         '/auth/register',
         'POST',
-        { name: who, email, password: 'long test password' },
+        { name: who, email, password: 'long test password', password_confirmation: 'long test password' },
         who,
       );
       assert.equal(signup.status, 201);

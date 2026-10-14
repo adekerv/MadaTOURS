@@ -53,6 +53,35 @@ class AccountController extends Controller
         return response()->json(['user' => $this->auth->user(), 'verificationLost' => $wasVerified]);
     }
 
+    /**
+     * Changing the password needs the current one. Every other session of the account is signed out afterwards, so a
+     * device left signed in elsewhere loses access; this one stays signed in.
+     */
+    public function password(AccountRequest $request): JsonResponse
+    {
+        $input = $request->validated();
+        $user = $request->user();
+        if ($user->hasPassword === false) {
+            throw new ApiException(409, 'You sign in with Google, so there is no password to change.');
+        }
+        $this->auth->limit('password-change', $user->id);
+        $this->confirmPassword($user, $input['currentPassword']);
+        $this->client->request('PUT', '/auth/v1/admin/users/'.rawurlencode($user->id), ['password' => $input['password']], admin: true);
+        try {
+            $this->client->request('POST', '/auth/v1/logout?scope=others', token: $this->auth->token());
+        } catch (ApiException) {
+            // The password is already changed; other sessions still end when their tokens expire.
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /** The signed-in person's own meet-ups, meet-up requests and reviews, newest first. */
+    public function activity(): JsonResponse
+    {
+        return response()->json($this->client->request('POST', '/rest/v1/rpc/mt_my_activity', [], $this->auth->token()));
+    }
+
     public function recoveryStatus(Request $request, RecoveryCodes $codes): JsonResponse
     {
         $user = $request->user();

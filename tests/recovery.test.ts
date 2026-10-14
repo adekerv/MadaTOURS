@@ -42,7 +42,7 @@ test('Accounts without email: signup, login, email change, recovery codes, reuse
     const signup = await call(
       '/auth/register',
       'POST',
-      { name: 'Alice', email: 'alice@example.test', password: 'long test password' },
+      { name: 'Alice', email: 'alice@example.test', password: 'long test password', password_confirmation: 'long test password' },
       'alice',
     );
     assert.equal(signup.status, 201);
@@ -194,7 +194,7 @@ test('Accounts without email: signup, login, email change, recovery codes, reuse
       await call(
         '/auth/register',
         'POST',
-        { name: 'Bob', email: 'bob@example.test', password: 'other test password' },
+        { name: 'Bob', email: 'bob@example.test', password: 'other test password', password_confirmation: 'other test password' },
         'bob',
       )
     ).body;
@@ -213,7 +213,7 @@ test('Accounts without email: signup, login, email change, recovery codes, reuse
     await call('/auth/register', 'POST', {
       name: 'Carol',
       email: 'carol@example.test',
-      password: 'third test password',
+      password: 'third test password', password_confirmation: 'third test password',
     });
     assert.equal((await reset('carol@example.test', 'ZZZZZ-ZZZZZ')).status, 400);
   } finally {

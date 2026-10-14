@@ -35,7 +35,7 @@ class SignupTest extends TestCase
     public function test_signup_signs_in_immediately_and_sends_a_personalized_welcome(): void
     {
         $this->provider();
-        $this->postJson('/api/auth/register', ['name' => ' Camille ', 'email' => ' USER@example.com ', 'password' => 'a long test password', 'language' => 'fr', 'role' => 'admin', 'data' => ['role' => 'admin']])
+        $this->postJson('/api/auth/register', ['name' => ' Camille ', 'email' => ' USER@example.com ', 'password' => 'a long test password', 'password_confirmation' => 'a long test password', 'language' => 'fr', 'role' => 'admin', 'data' => ['role' => 'admin']])
             ->assertCreated()->assertJsonPath('user.name', 'Camille')->assertJsonPath('user.role', 'user')->assertJsonPath('verificationRequired', false)
             ->assertDontSee('private-access')->assertDontSee('private-refresh')->assertSessionHas('supabase.access_token', 'private-access');
         Http::assertSent(fn ($r) => str_ends_with($r->url(), '/signup') && $r['data'] === ['display_name' => 'Camille', 'language' => 'fr'] && ! isset($r['role']) && $r['email'] === 'user@example.com');
@@ -46,7 +46,7 @@ class SignupTest extends TestCase
     public function test_signup_issues_eight_recovery_codes_once_and_stores_only_hashes(): void
     {
         $this->provider();
-        $codes = $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password'])
+        $codes = $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password', 'password_confirmation' => 'a long test password'])
             ->assertCreated()->assertJsonCount(8, 'recoveryCodes')->json('recoveryCodes');
         $this->assertCount(8, array_unique($codes));
         foreach ($codes as $code) {
@@ -78,14 +78,14 @@ class SignupTest extends TestCase
             '*/mt_profiles*' => Http::response([['role' => 'user']]),
             '*/rpc/mt_replace_recovery_codes' => Http::response(['code' => 'XX000'], 500),
         ]);
-        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password'])
+        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password', 'password_confirmation' => 'a long test password'])
             ->assertCreated()->assertJsonPath('user.name', 'Camille')->assertJsonMissingPath('recoveryCodes');
     }
 
     public function test_invalid_or_missing_name_does_not_create_an_account(): void
     {
         foreach (['', '<script>alert(1)</script>', str_repeat('a', 81)] as $name) {
-            $this->postJson('/api/auth/register', ['name' => $name, 'email' => 'user@example.com', 'password' => 'a long test password'])->assertStatus(400);
+            $this->postJson('/api/auth/register', ['name' => $name, 'email' => 'user@example.com', 'password' => 'a long test password', 'password_confirmation' => 'a long test password'])->assertStatus(400);
         }
         Http::assertNothingSent();
         Mail::assertNothingSent();
@@ -94,8 +94,19 @@ class SignupTest extends TestCase
     public function test_provider_rejection_never_sends_a_welcome(): void
     {
         Http::fake(['*/rpc/mt_check_rate_limit' => Http::response('true'), '*/auth/v1/signup' => Http::response(['error_code' => 'user_already_exists'], 422)]);
-        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password'])->assertStatus(400);
+        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password', 'password_confirmation' => 'a long test password'])
+            ->assertStatus(409)->assertJsonPath('error', 'An account already uses this email address.');
         Mail::assertNothingSent();
+    }
+
+    public function test_signup_needs_the_password_twice_and_checks_nothing_remotely_when_they_differ(): void
+    {
+        Http::fake();
+        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password', 'password_confirmation' => 'a long test passw0rd'])
+            ->assertStatus(400)->assertJsonPath('error', 'The passwords do not match.');
+        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password'])
+            ->assertStatus(400)->assertJsonPath('error', 'The passwords do not match.');
+        Http::assertNothingSent();
     }
 
     public function test_mail_outage_does_not_break_a_successful_signup_or_expose_details(): void
@@ -103,7 +114,7 @@ class SignupTest extends TestCase
         $this->provider();
         Mail::shouldReceive('to')->once()->andThrow(new \RuntimeException('secret smtp password'));
         Log::shouldReceive('warning')->once()->with('Welcome email delivery failed. Check the configured mail transport.');
-        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password'])
+        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password', 'password_confirmation' => 'a long test password'])
             ->assertCreated()->assertJsonPath('user.name', 'Camille')->assertDontSee('secret smtp password');
     }
 

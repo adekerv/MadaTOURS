@@ -43,6 +43,15 @@ class SupabaseClient
                 if ($code === 'same_password') {
                     throw new ApiException(400, 'Choose a different password.');
                 }
+                if ($code === 'weak_password') {
+                    throw new ApiException(400, 'This password is too easy to guess. Choose a longer or less common one.');
+                }
+                if (in_array($code, ['user_already_exists', 'email_exists'], true)) {
+                    throw new ApiException(409, 'An account already uses this email address.');
+                }
+                if ($code === 'user_banned') {
+                    throw new ApiException(403, 'This account is suspended. Contact us if you think this is a mistake.');
+                }
                 if ($response->serverError() || $code === 'email_address_not_authorized') {
                     throw new ApiException(503, 'Email or account services are unavailable. Please contact the project owner.');
                 }

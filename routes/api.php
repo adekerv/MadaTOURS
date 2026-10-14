@@ -63,6 +63,8 @@ Route::middleware('auth:supabase')->group(function () {
     Route::delete('review-photos/{photo}', [ReviewPhotoController::class, 'destroy'])->block(90, 15);
     Route::post('account/profile', [AccountController::class, 'profile'])->block(90, 15);
     Route::post('account/email', [AccountController::class, 'email'])->block(90, 15);
+    Route::post('account/password', [AccountController::class, 'password'])->block(90, 15);
+    Route::get('account/activity', [AccountController::class, 'activity'])->block(90, 15);
     Route::get('account/recovery-codes', [AccountController::class, 'recoveryStatus'])->block(90, 15);
     Route::post('account/recovery-codes', [AccountController::class, 'recoveryCodes'])->block(90, 15);
     Route::delete('account', [AccountController::class, 'destroy'])->block(90, 15);

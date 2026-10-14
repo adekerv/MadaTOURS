@@ -31,7 +31,7 @@ async function register(page: Page, name: string) {
     data: {
       name,
       email: `${randomUUID()}@example.test`,
-      password: 'a long test password',
+      password: 'a long test password', password_confirmation: 'a long test password',
       language: 'en',
     },
   });

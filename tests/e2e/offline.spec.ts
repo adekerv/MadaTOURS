@@ -15,7 +15,7 @@ test('saved places remain readable after a complete offline reload', async ({
     (
       await page.request.post('/api/auth/register', {
         headers,
-        data: { name: 'Offline user', email, password: 'Offline browser password 42' },
+        data: { name: 'Offline user', email, password: 'Offline browser password 42', password_confirmation: 'Offline browser password 42' },
       })
     ).ok(),
   ).toBe(true);
