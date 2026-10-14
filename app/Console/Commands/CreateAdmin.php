@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Exceptions\ApiException;
+use App\Services\Supabase\AccountLookup;
 use App\Services\Supabase\SupabaseClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
@@ -13,7 +14,7 @@ class CreateAdmin extends Command
 
     protected $description = 'Provision an administrator and save a generated password in a private, Git-ignored file';
 
-    public function handle(SupabaseClient $client): int
+    public function handle(SupabaseClient $client, AccountLookup $accounts): int
     {
         $email = strtolower(trim($this->argument('email')));
         $name = trim($this->option('name'));
@@ -24,19 +25,7 @@ class CreateAdmin extends Command
         }
 
         try {
-            $existing = null;
-            for ($page = 1; ; $page++) {
-                $users = $client->request('GET', '/auth/v1/admin/users', ['page' => $page, 'per_page' => 100], admin: true)['users'] ?? [];
-                foreach ($users as $user) {
-                    if (strtolower($user['email'] ?? '') === $email) {
-                        $existing = $user;
-                        break 2;
-                    }
-                }
-                if (count($users) < 100) {
-                    break;
-                }
-            }
+            $existing = $accounts->byEmail($email);
             if ($existing && ! $this->option('replace-password')) {
                 $this->error('This account already exists. Use --replace-password only when a password replacement is intended.');
 

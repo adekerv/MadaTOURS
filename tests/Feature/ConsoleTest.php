@@ -145,4 +145,64 @@ class ConsoleTest extends TestCase
             }
         }
     }
+
+    public function test_admin_seed_creates_the_configured_administrator_with_a_hashed_password_at_the_provider(): void
+    {
+        config(['admin.email' => 'ade@admin.test', 'admin.password' => 'a long seed password', 'admin.name' => 'Ade']);
+        Http::fake([
+            '*/admin/users?*' => Http::response(['users' => []]),
+            '*/admin/users' => Http::response(['id' => 'new-admin']),
+            '*/mt_profiles*' => Http::response([['id' => 'new-admin', 'role' => 'admin']]),
+        ]);
+        $this->artisan('admin:seed')->assertSuccessful();
+        Http::assertSent(fn ($r) => $r->method() === 'POST' && str_ends_with($r->url(), '/auth/v1/admin/users')
+            && $r['email'] === 'ade@admin.test' && $r['password'] === 'a long seed password' && $r['email_confirm'] === true
+            && $r['user_metadata'] === ['display_name' => 'Ade']);
+        Http::assertSent(fn ($r) => $r->method() === 'PATCH' && str_ends_with($r->url(), '/mt_profiles?id=eq.new-admin') && $r['role'] === 'admin');
+    }
+
+    public function test_admin_seed_leaves_an_existing_administrator_and_its_password_alone(): void
+    {
+        config(['admin.email' => 'ade@admin.test', 'admin.password' => 'a long seed password', 'supabase.publishable_key' => 'public-key']);
+        Http::fake([
+            '*/admin/users?*' => Http::response(['users' => [['id' => 'a', 'email' => 'ADE@admin.test']]]),
+            '*/token*' => Http::response(['user' => ['id' => 'a'], 'access_token' => 'check']),
+            '*/logout*' => Http::response(null, 204),
+            '*/mt_profiles*' => Http::response([['id' => 'a', 'role' => 'admin']]),
+        ]);
+        $this->artisan('admin:seed')->assertSuccessful();
+        Http::assertNotSent(fn ($r) => str_contains($r->url(), '/admin/users') && in_array($r->method(), ['POST', 'PUT'], true));
+    }
+
+    public function test_admin_seed_never_promotes_an_account_someone_else_registered_with_the_address(): void
+    {
+        config(['admin.email' => 'ade@admin.test', 'admin.password' => 'a long seed password', 'supabase.publishable_key' => 'public-key']);
+        Http::fake([
+            '*/admin/users?*' => Http::response(['users' => [['id' => 'stranger', 'email' => 'ade@admin.test']]]),
+            '*/token*' => Http::response(['error_code' => 'invalid_credentials'], 400),
+        ]);
+        $this->artisan('admin:seed')->assertFailed();
+        Http::assertNotSent(fn ($r) => str_contains($r->url(), '/mt_profiles'));
+    }
+
+    public function test_admin_seed_needs_credentials_before_contacting_the_provider(): void
+    {
+        config(['admin.email' => '', 'admin.password' => '']);
+        Http::fake();
+        $this->artisan('admin:seed')->assertFailed();
+        config(['admin.email' => 'ade@admin.test', 'admin.password' => 'too short']);
+        $this->artisan('admin:seed')->assertFailed();
+        Http::assertNothingSent();
+    }
+
+    public function test_admin_seed_warns_about_a_guessable_password(): void
+    {
+        config(['admin.email' => 'ade@admin.test', 'admin.password' => 'adminpassword']);
+        Http::fake([
+            '*/admin/users?*' => Http::response(['users' => []]),
+            '*/admin/users' => Http::response(['id' => 'new-admin']),
+            '*/mt_profiles*' => Http::response([['id' => 'new-admin', 'role' => 'admin']]),
+        ]);
+        $this->artisan('admin:seed')->expectsOutputToContain('easy to guess')->assertSuccessful();
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Exceptions\ApiException;
 use App\Services\RecoveryCodes;
+use App\Services\Supabase\AccountLookup;
 use App\Services\Supabase\SupabaseClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +15,7 @@ class ResetAccountPassword extends Command
 
     protected $description = 'Set a new password for an account whose owner lost both the password and every recovery code';
 
-    public function handle(SupabaseClient $client, RecoveryCodes $recovery): int
+    public function handle(SupabaseClient $client, RecoveryCodes $recovery, AccountLookup $accounts): int
     {
         $email = strtolower(trim($this->argument('email')));
         if (Validator::make(['email' => $email], ['email' => 'required|email:rfc|max:254'])->fails()) {
@@ -37,7 +38,7 @@ class ResetAccountPassword extends Command
         }
 
         try {
-            $account = $this->find($client, $email);
+            $account = $accounts->byEmail($email);
             if (! $account) {
                 $this->error('No account uses this email address.');
 
@@ -58,22 +59,6 @@ class ResetAccountPassword extends Command
             $this->error($error->getMessage());
 
             return self::FAILURE;
-        }
-    }
-
-    /** @return array{id: string}|null */
-    private function find(SupabaseClient $client, string $email): ?array
-    {
-        for ($page = 1; ; $page++) {
-            $users = $client->request('GET', '/auth/v1/admin/users', ['page' => $page, 'per_page' => 100], admin: true)['users'] ?? [];
-            foreach ($users as $user) {
-                if (strtolower($user['email'] ?? '') === $email) {
-                    return $user;
-                }
-            }
-            if (count($users) < 100) {
-                return null;
-            }
         }
     }
 }
