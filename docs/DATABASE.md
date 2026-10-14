@@ -7,22 +7,25 @@ Laravel is the only application server. The Blade entry point mounts React; brow
 1. `ApiSecurity` validates an exact allowed origin, body size, JSON syntax and the custom request header for mutations.
 2. Laravel decrypts its HttpOnly session cookie. Provider access and refresh tokens stay in encrypted server-side session storage.
 3. The `supabase` Laravel guard validates the account with Supabase Auth, then reads the server-controlled `mt_profiles.role`. User metadata never grants permissions. Session locks serialize token refreshes.
-4. Form requests validate inputs; the `manage-places` gate authorizes catalogue changes.
+4. Form requests validate inputs; the `manage-places` and `administer` gates authorize catalogue and dashboard changes.
 5. Repositories query the Data API using the publishable key plus the authenticated user's bearer token. PostgreSQL RLS checks ownership and administrator permissions again.
 6. API resources expose only the public place fields. Provider errors are mapped to safe messages.
 
-No Eloquent user/password table is created: it would duplicate Supabase Auth and split identity ownership. Likewise, ordinary queries do not connect as PostgreSQL's unrestricted owner. The direct PDO connection is used only by Artisan migrations and seeding. The secret API key is limited to rate-limit RPCs, password-confirmed account deletion and explicit administrator tooling.
+No Eloquent user/password table is created: it would duplicate Supabase Auth and split identity ownership. Likewise, ordinary queries do not connect as PostgreSQL's unrestricted owner. The direct PDO connection is used only by Artisan migrations and seeding. The secret API key never leaves the server. It is used where no user token can be: rate limits, recovery codes, password-confirmed account deletion, contact messages, photo storage, the recurring source and Google jobs, and administrator actions that Laravel has already authorized.
 
 ## Tables and integrity
 
-| Table             | Purpose and invariants                                                                             |
-| ----------------- | -------------------------------------------------------------------------------------------------- |
-| `auth.users`      | Supabase-managed credentials and verification                                                      |
-| `mt_profiles`     | One role per auth UUID; trigger creates profiles; users cannot promote themselves                  |
-| `mt_places`       | Identity IDs; validated coordinates, type, rating and JSON metadata; drafts hidden by RLS          |
-| `mt_saved_places` | Composite primary key `(user_id, place_id, kind)` makes repeated saves idempotent; owner-only rows |
-| `mt_metadata`     | Schema/seed/import receipts; only schema version is public                                         |
-| `mt_rate_limits`  | Hashed keys, counters and expiration; callable only through a privileged RPC                       |
+| Table             | Purpose and invariants                                                                               |
+| ----------------- | ---------------------------------------------------------------------------------------------------- |
+| `auth.users`      | Supabase-managed credentials and verification                                                        |
+| `mt_profiles`     | One role per auth UUID; trigger creates profiles; users cannot promote themselves                    |
+| `mt_places`       | Identity IDs; validated coordinates, type, rating and JSON metadata; drafts hidden by RLS            |
+| `mt_saved_places` | Composite primary key `(user_id, place_id, kind)` makes repeated saves idempotent; owner-only rows   |
+| `mt_metadata`     | Schema/seed/import receipts; only schema version is public                                           |
+| `mt_rate_limits`  | Hashed keys, counters and expiration; callable only through a privileged RPC                         |
+| Other `mt_*`      | Community, social, submissions, enrichment, listing audit, photos, recovery, tours and admin (below) |
+
+Later features each add one repeat-safe file in `database/schema`, applied in this order: `community.sql` (reviews, comments, check-ins), `social.sql` (followers and meet-ups), `submissions.sql` (place suggestions with photos), `enrichment.sql` (official sources and Google Place IDs), `listing.sql` (source facts and listing status), `review-photos.sql`, `recovery.sql` (recovery codes), `tours.sql`, `owner-photos.sql` (photo permissions and reports) and `admin.sql` (activity log, contact inbox, site settings and the dashboard's functions). Most of their writes go through `SECURITY DEFINER` functions that check the caller themselves, so calling the database directly does not bypass the rules.
 
 Foreign keys cascade account and place deletions to dependent records. User list queries join places in one request rather than fetching every place separately. Batches of 500 prevent provider row limits from truncating large catalogues. Results have deterministic ordering. Indexes cover the saved-list ownership/kind/order query, reverse place foreign key, published catalogue pages and expired rate-limit cleanup. Nearby search operates on the public catalogue in PHP; at substantially larger scale it should move to a spatial query.
 
@@ -31,7 +34,7 @@ Laravel migration history uses the namespaced `mt_migrations` table, with RLS en
 ## Migrations and seeds
 
 - `2026_09_26_000001_install_madatours_schema.php` adopts or installs the namespaced Supabase schema without dropping application data.
-- `2026_09_26_000002_index_catalogue_queries.php` adds the query indexes to new and existing projects.
+- Each later migration applies one schema file (the administration migration also re-applies `community.sql` and `review-photos.sql`, which changed for hidden reviews). `db:export-setup` concatenates the same files, in the same order, into `supabase/setup.sql`.
 - `CatalogueSeed` is shared by `DatabaseSeeder` and `db:export-setup`. It uses one transaction and an advisory lock, fills only missing IDs on first initialization, preserves the identity sequence and records `catalogue_seeded`. Later runs preserve intentional edits and deletions.
 - The base migration deliberately refuses rollback because it can adopt existing account-linked data. Do not use `migrate:fresh`, `db:wipe` or migration rollback against a shared Supabase project. Restore a reviewed backup when reversing adoption.
 

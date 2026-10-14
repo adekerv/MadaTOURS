@@ -37,7 +37,7 @@ A real Chromium browser at 390 × 844 signed in on the public site, saved Jardin
 
 ## Remaining release verification
 
-Follow [CLASS-DEMO.md](CLASS-DEMO.md) on your own computer and phone before class. Actual inbox delivery, configured verification/recovery email templates and the choice between demo accounts and public signup remain unverified.
+Follow [CLASS-DEMO.md](../CLASS-DEMO.md) on your own computer and phone before class. Actual inbox delivery, configured verification/recovery email templates and the choice between demo accounts and public signup remain unverified.
 
 Physical iPhone/iPad/Android testing, native compilation/signing, native cookie persistence, App Store review, load testing, backups/restoration and exhaustive venue verification are not completed. The local Java SDK is ignored and has been removed from Git tracking; it is excluded from deployment.
 

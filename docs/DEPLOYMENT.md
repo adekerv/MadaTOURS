@@ -27,7 +27,7 @@ php artisan supabase:check
 
 Run database migrations once in a controlled release step, after a backup. Container startup deliberately does not migrate a shared database. SQL Editor installations can use `php artisan db:export-setup`; later `migrate --seed` safely records the Laravel migration history. The first migration requires Supabase's existing auth schema.
 
-`/up` checks application liveness. `/api/health` checks the database schema through the public Data API. After release, verify immediate signup and the welcome message, login, saved lists in another browser, recovery and admin changes. Existing Express cookies are replaced by Laravel sessions, so users sign in again.
+`/up` checks application liveness. `/api/health` checks the database schema through the public Data API. After release, verify signup and its recovery codes, login, saved lists in another browser, a password reset with a recovery code, and a change in the admin dashboard. Create the first administrator with `php artisan admin:seed` (see [database setup](SUPABASE-SETUP.md#4-run-and-provision-administrators)).
 
 ## Vercel
 
@@ -45,7 +45,7 @@ php artisan key:generate --show | vercel env add APP_KEY production
 openssl rand -hex 32 | vercel env add CRON_SECRET production
 ```
 
-Optional: `GOOGLE_PLACES_API_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, and `APP_ORIGIN` set to a custom domain. Deploy a preview with `vercel deploy`, check `/api/health`, then promote with `vercel deploy --prod`.
+Optional: `GOOGLE_PLACES_API_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, `ORS_API_KEY` for tour road routes, and `APP_ORIGIN` set to a custom domain. Deploy a preview with `vercel deploy`, check `/api/health`, then promote with `vercel deploy --prod`.
 
 ## Recurring tasks
 

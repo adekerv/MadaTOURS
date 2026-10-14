@@ -7,7 +7,7 @@ Laravel 13 API plus a React 19 / Vite single-page app (Leaflet maps drawn by Map
 - `php artisan test` PHP suite; format with `vendor/bin/pint --format agent`
 - `npm run lint` (eslint + tsc), `npm run format:check`, `npm test` (node:test with PGlite), `npm run build`
 - `npx playwright test` browser suite, Chromium + WebKit (iPhone 13), about 10 minutes. It builds and starts its own server (app on 3100, test provider on 3101), so do not edit code while it runs
-- `php artisan db:export-setup` regenerates `supabase/setup.sql` from `database/schema/*.sql` (list the file in `ExportDatabase.php`). Live schema is installed by pasting SQL into the Supabase SQL editor; there is no migrations table
+- `php artisan db:export-setup` regenerates `supabase/setup.sql` from `database/schema/*.sql` (list the file in `ExportDatabase.php` and add a migration that applies it). Live schema is installed by pasting SQL into the Supabase SQL editor; there is no migrations table
 - `php artisan tours:compute-routes [--all] [--id=3]`, `php artisan account:reset-password {email}` (last-resort recovery)
 
 ## Decisions (ask before changing)

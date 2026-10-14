@@ -1,7 +1,9 @@
 # Accounts without email
 
-MadaTours has no email provider, so nothing in the app sends mail. Accounts use Supabase Auth with email and
-password (or Google), and a forgotten password is reset with a one-time recovery code instead of an email link.
+MadaTours needs no email provider: no sign-in step depends on mail. Accounts use Supabase Auth with email and
+password (or Google), and a forgotten password is reset with a one-time recovery code instead of an email link. The
+only mail is an optional welcome message, which stays in the Laravel log unless SMTP is configured (see
+[database setup](SUPABASE-SETUP.md#3-accounts-without-email)).
 
 ## What you must set up in Supabase (once)
 
@@ -25,8 +27,8 @@ password (or Google), and a forgotten password is reset with a one-time recovery
   signed out after a reset. All failures read the same, so the screen never says whether an email exists.
 - **Rate limit**: five reset attempts per email and `AUTH_ATTEMPTS_PER_IP` (default 30) per address, per 15 minutes.
   Refused attempts never reach the code check.
-- **New codes**: Settings → Account recovery, with the current password. They replace the whole old set.
-- **Email change**: Settings → Email address. The current password is the proof and the address changes at once.
+- **New codes**: My account → Account recovery, with the current password. They replace the whole old set.
+- **Email change**: My account → Email address. The current password is the proof and the address changes at once.
   An unchecked address cannot count as verified, so a verified account loses that status (the database does this in
   the same step as the change).
 - **Meet-ups** need a verified email. With no email, the only proof is Google's: an account that continues with

@@ -1,77 +1,90 @@
 # MadaTours
 
-A Laravel 13 application for discovering Martinique, with a React 19 / TypeScript interface, Leaflet maps, and Supabase PostgreSQL and Auth. Laravel serves the website and every API endpoint; Vite builds the interface. Capacitor projects support iOS and Android.
+A bilingual (French and English) guide to Martinique: 354 published restaurants, beaches, gardens, rum estates and outings on an interactive map, with day planning, curated island tours, reviews and meet-ups.
 
-Browse 354 published places, search in French or English, create an account with no email sent (a forgotten password is reset with a one-time recovery code), save favorites and revisit lists across devices, and manage places as an administrator. Day plans and offline place copies remain on the device; map tiles and itineraries are not synced offline.
+**Live site: [mada-tours.vercel.app](https://mada-tours.vercel.app)**
 
-## Requirements and local setup
+Laravel 13 serves the website and every API endpoint. The interface is React 19 and TypeScript, built by Vite, with Leaflet maps drawn from OpenFreeMap vector tiles. Supabase provides PostgreSQL (with row-level security), authentication and photo storage. Capacitor projects package the same interface for iOS and Android.
 
-- PHP 8.3+ with Composer 2, cURL, mbstring, XML, OpenSSL and PDO PostgreSQL. The development test suite requires PHP 8.3+.
-- Node 22.13+ and npm (CI uses PHP 8.5 / Node 24).
-- A Supabase project for accounts and persistent data.
+## Features
+
+- **Explore**: search in either language (accents ignored), filter by town, category, experience and distance, and open each place's facts, sources, hours and photos. Filters are shareable links; GPS coordinates never go into them.
+- **Plan**: build day trips on the device, reorder stops by distance, and get directions. Saved places and the app shell stay readable offline.
+- **Island tours**: routes between places, curated by administrators, drawn on the road by OpenRouteService.
+- **Accounts without email**: sign up with an email and password or with Google. A forgotten password is reset with one of eight one-time recovery codes, so no mail server is needed.
+- **Community**: favorites and a revisit list synced across devices, reviews with photos, check-ins, followers and meet-ups. Only Google-verified accounts can join meet-ups.
+- **Administration**: a full dashboard at `#admin` covering places, tours, meet-ups, users, reviews, the contact inbox, submissions, photo permissions, sources and Google matching, site content and an activity log.
+- **Honest content**: every listing cites its sources. Places without their own photo show an icon or a stock photo clearly labelled "not this place", and closures are applied only after review.
+
+## Run it locally
+
+You need PHP 8.3+ (CI uses 8.5) with Composer 2 and the cURL, mbstring, XML, OpenSSL and PDO PostgreSQL extensions, plus Node 22.13+ and a Supabase project.
 
 ```sh
 composer install
 npm ci
-# New installation only. Do not overwrite existing private configuration.
-cp -n .env.example .env
+cp -n .env.example .env   # new installation only; never overwrite private configuration
 php artisan key:generate
 ```
 
-Set the three server-only `SUPABASE_*` settings in `.env`. Existing `.env.local` installations remain supported when `.env` is absent; transfer their settings before switching to `.env`. Keep `APP_URL` and `APP_ORIGIN` equal to `http://127.0.0.1:8000` locally. Never put secrets in `VITE_*` variables.
+In `.env`, set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` (all server-only), and keep `APP_URL` and `APP_ORIGIN` at `http://127.0.0.1:8000`. Never put secrets in `VITE_*` variables. An existing `.env.local` is still read when `.env` is absent.
 
-Initialize the database with a Supabase **direct or session-pooler** connection in `DB_URL`:
+Install the schema and starter catalogue, using either method:
+
+- **With a database connection**: set `DB_URL` to the Supabase direct or session-pooler URI, then run `php artisan migrate --seed`.
+- **Without one**: run `php artisan db:export-setup` and paste the generated `supabase/setup.sql` into the Supabase SQL Editor.
+
+Both use the same schema files and seed. Reruns keep later edits and deletions. Then:
 
 ```sh
-php artisan migrate --seed
-php artisan supabase:check
-composer dev
+php artisan supabase:check   # read-only check of the schema and catalogue
+php artisan admin:seed       # first administrator, from ADMIN_EMAIL and ADMIN_PASSWORD
+composer dev                 # Laravel and Vite together
 ```
 
-Open **http://127.0.0.1:8000**. `composer dev` starts Laravel and Vite together. `npm run dev` starts only Vite; it is not the application server. For a built interface, use `npm run build` followed by `php artisan serve --host=127.0.0.1`.
+Open **http://127.0.0.1:8000**. `npm run dev` starts only Vite; it is not the application server. In the Supabase dashboard, turn off **Confirm email** and **Secure email change** (see [accounts without email](docs/ACCOUNTS-WITHOUT-EMAIL.md)).
 
-Without database connection credentials, `php artisan db:export-setup` generates `supabase/setup.sql` for the Supabase SQL Editor. Both paths use the same schema and seed. See [database setup](docs/SUPABASE-SETUP.md) for existing-project adoption and email configuration. The initial seed runs once and preserves subsequent edits and deletions.
-
-## Structure
-
-| Path                                               | Responsibility                                                        |
-| -------------------------------------------------- | --------------------------------------------------------------------- |
-| `app/Http/Controllers`                             | Small controllers for accounts, places, saved lists and health        |
-| `app/Http/Requests`                                | Input validation and request authorization                            |
-| `app/Http/Resources`                               | Public API response shape                                             |
-| `app/Services`                                     | Authentication, provider transport and nearby search                  |
-| `app/Repositories`                                 | Database queries with each user's row-level permissions               |
-| `app/Console/Commands`                             | Database export, provider checks and admin provisioning               |
-| `routes`                                           | Laravel web, API and console routes                                   |
-| `database/migrations`, `database/schema`           | Versioned PostgreSQL schema and indexes                               |
-| `database/seeders`, `database/data`                | Repeat-safe catalogue initialization and source data                  |
-| `resources/js`, `resources/css`, `resources/views` | React interface, styles and Blade entry point                         |
-| `tests/Feature`, `tests/Unit`                      | Laravel behavior, security and service tests                          |
-| `tests/*.test.ts`, `tests/e2e`                     | PostgreSQL policies, API integration, content and browser checks      |
-| `scripts`                                          | Content research/import, email configuration and native asset tooling |
-| `public/photos`, `supabase`                        | Licensed photos, catalogue research and email templates               |
-
-Supabase remains the identity and database provider so existing accounts, IDs and saved lists survive the migration. Laravel uses its HTTP client and repositories for ordinary Data API queries, passing the user's token to enforce PostgreSQL RLS. PDO is reserved for migrations and seeding; application requests never use an unrestricted database connection. See [architecture](docs/DATABASE.md).
-
-## Checks and maintenance
+## Checks
 
 ```sh
-composer check                 # PHP formatting and Laravel tests
-npm run lint                   # ESLint and TypeScript
-npm test                       # Laravel HTTP + isolated PostgreSQL, content and utility tests
-npm run build                  # Typecheck and production web build
+composer check               # Pint and the PHP tests
+npm run lint                 # ESLint and TypeScript
+npm test                     # API, PostgreSQL RLS, content and utility tests on an in-memory PostgreSQL
+npm run build                # typecheck and production build
 npx playwright install chromium webkit
-npm run test:e2e                # Desktop/mobile flows through Laravel
+npm run test:e2e             # browser flows in Chromium and WebKit (iPhone 13), about 10 minutes
 npm run format:check
-php artisan admin:create your-email@example.com --name="Your name"
 ```
 
-Automated tests use an isolated PostgreSQL engine and an Auth contract double; they do not use real accounts or send email. `php artisan supabase:check` is a read-only live check. The opt-in `npm run test:live -- --run --url http://127.0.0.1:8000` tests the running Laravel server with temporary Supabase accounts and cleans them up. Actual inbox delivery needs a separate check.
+The automated tests use an in-memory PostgreSQL engine and a stand-in for Supabase Auth, so they never touch real accounts.
 
-## Deployment and mobile
+## Project layout
 
-The live site is this Laravel application on Vercel at **https://mada-tours.vercel.app**, run as one PHP function (`vercel.json`, `api/index.php`) with the Vercel Supabase integration. The Dockerfile and the optional Render blueprint remain for PHP/container hosts. The document root is `public/`; the build output is `public/build/`. [Deployment instructions](docs/DEPLOYMENT.md) cover environment variables, database changes, sessions and recurring tasks. Database changes are not applied by a deployment: apply new `database/schema` files to Supabase separately (see [database setup](docs/SUPABASE-SETUP.md)).
+| Path                                               | Contents                                                                    |
+| -------------------------------------------------- | --------------------------------------------------------------------------- |
+| `app/Http/Controllers`, `app/Http/Requests`        | API endpoints and their validation and authorization                        |
+| `app/Services`, `app/Repositories`                 | Supabase Auth and Data API access, routing, photos, sources, recurring jobs |
+| `app/Console/Commands`                             | Setup export, admin provisioning, account recovery, tour routes, checks     |
+| `database/schema`, `database/migrations`           | The PostgreSQL schema with its RLS policies, and migrations that apply it   |
+| `database/data`, `supabase/catalogue`              | The starter catalogue and reviewed correction batches                       |
+| `resources/js`, `resources/css`, `resources/views` | React interface, styles and the Blade entry point                           |
+| `tests`                                            | PHP tests, Node integration tests and Playwright browser tests              |
+| `scripts`                                          | Catalogue research, audits, photo tooling and store assets                  |
+| `ios`, `android`, `native-assets`                  | Capacitor projects, icons and store material                                |
 
-Keep `VITE_API_URL` empty for the website. Native builds use `dist/mobile` and the deployed Laravel HTTPS origin; see [mobile guide](docs/MOBILE.md). Native signing and store submission are separate release steps.
+Every request is checked by Laravel and again by PostgreSQL row-level security: the server queries Supabase with each user's own token, and no request uses an unrestricted database connection. See [architecture](docs/DATABASE.md).
 
-Additional guides: [accounts without email](docs/ACCOUNTS-WITHOUT-EMAIL.md), [maps](docs/MAPS.md), [tours and road routes](docs/TOURS.md), [source facts and listing audit](docs/SOURCES-AND-AUDIT.md), [catalogue research](docs/CATALOGUE-RESEARCH.md), [content and photo credits](docs/CONTENT.md), [class demonstration](docs/CLASS-DEMO.md), [verification](docs/VERIFICATION.md).
+## Deployment
+
+Production runs on Vercel as one PHP function (`vercel.json`, `api/index.php`), with the Supabase integration and a daily Vercel Cron. A deployment never changes the database: apply new `database/schema` files in the Supabase SQL Editor as a separate step. The Dockerfile and `render.yaml` remain for PHP and container hosts. See [deployment](docs/DEPLOYMENT.md) and [mobile](docs/MOBILE.md).
+
+## Documentation
+
+- [Database setup](docs/SUPABASE-SETUP.md) · [Architecture](docs/DATABASE.md) · [Deployment](docs/DEPLOYMENT.md)
+- [Accounts without email](docs/ACCOUNTS-WITHOUT-EMAIL.md) · [Maps](docs/MAPS.md) · [Tours and road routes](docs/TOURS.md)
+- [Content and photos](docs/CONTENT.md) · [Source facts and listing audit](docs/SOURCES-AND-AUDIT.md) · [Catalogue research](docs/CATALOGUE-RESEARCH.md)
+- [Mobile apps](docs/MOBILE.md) · [Class demonstration](docs/CLASS-DEMO.md) · [Status and next steps](docs/IMPROVEMENTS.md)
+
+## Credits
+
+Map data © OpenStreetMap contributors, tiles by OpenFreeMap, road routes © openrouteservice.org by HeiGIT. Venue facts come from the Martinique tourism board and local tourism offices, cited on each listing. Photos are credited in [public/photos/CREDITS.md](public/photos/CREDITS.md) and [public/assets/placeholders/CREDITS.md](public/assets/placeholders/CREDITS.md).

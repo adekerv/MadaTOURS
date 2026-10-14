@@ -5,16 +5,19 @@ A **tour** is an ordered route between published places that an administrator cu
 
 ## Saving a tour
 
-Administrators manage tours in **Manage places → Tours** (`resources/js/components/admin/TourManager.tsx`). The API is
+Administrators manage tours in the admin dashboard under **Tours** (`#admin/tours`,
+`resources/js/components/admin/AdminTours.tsx`), where a tour can also be duplicated or featured. The API is
 admin-only for writes (`app/Http/Controllers/TourController.php`) and the `mt_tours` table enforces the same rule in
 Postgres with row-level security (`database/schema/tours.sql`).
 
 | Route                                     | What it does                          |
 | ----------------------------------------- | ------------------------------------- |
 | `GET /api/tours`                          | Published tours, public, no session.  |
+| `GET /api/tours/{id}`                     | One tour with its road line (public). |
 | `GET /api/moderation/tours`               | Every tour including drafts (admin).  |
 | `POST /api/tours`, `POST /api/tours/{id}` | Create or edit (admin).               |
 | `POST /api/tours/{id}/route`              | Ask for the road route again (admin). |
+| `POST /api/tours/{id}/duplicate`          | Copy a tour as a new draft (admin).   |
 | `DELETE /api/tours/{id}`                  | Delete (admin).                       |
 
 ## How the road route works
