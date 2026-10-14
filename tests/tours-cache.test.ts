@@ -9,6 +9,8 @@ const tour: Tour = {
   description: 'Beaches and a lighthouse.',
   descriptionFr: null,
   published: true,
+  featured: false,
+  image: null,
   stops: [
     { placeId: 1, minutes: 60 },
     { placeId: 2, minutes: 45 },

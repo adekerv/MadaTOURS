@@ -1,19 +1,7 @@
 import { MustGo } from './home/MustGo';
 import { Tours } from './home/Tours';
 import { useI18n } from '../i18n/I18nProvider';
-import {
-  Compass,
-  ArrowUpRight,
-  Utensils,
-  Mountain,
-  Gamepad2,
-  LogIn,
-  LogOut,
-  Settings,
-  ShieldCheck,
-  Heart,
-  Calendar,
-} from 'lucide-react';
+import { Compass, ArrowUpRight, Utensils, Mountain, Gamepad2, Heart, Calendar } from 'lucide-react';
 import type { ExploreParams, Place, User } from '../types';
 import { SavedPlaceCard } from './home/SavedPlaceCard';
 import { SearchBar } from './home/SearchBar';
@@ -23,6 +11,9 @@ import { OnboardingHint } from './home/OnboardingHint';
 import { SiteFooter } from './ui/SiteFooter';
 import { CoastlineArt } from './home/CoastlineArt';
 import { PlacePhoto, PlaceCardSkeleton } from './ui/PlacePhoto';
+import { AccountMenu } from './ui/AccountMenu';
+import { localized, useSiteSettings } from '../lib/site';
+import { useSession } from '../lib/session';
 interface Props {
   onPlanDay: () => void;
   onCommunity: () => void;
@@ -40,12 +31,7 @@ interface Props {
   onRemoveFavorite: (place: Place) => void;
   onRemoveRevisit: (place: Place) => void;
   user: User | null;
-  sessionLoading: boolean;
   collectionsLoading: boolean;
-  onLoginClick: () => void;
-  onLogout: () => void;
-  onAdminClick: () => void;
-  onAccountClick: () => void;
 }
 const features = [
   {
@@ -93,14 +79,13 @@ export function Homepage({
   onRemoveFavorite,
   onRemoveRevisit,
   user,
-  sessionLoading,
   collectionsLoading,
-  onLoginClick,
-  onLogout,
-  onAdminClick,
-  onAccountClick,
 }: Props) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const sessionLoading = useSession().loading;
+  const hero = useSiteSettings()?.hero;
+  const heroTitle = hero ? localized(language, hero.title, hero.titleFr) : null;
+  const heroSubtitle = hero ? localized(language, hero.subtitle, hero.subtitleFr) : null;
   return (
     <div className="home-shell mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
       <header className="relative z-20 flex flex-wrap items-center gap-x-3 gap-y-3 border-b border-slate-200/70 py-4">
@@ -126,38 +111,7 @@ export function Homepage({
           className="order-2 ml-auto flex items-center gap-1 sm:gap-2 xl:order-4"
         >
           <LanguageSelect />
-          {sessionLoading ? (
-            <span role="status" className="text-sm text-slate-500">
-              {t('Connecting…')}
-            </span>
-          ) : user ? (
-            <>
-              {user.role === 'admin' && (
-                <button
-                  onClick={onAdminClick}
-                  className="icon-button"
-                  aria-label={t('Manage places')}
-                >
-                  <ShieldCheck size={21} />
-                </button>
-              )}
-              <button
-                onClick={onAccountClick}
-                className="icon-button"
-                aria-label={t('Your account')}
-              >
-                <Settings size={21} />
-              </button>
-              <button onClick={onLogout} className="icon-button" aria-label={t('Sign out')}>
-                <LogOut size={21} />
-              </button>
-            </>
-          ) : (
-            <button onClick={onLoginClick} className="secondary-button flex items-center gap-2">
-              <LogIn size={17} />
-              <span>{t('Sign in')}</span>
-            </button>
-          )}
+          <AccountMenu />
         </nav>
         <div className="order-4 w-full xl:order-3 xl:ml-auto xl:w-56">
           <SearchBar
@@ -202,14 +156,26 @@ export function Homepage({
             <Compass size={16} />
             {t('Your island, your adventure')}
           </p>
+          {hero?.image && (
+            <img
+              src={hero.image}
+              alt=""
+              className="mx-auto mb-8 h-48 w-full max-w-4xl rounded-3xl object-cover sm:h-72"
+            />
+          )}
           <h1 className="mx-auto max-w-4xl text-[clamp(2.5rem,7vw,5.6rem)] font-bold leading-[1.05] tracking-tight text-slate-900">
-            {t('A little closer to')} <br />
-            <span className="font-serif italic text-orange-600">Martinique.</span>
+            {heroTitle ?? (
+              <>
+                {t('A little closer to')} <br />
+                <span className="font-serif italic text-orange-600">Martinique.</span>
+              </>
+            )}
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-base sm:text-lg leading-relaxed text-slate-600">
-            {t(
-              'Find your next favorite beach, a new trail, or a table by the sea. Explore the island at your own pace.',
-            )}
+            {heroSubtitle ??
+              t(
+                'Find your next favorite beach, a new trail, or a table by the sea. Explore the island at your own pace.',
+              )}
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <button

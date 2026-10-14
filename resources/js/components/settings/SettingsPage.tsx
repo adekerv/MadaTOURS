@@ -7,6 +7,9 @@ import { DeleteAccount } from './DeleteAccount';
 import { EmailSection } from './EmailSection';
 import { ProfileForm } from './ProfileForm';
 import { RecoverySection } from './RecoverySection';
+import { PasswordSection } from './PasswordSection';
+import { ActivitySection } from './ActivitySection';
+import { AccountMenu } from '../ui/AccountMenu';
 export function SettingsPage({
   user,
   sessionLoading,
@@ -28,13 +31,18 @@ export function SettingsPage({
           <ArrowLeft size={20} />
           {t('Back to home')}
         </a>
-        <LanguageSelect />
+        <div className="flex items-center gap-1 sm:gap-2">
+          <LanguageSelect />
+          <AccountMenu />
+        </div>
       </header>
       <main id="main-content" tabIndex={-1} className="py-8 sm:py-12">
         <p className="text-xs font-semibold uppercase tracking-widest text-orange-700">MADATOURS</p>
-        <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{t('Account settings')}</h1>
+        <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{t('My account')}</h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
-          {t('Change your name, email address and recovery codes, or delete your account.')}
+          {t(
+            'Change your name, email address, password and recovery codes, see your meet-ups and reviews, or delete your account.',
+          )}
         </p>
         {sessionLoading ? (
           <p role="status" className="mt-8 text-slate-600">
@@ -44,6 +52,8 @@ export function SettingsPage({
           <div className="mt-8 space-y-6">
             <ProfileForm key={user.id} user={user} onSaved={onUserChange} />
             <EmailSection user={user} onChanged={onUserChange} />
+            <PasswordSection user={user} />
+            <ActivitySection key={user.id} />
             <RecoverySection user={user} />
             <DeleteAccount key={user.id} user={user} onDeleted={onDeleted} />
           </div>

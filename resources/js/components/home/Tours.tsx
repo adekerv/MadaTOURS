@@ -199,19 +199,31 @@ export function Tours({ places, placesLoading }: { places: Place[]; placesLoadin
             <button
               type="button"
               onClick={() => setOpen(tour)}
-              className="place-card flex h-full w-full flex-col rounded-2xl border border-slate-200 bg-white p-5 text-left"
+              className="place-card flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left"
             >
-              <Route className="text-orange-600" size={22} aria-hidden="true" />
-              <h3 className="mt-3 text-lg font-bold">{tourName(tour, language)}</h3>
-              <p className="mt-2 line-clamp-3 text-sm text-slate-600">
-                {tourDescription(tour, language)}
-              </p>
-              <span className="mb-4 mt-3 text-sm font-semibold text-orange-800">
-                <RouteFacts tour={tour} />
-              </span>
-              <span className="mt-auto flex items-center gap-2 text-sm font-semibold">
-                {t('View the route')}
-                <ArrowUpRight size={17} aria-hidden="true" />
+              {tour.image && (
+                <img src={tour.image} alt="" loading="lazy" className="h-40 w-full object-cover" />
+              )}
+              <span className="flex flex-1 flex-col p-5">
+                <span className="flex items-center justify-between gap-2">
+                  <Route className="text-orange-600" size={22} aria-hidden="true" />
+                  {tour.featured && (
+                    <span className="rounded-full bg-orange-50 px-2 py-0.5 text-xs font-semibold text-orange-800">
+                      {t('Featured')}
+                    </span>
+                  )}
+                </span>
+                <h3 className="mt-3 text-lg font-bold">{tourName(tour, language)}</h3>
+                <p className="mt-2 line-clamp-3 text-sm text-slate-600">
+                  {tourDescription(tour, language)}
+                </p>
+                <span className="mb-4 mt-3 text-sm font-semibold text-orange-800">
+                  <RouteFacts tour={tour} />
+                </span>
+                <span className="mt-auto flex items-center gap-2 text-sm font-semibold">
+                  {t('View the route')}
+                  <ArrowUpRight size={17} aria-hidden="true" />
+                </span>
               </span>
             </button>
           </li>

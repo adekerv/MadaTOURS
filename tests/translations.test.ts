@@ -37,7 +37,7 @@ test('Literal UI messages have explicit English and French translations', () => 
     function visit(node: ts.Node) {
       if (ts.isCallExpression(node)) {
         const name = node.expression.getText(source);
-        if (['t', 'setError', 'setNotice', 'setSuccess'].includes(name) && node.arguments[0])
+        if (['t', 'setError', 'setNotice', 'setSuccess', 'toast'].includes(name) && node.arguments[0])
           message(node.arguments[0]);
         if (name === 'write' && node.arguments[2]) message(node.arguments[2]);
       }

@@ -1,9 +1,9 @@
-import { useId, useState, type FormEvent } from 'react';
+import { useId, useRef, useState, type FormEvent } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Eye, EyeOff } from 'lucide-react';
 import type { User } from '../../types';
-import { api, errorMessage } from '../../lib/api';
+import { api, ApiError, errorMessage } from '../../lib/api';
 import { Modal } from '../ui/Modal';
+import { PasswordInput } from '../ui/PasswordInput';
 import { RecoveryCodes } from '../account/RecoveryCodes';
 import { useI18n } from '../../i18n/I18nProvider';
 type Mode = 'login' | 'register' | 'recover' | 'codes';
@@ -18,10 +18,15 @@ export function AuthModal({
 }) {
   const { t, language } = useI18n();
   const hint = useId();
+  const mismatchId = useId();
+  const confirmRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmation, setConfirmation] = useState('');
+  const [confirmTouched, setConfirmTouched] = useState(false);
+  const [emailTaken, setEmailTaken] = useState(false);
   const [code, setCode] = useState('');
   const [codes, setCodes] = useState<string[]>([]);
   const [created, setCreated] = useState<User | null>(null);
@@ -29,7 +34,6 @@ export function AuthModal({
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const titles: Record<Mode, string> = {
     login: 'Welcome to MadaTours',
     register: 'Create your account',
@@ -39,15 +43,27 @@ export function AuthModal({
   const change = (next: Mode) => {
     setMode(next);
     setPassword('');
+    setConfirmation('');
+    setConfirmTouched(false);
+    setEmailTaken(false);
     setCode('');
     setError('');
     setMessage('');
   };
+  const confirms = mode === 'register' || mode === 'recover';
+  const mismatch = confirms && confirmation !== '' && confirmation !== password;
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (busy) return;
+    if (confirms && confirmation !== password) {
+      // Shown under the field and announced; nothing is sent until the two match.
+      setConfirmTouched(true);
+      confirmRef.current?.focus();
+      return;
+    }
     setBusy(true);
     setError('');
+    setEmailTaken(false);
     setMessage('');
     try {
       const result = await api<{
@@ -60,7 +76,7 @@ export function AuthModal({
           email,
           password,
           ...(mode === 'recover' ? { code } : {}),
-          ...(mode === 'register' ? { name, language } : {}),
+          ...(mode === 'register' ? { name, language, password_confirmation: confirmation } : {}),
         }),
       });
       if (result.user) {
@@ -85,6 +101,7 @@ export function AuthModal({
       }
     } catch (error) {
       setError(errorMessage(error));
+      setEmailTaken(mode === 'register' && error instanceof ApiError && error.status === 409);
     } finally {
       setBusy(false);
     }
@@ -212,33 +229,43 @@ export function AuthModal({
         {needsPassword && (
           <label className="field-label">
             {t(mode === 'recover' ? 'New password' : 'Password')}
-            <span className="relative block">
-              <input
-                aria-label={t(mode === 'recover' ? 'New password' : 'Password')}
-                aria-describedby={mode !== 'login' ? hint : undefined}
-                type={showPassword ? 'text' : 'password'}
-                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                minLength={mode === 'login' ? 1 : 12}
-                maxLength={128}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="field-input pr-14"
-                disabled={busy}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((value) => !value)}
-                aria-label={t(showPassword ? 'Hide password' : 'Show password')}
-                aria-pressed={showPassword}
-                className="absolute inset-y-0 right-0 flex min-h-11 min-w-11 items-center justify-center rounded-r-xl px-3 text-slate-600 hover:text-orange-800"
-              >
-                {showPassword ? <EyeOff size={20} aria-hidden /> : <Eye size={20} aria-hidden />}
-              </button>
-            </span>
+            <PasswordInput
+              aria-label={t(mode === 'recover' ? 'New password' : 'Password')}
+              aria-describedby={mode !== 'login' ? hint : undefined}
+              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+              minLength={mode === 'login' ? 1 : 12}
+              maxLength={128}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={busy}
+            />
             {mode !== 'login' && (
               <span id={hint} className="text-sm font-normal text-slate-600">
                 {t('Use at least 12 characters. A few memorable words work well.')}
+              </span>
+            )}
+          </label>
+        )}
+        {confirms && (
+          <label className="field-label">
+            {t(mode === 'recover' ? 'Confirm new password' : 'Confirm password')}
+            <PasswordInput
+              ref={confirmRef}
+              aria-label={t(mode === 'recover' ? 'Confirm new password' : 'Confirm password')}
+              aria-invalid={mismatch && confirmTouched}
+              aria-describedby={mismatch && confirmTouched ? mismatchId : undefined}
+              autoComplete="new-password"
+              maxLength={128}
+              required
+              value={confirmation}
+              onChange={(e) => setConfirmation(e.target.value)}
+              onBlur={() => setConfirmTouched(true)}
+              disabled={busy}
+            />
+            {mismatch && confirmTouched && (
+              <span id={mismatchId} role="alert" className="text-sm font-semibold text-red-700">
+                {t('The passwords do not match.')}
               </span>
             )}
           </label>
@@ -249,11 +276,20 @@ export function AuthModal({
           </p>
         )}
         {error && (
-          <p role="alert" className="error-message">
-            {t(error)}
-          </p>
+          <div role="alert" className="error-message">
+            <p>{t(error)}</p>
+            {emailTaken && (
+              <button
+                type="button"
+                className="mt-1 min-h-11 font-semibold text-red-900 underline"
+                onClick={() => change('login')}
+              >
+                {t('Sign in instead')}
+              </button>
+            )}
+          </div>
         )}
-        <button disabled={busy} className="primary-button w-full">
+        <button disabled={busy || (mismatch && confirmTouched)} className="primary-button w-full">
           {t(
             busy
               ? 'Please wait…'

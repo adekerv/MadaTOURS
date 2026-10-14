@@ -1113,3 +1113,159 @@ summary {
 .dark .hero-glow {
   background: #ea580c14;
 }
+
+/* Toasts: stacked at the bottom, above the safe area; they render inside an open dialog when there is one. */
+.toast-stack {
+  position: fixed;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(28rem, calc(100% - 2rem));
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  background: var(--surface-card);
+  color: var(--text-primary);
+  box-shadow: 0 4px 25px #0f172a30;
+  font-size: 0.875rem;
+  pointer-events: auto;
+  animation: toast-in 180ms ease-out;
+}
+.toast-success svg:first-child {
+  color: #15803d;
+}
+.toast-error {
+  border-color: #fecaca;
+}
+.toast-error svg:first-child {
+  color: #b91c1c;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+/* Admin dashboard: a sidebar from tablet width up, a scrollable section bar on phones. */
+.admin-shell {
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+.admin-nav-link {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  border-radius: 0.75rem;
+  padding: 0 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.admin-nav-link:hover {
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+.admin-nav-link[aria-current='page'] {
+  background: #fff1e6;
+  color: #9a3412;
+}
+.dark .admin-nav-link[aria-current='page'] {
+  background: #39291d;
+  color: #ffb987;
+}
+.admin-nav-count {
+  margin-left: auto;
+  border-radius: 999px;
+  background: #c2410c;
+  padding: 0 0.45rem;
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.admin-table th {
+  border-bottom: 1px solid var(--line);
+  padding: 0.6rem 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.admin-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.6rem 0.75rem;
+  vertical-align: middle;
+}
+.admin-table tbody tr:hover {
+  background: var(--surface-muted);
+}
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* A panel that slides in from the right for details and quick edits; full width on phones. */
+.app-dialog.slide-over {
+  margin: 0 0 0 auto;
+  width: min(36rem, 100%);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  border-radius: 0;
+}
+.app-dialog.slide-over[open] {
+  animation: slide-over-in 200ms ease-out;
+}
+.app-dialog.slide-over[open].dialog-closing {
+  animation: slide-over-out 150ms ease-in forwards;
+}
+@keyframes slide-over-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes slide-over-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-dialog.slide-over[open],
+  .app-dialog.slide-over[open].dialog-closing {
+    animation: none;
+  }
+}

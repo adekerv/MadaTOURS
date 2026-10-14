@@ -14,6 +14,9 @@ export const tourSchema = z.object({
   description: z.string(),
   descriptionFr: z.string().nullable(),
   published: z.boolean(),
+  /** Shown first on the homepage. Older cached tours have neither field. */
+  featured: z.boolean().default(false),
+  image: z.string().nullable().default(null),
   stops: z.array(tripStopSchema).min(2).max(25),
   /** Null while only straight lines are known. */
   route: z.object(routeFacts).nullable(),

@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { PasswordInput } from '../ui/PasswordInput';
 import type { User } from '../../types';
 import { api, errorMessage } from '../../lib/api';
 import { useI18n } from '../../i18n/I18nProvider';
@@ -78,9 +79,8 @@ export function RecoverySection({ user }: { user: User }) {
             </p>
             <label className="field-label">
               {t('Current password')}
-              <input
-                type="password"
-                className="field-input"
+              <PasswordInput
+                aria-label={t('Current password')}
                 autoComplete="current-password"
                 required
                 maxLength={128}

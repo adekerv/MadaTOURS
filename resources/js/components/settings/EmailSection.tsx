@@ -3,6 +3,7 @@ import type { User } from '../../types';
 import { api, errorMessage } from '../../lib/api';
 import { useI18n } from '../../i18n/I18nProvider';
 import { VerifiedEmailNotice } from '../account/VerifiedEmailNotice';
+import { PasswordInput } from '../ui/PasswordInput';
 export function EmailSection({ user, onChanged }: { user: User; onChanged: (user: User) => void }) {
   const { t } = useI18n();
   const [email, setEmail] = useState('');
@@ -65,9 +66,8 @@ export function EmailSection({ user, onChanged }: { user: User; onChanged: (user
           </label>
           <label className="field-label">
             {t('Current password')}
-            <input
-              type="password"
-              className="field-input"
+            <PasswordInput
+              aria-label={t('Current password')}
               autoComplete="current-password"
               required
               maxLength={128}

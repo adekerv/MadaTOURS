@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { PasswordInput } from '../ui/PasswordInput';
 import type { User } from '../../types';
 import { api, errorMessage } from '../../lib/api';
 import { useI18n } from '../../i18n/I18nProvider';
@@ -69,9 +70,8 @@ export function DeleteAccount({ user, onDeleted }: { user: User; onDeleted: () =
         {needsPassword ? (
           <label className="field-label">
             {t('Password')}
-            <input
-              type="password"
-              className="field-input"
+            <PasswordInput
+              aria-label={t('Password')}
               autoComplete="current-password"
               required
               maxLength={128}

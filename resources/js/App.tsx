@@ -1,5 +1,5 @@
 import { useI18n } from './i18n/I18nProvider';
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Notice } from './components/ui/Notice';
 import { useNativeBack } from './hooks/useNativeBack';
 import { Homepage } from './components/Homepage';
@@ -11,6 +11,9 @@ import { clearOfflinePlaces, readOfflinePlaces, saveOfflinePlaces } from './lib/
 import { splitSaved } from './lib/places-utils';
 import { readExploreRoute, exploreHash } from './lib/explore-route';
 import type { InformationRoute } from './components/information/InformationPage';
+import { homeFor, SessionContext, type AuthMode, type Session } from './lib/session';
+import { ToastProvider } from './components/ui/Toast';
+import { AnnouncementBanner } from './components/ui/AnnouncementBanner';
 
 const InformationPage = lazy(() =>
   import('./components/information/InformationPage').then((module) => ({
@@ -24,8 +27,14 @@ function readInformationRoute(): InformationRoute | null {
     : null;
 }
 
+/** "#account" is the account page; "#settings" is its earlier address and still opens it. */
 function readSettingsRoute(): boolean {
-  return location.hash.slice(1) === 'settings';
+  return ['account', 'settings'].includes(location.hash.slice(1));
+}
+/** "#admin" opens the dashboard; "#admin/users" and the like open one of its sections. */
+function readAdminRoute(): string | null {
+  const [page, section] = location.hash.slice(1).split('/');
+  return page === 'admin' ? section || 'overview' : null;
 }
 
 const SettingsPage = lazy(() =>
@@ -53,9 +62,9 @@ const OfflinePlacesModal = lazy(() =>
 const ExplorationPage = lazy(() =>
   import('./components/ExplorationPage').then((module) => ({ default: module.ExplorationPage })),
 );
-const AdminDashboard = lazy(() =>
-  import('./components/admin/AdminDashboard').then((module) => ({
-    default: module.AdminDashboard,
+const AdminLayout = lazy(() =>
+  import('./components/admin/AdminLayout').then((module) => ({
+    default: module.AdminLayout,
   })),
 );
 export default function App() {
@@ -65,6 +74,7 @@ export default function App() {
   const [exploreParams, setExploreParams] = useState(() => readExploreRoute(location.hash));
   const [informationRoute, setInformationRoute] = useState(readInformationRoute);
   const [settingsRoute, setSettingsRoute] = useState(readSettingsRoute);
+  const [adminRoute, setAdminRoute] = useState(readAdminRoute);
   const [user, setUser] = useState<User | null>(null);
   const [favorites, setFavorites] = useState<Place[]>([]);
   const [revisits, setRevisits] = useState<Place[]>([]);
@@ -77,8 +87,12 @@ export default function App() {
   const [socialOpen, setSocialOpen] = useState(false);
   const [plannerOpen, setPlannerOpen] = useState(false);
   const [offlineOpen, setOfflineOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
-  const [adminOpen, setAdminOpen] = useState(false);
+  const [auth, setAuth] = useState<{ mode: AuthMode; redirect: boolean } | null>(null);
+  const setAuthMode = useCallback(
+    (mode: AuthMode, options: { redirect?: boolean } = {}) =>
+      setAuth({ mode, redirect: options.redirect ?? false }),
+    [],
+  );
   const [notice, setNotice] = useState('');
   const [sessionLoading, setSessionLoading] = useState(true);
   const [collectionsLoading, setCollectionsLoading] = useState(false);
@@ -92,6 +106,7 @@ export default function App() {
       setExploreParams(readExploreRoute(location.hash));
       setInformationRoute(readInformationRoute());
       setSettingsRoute(readSettingsRoute());
+      setAdminRoute(readAdminRoute());
       window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', onChange);
@@ -256,17 +271,22 @@ export default function App() {
       pending.current.delete(key);
     }
   };
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await api('/auth/logout', { method: 'POST' });
       setUser(null);
       clearOfflinePlaces();
-      setAdminOpen(false);
+      // Pages that only make sense signed in send the person home.
+      if (readSettingsRoute() || readAdminRoute()) location.hash = '';
       setNotice('You have signed out.');
     } catch (error) {
       setNotice(errorMessage(error));
     }
-  };
+  }, []);
+  const session = useMemo<Session>(
+    () => ({ user, loading: sessionLoading, openAuth: setAuthMode, logout, setUser }),
+    [user, sessionLoading, setAuthMode, logout],
+  );
   const startExplore = useCallback((params: ExploreParams = { filter: 'all', radius: 50 }) => {
     location.hash = exploreHash(params);
   }, []);
@@ -279,151 +299,144 @@ export default function App() {
   };
 
   return (
-    <>
-      <a
-        href="#main-content"
-        className="skip-link"
-        onClick={(event) => {
-          event.preventDefault();
-          const main = document.getElementById('main-content');
-          main?.focus();
-          main?.scrollIntoView();
-        }}
-      >
-        {t('Skip to content')}
-      </a>
-      <Suspense
-        fallback={
-          <div role="status" className="grid min-h-dvh place-items-center text-slate-600">
-            {t('Opening MadaTours…')}
-          </div>
-        }
-      >
-        {settingsRoute ? (
-          <SettingsPage
-            user={user}
-            sessionLoading={sessionLoading}
-            onUserChange={setUser}
-            onSignIn={() => setAuthMode('login')}
-            onDeleted={() => {
-              setUser(null);
-              clearOfflinePlaces();
-              location.hash = '';
-              setNotice(t('Your account and its data have been deleted.'));
-            }}
-          />
-        ) : informationRoute ? (
-          <InformationPage
-            onSubmitPlace={() => (user ? setSubmissionOpen(true) : setAuthMode('login'))}
-            page={informationRoute}
-            signedIn={!!user}
-            onAccount={() => (user ? (location.hash = 'settings') : setAuthMode('login'))}
-          />
-        ) : exploreParams ? (
-          <ExplorationPage
-            key={JSON.stringify(exploreParams)}
-            places={places}
-            catalogueStatus={catalogueStatus}
-            onRefreshPlaces={refreshPlaces}
-            onBack={backHome}
-            favorites={favorites}
-            revisits={revisits}
-            onToggleFavorite={(place) => void toggleSaved('favorites', place)}
-            onToggleRevisit={(place) => void toggleSaved('revisits', place)}
-            user={user}
-            onLoginClick={() => setAuthMode('login')}
-            initialParams={exploreParams}
-            onAdminClick={() => setAdminOpen(true)}
-          />
-        ) : (
-          <Homepage
-            onStart={startExplore}
-            onSubmitPlace={() => (user ? setSubmissionOpen(true) : setAuthMode('login'))}
-            onSuggestTrip={() => (user ? setSuggestOpen(true) : setAuthMode('login'))}
-            onCommunity={() => (user ? setSocialOpen(true) : setAuthMode('login'))}
-            onPlanDay={() => setPlannerOpen(true)}
-            onSignup={() => setAuthMode('register')}
-            onOfflineClick={() => setOfflineOpen(true)}
-            places={places}
-            favorites={favorites}
-            catalogueLoading={catalogueStatus === 'loading'}
-            revisits={revisits}
-            unlisted={unlisted}
-            onRemoveUnlisted={(collection, id) => void removeUnlisted(collection, id)}
-            onRemoveFavorite={(place) => void toggleSaved('favorites', place)}
-            onRemoveRevisit={(place) => void toggleSaved('revisits', place)}
-            user={user}
-            sessionLoading={sessionLoading}
-            collectionsLoading={collectionsLoading}
-            onAccountClick={() => (location.hash = 'settings')}
-            onLoginClick={() => setAuthMode('login')}
-            onLogout={() => void logout()}
-            onAdminClick={() => setAdminOpen(true)}
-          />
-        )}
-        {submissionOpen && user && <PlaceSubmissions onClose={() => setSubmissionOpen(false)} />}
-        {suggestOpen && user && (
-          <RouteSuggestion
-            places={places}
-            onClose={() => setSuggestOpen(false)}
-            onSaved={() => {
-              setSuggestOpen(false);
-              setPlannerOpen(true);
-            }}
-          />
-        )}
-        {socialOpen && user && (
-          <SocialHub user={user} places={places} onClose={() => setSocialOpen(false)} />
-        )}
-        {plannerOpen && (
-          <DayPlanner
-            places={places}
-            savedPlaces={[...favorites, ...revisits]}
-            onClose={() => setPlannerOpen(false)}
-          />
-        )}
-        {offlineOpen && <OfflinePlacesModal onClose={() => setOfflineOpen(false)} />}
-        {adminOpen && user?.role === 'admin' && (
-          <AdminDashboard
-            user={user}
-            onClose={() => {
-              setAdminOpen(false);
-              refreshAll();
-            }}
-            onRefreshPlaces={refreshAll}
-          />
-        )}
-      </Suspense>
-      {!exploreParams && catalogueStatus === 'offline' && (
-        <div
-          role="status"
-          className="mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-2xl bg-amber-50 px-4 py-2 text-sm text-amber-900"
-        >
-          <span>
-            {t(
-              "You're offline or the connection is unavailable. Browse the saved guide; updates need a connection.",
-            )}
-          </span>
-          <button onClick={refreshPlaces} className="shrink-0 font-semibold underline">
-            {t('Retry')}
-          </button>
-        </div>
-      )}
-      {authMode && (
-        <AuthModal
-          initialMode={authMode}
-          onClose={() => setAuthMode(null)}
-          onLoginSuccess={(loggedIn, created) => {
-            setUser(loggedIn);
-            setNotice(
-              t(created ? 'Thanks for signing up! Welcome, {name}.' : 'Welcome, {name}.', {
-                name: loggedIn.name,
-              }),
-            );
+    <SessionContext.Provider value={session}>
+      <ToastProvider>
+        <a
+          href="#main-content"
+          className="skip-link"
+          onClick={(event) => {
+            event.preventDefault();
+            const main = document.getElementById('main-content');
+            main?.focus();
+            main?.scrollIntoView();
           }}
-        />
-      )}
-      {notice && <Notice message={notice} onDismiss={() => setNotice('')} />}
-    </>
+        >
+          {t('Skip to content')}
+        </a>
+        <Suspense
+          fallback={
+            <div role="status" className="grid min-h-dvh place-items-center text-slate-600">
+              {t('Opening MadaTours…')}
+            </div>
+          }
+        >
+          {!adminRoute && !exploreParams && <AnnouncementBanner />}
+          {adminRoute ? (
+            <AdminLayout section={adminRoute} places={places} onRefreshPlaces={refreshAll} />
+          ) : settingsRoute ? (
+            <SettingsPage
+              user={user}
+              sessionLoading={sessionLoading}
+              onUserChange={setUser}
+              onSignIn={() => setAuthMode('login')}
+              onDeleted={() => {
+                setUser(null);
+                clearOfflinePlaces();
+                location.hash = '';
+                setNotice(t('Your account and its data have been deleted.'));
+              }}
+            />
+          ) : informationRoute ? (
+            <InformationPage
+              onSubmitPlace={() => (user ? setSubmissionOpen(true) : setAuthMode('login'))}
+              page={informationRoute}
+              signedIn={!!user}
+              onAccount={() => (user ? (location.hash = 'account') : setAuthMode('login'))}
+            />
+          ) : exploreParams ? (
+            <ExplorationPage
+              key={JSON.stringify(exploreParams)}
+              places={places}
+              catalogueStatus={catalogueStatus}
+              onRefreshPlaces={refreshPlaces}
+              onBack={backHome}
+              favorites={favorites}
+              revisits={revisits}
+              onToggleFavorite={(place) => void toggleSaved('favorites', place)}
+              onToggleRevisit={(place) => void toggleSaved('revisits', place)}
+              user={user}
+              onLoginClick={() => setAuthMode('login')}
+              initialParams={exploreParams}
+              onAdminClick={() => (location.hash = 'admin/places')}
+            />
+          ) : (
+            <Homepage
+              onStart={startExplore}
+              onSubmitPlace={() => (user ? setSubmissionOpen(true) : setAuthMode('login'))}
+              onSuggestTrip={() => (user ? setSuggestOpen(true) : setAuthMode('login'))}
+              onCommunity={() => (user ? setSocialOpen(true) : setAuthMode('login'))}
+              onPlanDay={() => setPlannerOpen(true)}
+              onSignup={() => setAuthMode('register')}
+              onOfflineClick={() => setOfflineOpen(true)}
+              places={places}
+              favorites={favorites}
+              catalogueLoading={catalogueStatus === 'loading'}
+              revisits={revisits}
+              unlisted={unlisted}
+              onRemoveUnlisted={(collection, id) => void removeUnlisted(collection, id)}
+              onRemoveFavorite={(place) => void toggleSaved('favorites', place)}
+              onRemoveRevisit={(place) => void toggleSaved('revisits', place)}
+              user={user}
+              collectionsLoading={collectionsLoading}
+            />
+          )}
+          {submissionOpen && user && <PlaceSubmissions onClose={() => setSubmissionOpen(false)} />}
+          {suggestOpen && user && (
+            <RouteSuggestion
+              places={places}
+              onClose={() => setSuggestOpen(false)}
+              onSaved={() => {
+                setSuggestOpen(false);
+                setPlannerOpen(true);
+              }}
+            />
+          )}
+          {socialOpen && user && (
+            <SocialHub user={user} places={places} onClose={() => setSocialOpen(false)} />
+          )}
+          {plannerOpen && (
+            <DayPlanner
+              places={places}
+              savedPlaces={[...favorites, ...revisits]}
+              onClose={() => setPlannerOpen(false)}
+            />
+          )}
+          {offlineOpen && <OfflinePlacesModal onClose={() => setOfflineOpen(false)} />}
+        </Suspense>
+        {!exploreParams && catalogueStatus === 'offline' && (
+          <div
+            role="status"
+            className="mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-2xl bg-amber-50 px-4 py-2 text-sm text-amber-900"
+          >
+            <span>
+              {t(
+                "You're offline or the connection is unavailable. Browse the saved guide; updates need a connection.",
+              )}
+            </span>
+            <button onClick={refreshPlaces} className="shrink-0 font-semibold underline">
+              {t('Retry')}
+            </button>
+          </div>
+        )}
+        {auth && (
+          <AuthModal
+            initialMode={auth.mode}
+            onClose={() => setAuth(null)}
+            onLoginSuccess={(loggedIn, created) => {
+              setUser(loggedIn);
+              // From the navbar, people land on their account or the dashboard; from an action (saving a place,
+              // suggesting one) they stay where they were to finish it.
+              if (auth.redirect) location.hash = homeFor(loggedIn);
+              setNotice(
+                t(created ? 'Thanks for signing up! Welcome, {name}.' : 'Welcome, {name}.', {
+                  name: loggedIn.name,
+                }),
+              );
+            }}
+          />
+        )}
+        {notice && <Notice message={notice} onDismiss={() => setNotice('')} />}
+      </ToastProvider>
+    </SessionContext.Provider>
   );
 }

@@ -1,4 +1,12 @@
 import { useI18n } from '../../i18n/I18nProvider';
+import { useSiteSettings } from '../../lib/site';
+
+const socialNames = {
+  instagram: 'Instagram',
+  facebook: 'Facebook',
+  tiktok: 'TikTok',
+  youtube: 'YouTube',
+};
 /**
  * Account links appear only for a signed-in visitor. Deleting an account lives in Account settings; the public
  * "Delete your account" page stays reachable at its address (app stores ask for one) and from the Privacy page.
@@ -11,6 +19,10 @@ export function SiteFooter({
   signedIn?: boolean;
 }) {
   const { t } = useI18n();
+  const social = useSiteSettings()?.social;
+  const socialLinks = social
+    ? (Object.keys(socialNames) as (keyof typeof socialNames)[]).filter((key) => social[key])
+    : [];
   return (
     <footer className="site-footer mt-8 border-t border-slate-200 py-7 text-sm text-slate-600">
       <div className="flex flex-wrap items-center justify-between gap-5">
@@ -31,7 +43,7 @@ export function SiteFooter({
             ['contact', 'Contact'],
             ['privacy', 'Privacy Policy'],
             ['terms', 'Terms'],
-            ...(signedIn ? [['settings', 'Account settings']] : []),
+            ...(signedIn ? [['account', 'My account']] : []),
           ].map(([page, label]) => (
             <a key={page} href={`#${page}`} className="inline-flex min-h-11 items-center underline">
               {t(label)}
@@ -39,6 +51,21 @@ export function SiteFooter({
           ))}
         </nav>
       </div>
+      {socialLinks.length > 0 && (
+        <nav aria-label={t('Follow MadaTours')} className="mt-4 flex flex-wrap gap-x-5">
+          {socialLinks.map((key) => (
+            <a
+              key={key}
+              href={social![key]!}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center font-semibold text-orange-800 underline"
+            >
+              {socialNames[key]}
+            </a>
+          ))}
+        </nav>
+      )}
       <div className="mt-5 flex flex-wrap items-center gap-x-3">
         <span>{t('Weather, map and route data:')}</span>
         <a

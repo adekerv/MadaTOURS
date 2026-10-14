@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from 'react';
-import { ArrowLeft, Mail, Send } from 'lucide-react';
+import { ArrowLeft, Send } from 'lucide-react';
 import copy from '../../../content/information.json';
 import { useI18n } from '../../i18n/I18nProvider';
 import { LanguageSelect } from '../ui/LanguageSelect';
 import { SiteFooter } from '../ui/SiteFooter';
 import { photoLibrary } from '../../lib/placeholders';
+import { AccountMenu } from '../ui/AccountMenu';
+import { ContactDetails, ContactForm } from './ContactForm';
 export type InformationRoute = keyof typeof copy.en;
 export const contactEmail = 'adejkervin@protonmail.com';
 export function InformationPage({
@@ -27,7 +29,10 @@ export function InformationPage({
           <ArrowLeft size={20} />
           {t('Back to home')}
         </a>
-        <LanguageSelect />
+        <div className="flex items-center gap-1 sm:gap-2">
+          <LanguageSelect />
+          <AccountMenu />
+        </div>
       </header>
       <main id="main-content" tabIndex={-1} className="py-8 sm:py-12">
         <p className="text-xs font-semibold uppercase tracking-widest text-orange-700">MADATOURS</p>
@@ -148,16 +153,14 @@ export function InformationPage({
         )}
         {page === 'contact' && (
           <>
-            <a href={`mailto:${contactEmail}`} className="mt-5 gap-2 text-orange-800 underline">
-              <Mail size={18} />
-              {contactEmail}
-            </a>
+            <ContactDetails fallbackEmail={contactEmail} />
+            <ContactForm />
             <SuggestionForm />
           </>
         )}
         {page === 'delete-account' && (
           <button className="primary-button mt-6" onClick={onAccount}>
-            {t(signedIn ? 'Open account settings' : 'Sign in to manage your account')}
+            {t(signedIn ? 'Open my account' : 'Sign in to manage your account')}
           </button>
         )}
         {page === 'privacy' && (

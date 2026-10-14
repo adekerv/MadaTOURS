@@ -1,5 +1,6 @@
 import { useI18n } from '../../i18n/I18nProvider';
 import { LanguageSelect } from '../ui/LanguageSelect';
+import { AccountMenu } from '../ui/AccountMenu';
 import { ArrowLeft, LocateFixed } from 'lucide-react';
 import type { UserLocation } from '../../types';
 export function Header({
@@ -25,7 +26,7 @@ export function Header({
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         <LanguageSelect />
         <button
           onClick={onGetLocation}
@@ -37,6 +38,7 @@ export function Header({
             {userLocation?.manual ? t('Search location') : t('Your location')}
           </span>
         </button>
+        <AccountMenu compact />
       </div>
     </header>
   );

@@ -9,8 +9,17 @@ interface Props {
   wide?: boolean;
   /** Docks to the bottom edge on narrow screens, like a drawer. */
   sheet?: boolean;
+  /** Slides in from the right edge, full height: for details and quick edits beside a list. */
+  side?: boolean;
 }
-export function Modal({ title, onClose, children, wide = false, sheet = false }: Props) {
+export function Modal({
+  title,
+  onClose,
+  children,
+  wide = false,
+  sheet = false,
+  side = false,
+}: Props) {
   const { t } = useI18n();
   const ref = useRef<HTMLDialogElement>(null);
   const id = useId();
@@ -59,7 +68,7 @@ export function Modal({ title, onClose, children, wide = false, sheet = false }:
             close();
         }
       }}
-      className={`app-dialog ${wide ? 'app-dialog-wide' : ''} ${sheet ? 'app-dialog-sheet' : ''} ${closing ? 'dialog-closing' : ''}`}
+      className={`app-dialog ${wide ? 'app-dialog-wide' : ''} ${sheet ? 'app-dialog-sheet' : ''} ${side ? 'slide-over' : ''} ${closing ? 'dialog-closing' : ''}`}
     >
       <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-100 bg-white px-5 py-3">
         <h2 id={id} className="text-lg font-bold text-slate-900">
