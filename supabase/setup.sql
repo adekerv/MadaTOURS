@@ -1046,7 +1046,8 @@ END; $$;
 -- Administration: the activity log, the contact inbox, editable site content, featured tours, and the read and
 -- write functions behind the admin dashboard. Every admin function checks mt_is_admin() itself, so a signed-in
 -- person who is not an administrator gets nothing even when calling the database directly. Apply after the other
--- schema files (it uses mt_private, the social tables and the tours table).
+-- schema files: it needs community.sql (mt_private), social.sql, submissions.sql, review-photos.sql and tours.sql
+-- (it adds columns to mt_tours). Every statement can be run again safely.
 
 CREATE OR REPLACE FUNCTION mt_private.require_admin() RETURNS uuid
 LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = '' AS $$
