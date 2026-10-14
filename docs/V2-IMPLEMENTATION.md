@@ -34,9 +34,10 @@ Fixed in this pass:
 - `.github/workflows/check.yml` was invalid YAML, so CI could not start.
 - The v2 browser test shared review text across runs and failed after the first viewport.
 
-Still open, owner action required (updated 2026-10-07):
-- ~~The live Supabase database has none of the v2 schema.~~ Done: the v2 tables (reviews, comments, check-ins, follows, events, submissions, Google matches, daily picks, listing audits) are live.
-- The October 3–4 schema files (`review-photos.sql`, `recovery.sql`, `tours.sql`) are not yet applied to the live database, so review photos, recovery codes and tours fail there (`/api/tours` returns 503). Apply them in that order in the SQL Editor.
+Still open, owner action required (updated 2026-10-14):
+
+- ~~The live Supabase database has none of the v2 schema.~~ Done: the v2 tables (reviews, comments, check-ins, follows, events, submissions, Google matches, daily picks, listing audits) are live, and so is `owner-photos.sql`.
+- Not yet applied to the live database: `community.sql` (re-run for hidden reviews), `review-photos.sql`, `recovery.sql`, `tours.sql` and `admin.sql`. Until then review photos, recovery codes, tours (`/api/tours` returns 503), the contact inbox, site settings and the admin activity log fail there. Apply them in that order in the SQL Editor, then run `php artisan admin:seed`.
 - The `Application checks` workflow has failed on every push since 28 September (PHP checks and the container start-up check).
 - No browser key (`VITE_GOOGLE_MAPS_API_KEY`) is configured, so the live Google panel cannot load.
 - Set `RECURRING_TASKS_SECRET` on the host and the two GitHub secrets described in DEPLOYMENT.md.
