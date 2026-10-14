@@ -29,14 +29,20 @@ test('Settings: name, language and email changes, and deletion that removes only
       await call('/auth/register', 'POST', {
         name: 'Alice',
         email: 'alice@example.test',
-        password: 'long test password', password_confirmation: 'long test password',
+        password: 'long test password',
+        password_confirmation: 'long test password',
       })
     ).body.user;
     const bob = (
       await call(
         '/auth/register',
         'POST',
-        { name: 'Bob', email: 'bob@example.test', password: 'other test password', password_confirmation: 'other test password' },
+        {
+          name: 'Bob',
+          email: 'bob@example.test',
+          password: 'other test password',
+          password_confirmation: 'other test password',
+        },
         'bob',
       )
     ).body.user;

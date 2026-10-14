@@ -50,7 +50,12 @@ test('Review photos: reviews stay public, their photos reach only signed-in peop
         await call(
           '/auth/register',
           'POST',
-          { name, email: `${name.toLowerCase()}@example.test`, password: 'long test password', password_confirmation: 'long test password' },
+          {
+            name,
+            email: `${name.toLowerCase()}@example.test`,
+            password: 'long test password',
+            password_confirmation: 'long test password',
+          },
           who,
         )
       ).body.user;
