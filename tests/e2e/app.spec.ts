@@ -177,6 +177,7 @@ test('register, save, restore session, remove, and delete account from the UI', 
   await page.getByLabel('Your name', { exact: true }).fill('Camille');
   await page.getByLabel('Email', { exact: true }).fill(email);
   await page.getByLabel('Password', { exact: true }).fill('Browser test password 42');
+  await page.getByLabel('Confirm password', { exact: true }).fill('Browser test password 42');
   await page.screenshot({ path: `test-results/${test.info().project.name}-signup.png` });
   await page.getByRole('button', { name: 'Create account', exact: true }).click();
   // Signup hands over the recovery codes once; the window stays until they are saved.
@@ -194,6 +195,9 @@ test('register, save, restore session, remove, and delete account from the UI', 
   await page.getByLabel('Password', { exact: true }).fill('Browser test password 42');
   await page.getByRole('dialog').getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  // Signing in from the navbar opens the account page.
+  await expect(page.getByRole('heading', { name: 'My account', level: 1 })).toBeVisible();
+  await page.getByRole('link', { name: 'Back to home' }).click();
   await expect(page.getByText('Welcome, Camille.', { exact: true }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Explore the island' }).click();
   await page.getByRole('searchbox', { name: 'Filter places' }).fill('Jardin de Balata');
@@ -208,8 +212,11 @@ test('register, save, restore session, remove, and delete account from the UI', 
   await expect(page.getByRole('heading', { name: 'Your favorites' })).toBeVisible();
   await page.getByRole('button', { name: 'Remove Jardin de Balata' }).first().click();
   await expect(page.getByRole('heading', { name: 'Your favorites' })).toHaveCount(0);
-  await page.getByRole('button', { name: 'Your account', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Account settings', level: 1 })).toBeVisible();
+  await page
+    .getByRole('navigation', { name: 'Account' })
+    .getByRole('link', { name: 'My account', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: 'My account', level: 1 })).toBeVisible();
   await page.getByLabel(`Type ${email} to confirm`, { exact: true }).fill(email);
   await page.getByLabel('Password', { exact: true }).fill('Browser test password 42');
   await page.getByRole('button', { name: 'Permanently delete my account' }).click();
@@ -223,14 +230,19 @@ test('admin-created places immediately appear in home search and can be deleted'
   const email = `admin-ui-${Date.now()}@example.test`;
   await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { name: 'Admin', email, password: 'Admin browser password 42', password_confirmation: 'Admin browser password 42' },
+    data: {
+      name: 'Admin',
+      email,
+      password: 'Admin browser password 42',
+      password_confirmation: 'Admin browser password 42',
+    },
   });
   await page.request.post('http://127.0.0.1:3101/__test/admin', {
     headers: { 'X-Test-Token': process.env.MADATOURS_E2E_TOKEN! },
     data: { email },
   });
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Manage places', exact: true }).click();
+  await page.goto('/#admin/places');
+  await page.getByRole('button', { name: 'Add a place', exact: true }).click();
   await page.getByLabel('Name', { exact: true }).fill('UI Test Cove');
   await page.getByLabel('Town', { exact: true }).fill('Test Town');
   await page.getByLabel('Latitude', { exact: true }).fill('14.6');
@@ -240,13 +252,14 @@ test('admin-created places immediately appear in home search and can be deleted'
   await expect(
     page.getByText('Place added. It is now available in search and on the map.'),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Close Manage places' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.goto('/');
   await page.getByRole('combobox', { name: 'Search places' }).click();
   await page.getByRole('combobox', { name: 'Search places' }).fill('UI Test Cove');
   await expect(page.getByRole('option', { name: /UI Test Cove/ })).toBeVisible();
   await page.getByRole('button', { name: 'Clear search' }).click();
-  await page.getByRole('button', { name: 'Manage places', exact: true }).click();
+  await page.goto('/#admin/places');
+  await page.getByRole('searchbox', { name: 'Search by name or town' }).fill('UI Test Cove');
   await page.getByRole('button', { name: 'Delete UI Test Cove', exact: true }).click();
   await page.getByRole('button', { name: 'Confirm deletion', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Delete UI Test Cove', exact: true })).toHaveCount(
@@ -359,7 +372,12 @@ test('a forgotten password is reset with a recovery code, once, and the new pass
   const email = `recovery-${Date.now()}@example.test`;
   const signup = await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { name: 'Recovery user', email, password: 'Original password 42', password_confirmation: 'Original password 42' },
+    data: {
+      name: 'Recovery user',
+      email,
+      password: 'Original password 42',
+      password_confirmation: 'Original password 42',
+    },
   });
   const codes: string[] = (await signup.json()).recoveryCodes;
   expect(codes).toHaveLength(8);
@@ -372,6 +390,7 @@ test('a forgotten password is reset with a recovery code, once, and the new pass
   await page.getByLabel('Email', { exact: true }).fill(email);
   await page.getByLabel('Recovery code', { exact: true }).fill('ZZZZZ-ZZZZZ');
   await page.getByLabel('New password', { exact: true }).fill('Replacement password 42');
+  await page.getByLabel('Confirm new password', { exact: true }).fill('Replacement password 42');
   await page.getByRole('button', { name: 'Reset password', exact: true }).click();
   await expect(page.getByRole('alert')).toHaveText('The email or recovery code is not valid.');
   await page.getByLabel('Recovery code', { exact: true }).fill(codes[0].toLowerCase());
@@ -455,7 +474,7 @@ for (const language of ['en', 'fr'] as const)
     await dialog.getByRole('button', { name: t('New here? Create an account') }).click();
     await dialog.getByLabel(t('Your name')).fill('Camille');
     await dialog.locator('input[type=email]').fill('camille@example.test');
-    const password = dialog.locator('input[autocomplete=new-password]');
+    const password = dialog.locator('input[autocomplete=new-password]').first();
     await password.fill('short');
     // The message is only on the field while the browser shows its pop-up, so it is recorded when that happens.
     await password.evaluate((input: HTMLInputElement) =>
@@ -502,7 +521,7 @@ test('account links and the guest introduction show only where they belong', asy
   const footer = page.locator('footer');
   // Guests: no account links in the footer, and the "no account needed" introduction.
   await expect(footer.getByRole('link', { name: 'Delete account' })).toHaveCount(0);
-  await expect(footer.getByRole('link', { name: 'Account settings' })).toHaveCount(0);
+  await expect(footer.getByRole('link', { name: 'My account' })).toHaveCount(0);
   await expect(page.getByText('Your island guide, no account needed')).toBeVisible();
   // The public deletion page stays reachable from Privacy (app stores ask for one).
   await page.goto('/#privacy');
@@ -511,20 +530,23 @@ test('account links and the guest introduction show only where they belong', asy
   const email = `footer-${Date.now()}@example.test`;
   await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { name: 'Footer', email, password: 'Footer browser password 42', password_confirmation: 'Footer browser password 42' },
+    data: {
+      name: 'Footer',
+      email,
+      password: 'Footer browser password 42',
+      password_confirmation: 'Footer browser password 42',
+    },
   });
   await page.goto('/');
   await expect(page.getByText(/Welcome|Footer/).first()).toBeVisible();
   // Signed in: settings is in the footer, deletion is not, and the guest introduction is gone.
-  await expect(footer.getByRole('link', { name: 'Account settings' })).toBeVisible();
+  await expect(footer.getByRole('link', { name: 'My account' })).toBeVisible();
   await expect(footer.getByRole('link', { name: 'Delete account' })).toHaveCount(0);
   await expect(page.getByText('Your island guide, no account needed')).toHaveCount(0);
   // Deleting the account is on the settings page, and its footer does not link back to itself.
-  await footer.getByRole('link', { name: 'Account settings' }).click();
+  await footer.getByRole('link', { name: 'My account' }).click();
   await expect(page.getByRole('heading', { name: 'Delete your account' })).toBeVisible();
-  await expect(page.locator('footer').getByRole('link', { name: 'Account settings' })).toHaveCount(
-    0,
-  );
+  await expect(page.locator('footer').getByRole('link', { name: 'My account' })).toHaveCount(0);
   await page.request.delete('/api/account', {
     headers: { 'X-MadaTours-Client': '1' },
     data: { password: 'Footer browser password 42', confirmation: email },

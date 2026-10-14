@@ -41,6 +41,7 @@ for (const language of ['en', 'fr'] as const)
     await page.getByLabel(t('Your name'), { exact: true }).fill('Camille');
     await page.getByLabel(t('Email'), { exact: true }).fill(email);
     await page.getByLabel(t('Password'), { exact: true }).fill('a long test password');
+    await page.getByLabel(t('Confirm password'), { exact: true }).fill('a long test password');
     await expect(dialog).not.toContainText(noEmailPromise);
     await dialog.getByRole('button', { name: t('Create account'), exact: true }).click();
     await expect(dialog.locator('[data-recovery-code]')).toHaveCount(8);
@@ -88,6 +89,7 @@ for (const language of ['en', 'fr'] as const)
       await dialog.getByLabel(t('Email'), { exact: true }).fill(email);
       await dialog.getByLabel(t('Recovery code'), { exact: true }).fill(code);
       await dialog.getByLabel(t('New password'), { exact: true }).fill(password);
+      await dialog.getByLabel(t('Confirm new password'), { exact: true }).fill(password);
       await dialog.getByRole('button', { name: t('Reset password'), exact: true }).click();
     };
     await recover(codes[2].toLowerCase().replace('-', ' '), 'a replacement password');

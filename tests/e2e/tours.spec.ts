@@ -100,10 +100,7 @@ const creditCoversNoPin = (dialog: Locator) =>
     });
   });
 const fillTour = async (page: Page, name: string) => {
-  await page
-    .getByRole('dialog')
-    .locator('summary', { hasText: /^\s*Tours\s*$/ })
-    .click();
+  await page.getByRole('button', { name: 'Add a tour', exact: true }).click();
   // A place visitors cannot go to is not offered, as in the day planner.
   await expect(
     page.getByLabel('Add a stop').locator('option', { hasText: 'Cascade Didier' }),
@@ -123,13 +120,11 @@ test('an administrator saves a tour and visitors see its stored road route', asy
   test.setTimeout(60000);
   const email = await signInAsAdmin(page);
   try {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Manage places', exact: true }).click();
+    await page.goto('/#admin/tours');
     await fillTour(page, 'Road trip');
     await page.getByRole('button', { name: 'Add tour', exact: true }).click();
     await expect(page.getByText(/Tour saved\. The road route is [\d.]+ km long\./)).toBeVisible();
     await expect(page.getByText('Road route: 3.0 km')).toBeVisible();
-    await page.getByRole('button', { name: 'Close Manage places' }).click();
 
     // Reading the tour never asks for a route again: one request was made, when it was saved.
     const asked = await (
@@ -169,13 +164,11 @@ test('a routing outage never blocks saving, and visitors then see straight lines
       headers: testHeaders(),
       data: { mode: 'fail', reset: true },
     });
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Manage places', exact: true }).click();
+    await page.goto('/#admin/tours');
     await fillTour(page, 'Outage trip');
     await page.getByRole('button', { name: 'Add tour', exact: true }).click();
     await expect(page.getByText(/Tour saved, but no road route could be worked out/)).toBeVisible();
     await expect(page.getByText('Straight lines only')).toBeVisible();
-    await page.getByRole('button', { name: 'Close Manage places' }).click();
 
     await openTour(page, 'Outage trip');
     const dialog = page.getByRole('dialog');
@@ -192,11 +185,7 @@ test('a routing outage never blocks saving, and visitors then see straight lines
       headers: testHeaders(),
       data: { mode: 'ok' },
     });
-    await page.getByRole('button', { name: 'Manage places', exact: true }).click();
-    await page
-      .getByRole('dialog')
-      .locator('summary', { hasText: /^\s*Tours\s*$/ })
-      .click();
+    await page.goto('/#admin/tours');
     await page.getByRole('button', { name: 'Recalculate route for Outage trip' }).click();
     await expect(page.getByText('Road route updated.')).toBeVisible();
     await expect(page.getByText('Road route: 3.0 km')).toBeVisible();

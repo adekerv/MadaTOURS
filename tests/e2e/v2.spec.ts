@@ -23,7 +23,13 @@ async function register(page: Page) {
   const email = `${randomUUID()}@example.test`;
   const response = await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { name, email, password: 'a long test password', password_confirmation: 'a long test password', language: 'en' },
+    data: {
+      name,
+      email,
+      password: 'a long test password',
+      password_confirmation: 'a long test password',
+      language: 'en',
+    },
   });
   expect(response.status()).toBe(201);
   return { name, email };
@@ -180,9 +186,9 @@ for (const language of ['en', 'fr'] as Language[])
       headers: { 'X-Test-Token': process.env.MADATOURS_E2E_TOKEN! },
       data: { email: user.email },
     });
-    await page.goto(`/?lang=${language}`);
-    await page.getByRole('button', { name: t('Manage places'), exact: true }).click();
-    await page.getByText(t('Place submissions'), { exact: true }).first().click();
+    // Only the hash changes, so reload to pick up the new administrator role.
+    await page.goto(`/?lang=${language}#admin/submissions`);
+    await page.reload();
     const article = page
       .getByRole('article')
       .filter({ has: page.getByRole('heading', { name, exact: true }) });

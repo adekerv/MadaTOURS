@@ -23,7 +23,13 @@ async function register(page: Page) {
   const email = `${randomUUID()}@example.test`;
   const response = await page.request.post('/api/auth/register', {
     headers: { 'X-MadaTours-Client': '1' },
-    data: { name, email, password: 'a long test password', password_confirmation: 'a long test password', language: 'en' },
+    data: {
+      name,
+      email,
+      password: 'a long test password',
+      password_confirmation: 'a long test password',
+      language: 'en',
+    },
   });
   expect(response.status()).toBe(201);
   return { name, email };
@@ -39,7 +45,7 @@ const session = async (page: Page) =>
 
 test('guests are asked to sign in instead of seeing account forms', async ({ page }) => {
   await page.goto('/#settings');
-  await expect(page.getByRole('heading', { name: 'Account settings', level: 1 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'My account', level: 1 })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Sign in to manage your account' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Permanently delete my account' })).toHaveCount(0);
 });
@@ -56,10 +62,11 @@ for (const language of ['en', 'fr'] as const)
       const newEmail = `${randomUUID()}@example.test`;
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`/?lang=${language}`);
-      await page.getByRole('button', { name: t('Your account'), exact: true }).click();
-      await expect(
-        page.getByRole('heading', { name: t('Account settings'), level: 1 }),
-      ).toBeVisible();
+      await page
+        .getByRole('navigation', { name: t('Account') })
+        .getByRole('link', { name: t('My account'), exact: true })
+        .click();
+      await expect(page.getByRole('heading', { name: t('My account'), level: 1 })).toBeVisible();
       await fits(page);
 
       const section = (heading: string) =>
@@ -68,6 +75,7 @@ for (const language of ['en', 'fr'] as const)
           .filter({ has: page.getByRole('heading', { name: t(heading), level: 2 }) });
       const emailSection = section('Email address');
       const recoverySection = section('Account recovery');
+      const passwordSection = section('Password');
 
       // Profile: saved to the account and still there after a reload.
       await page.getByLabel(t('Name'), { exact: true }).fill(newName);
@@ -124,12 +132,38 @@ for (const language of ['en', 'fr'] as const)
       await expect(page.locator('[data-recovery-code]')).toHaveCount(0);
       await fits(page);
 
+      // Password: the new one is typed twice and must match; the current one is checked.
+      await passwordSection
+        .getByLabel(t('Current password'), { exact: true })
+        .fill('a long test password');
+      await passwordSection
+        .getByLabel(t('New password'), { exact: true })
+        .fill('a changed password');
+      await passwordSection
+        .getByLabel(t('Confirm new password'), { exact: true })
+        .fill('a changed passwort');
+      await passwordSection.getByLabel(t('Confirm new password'), { exact: true }).blur();
+      await expect(passwordSection.getByText(t('The passwords do not match.'))).toBeVisible();
+      await expect(
+        passwordSection.getByRole('button', { name: t('Change password'), exact: true }),
+      ).toBeDisabled();
+      await passwordSection
+        .getByLabel(t('Confirm new password'), { exact: true })
+        .fill('a changed password');
+      await passwordSection
+        .getByRole('button', { name: t('Change password'), exact: true })
+        .click();
+      await expect(
+        page.getByText(t('Your password has been changed. Other devices have been signed out.')),
+      ).toBeVisible();
+      await fits(page);
+
       // Delete: the button stays disabled until the exact email is typed.
       const remove = page.getByRole('button', { name: t('Permanently delete my account') });
       const typed = page.getByLabel(t('Type {email} to confirm', { email: newEmail }), {
         exact: true,
       });
-      await page.getByLabel(t('Password'), { exact: true }).fill('a long test password');
+      await page.getByLabel(t('Password'), { exact: true }).fill('a changed password');
       await expect(remove).toBeDisabled();
       await typed.fill(newEmail.slice(0, -2));
       await expect(remove).toBeDisabled();
