@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS public.mt_reviews (
   UNIQUE(user_id,place_id)
 );
 CREATE INDEX IF NOT EXISTS mt_reviews_place_idx ON public.mt_reviews(place_id,created_at DESC);
+-- An administrator can hide a review: it stays stored but leaves the place page and the community rating.
+ALTER TABLE public.mt_reviews ADD COLUMN IF NOT EXISTS hidden boolean NOT NULL DEFAULT false;
 CREATE TABLE IF NOT EXISTS public.mt_comments (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -63,8 +65,8 @@ DECLARE target bigint := coalesce(NEW.place_id,OLD.place_id);
 BEGIN
   -- Serialize aggregate updates so concurrent reviews cannot overwrite a newer count.
   PERFORM 1 FROM public.mt_places WHERE id=target FOR UPDATE;
-  UPDATE public.mt_places SET community_rating=(SELECT round(avg(rating),2) FROM public.mt_reviews WHERE place_id=target),
-    community_count=(SELECT count(*) FROM public.mt_reviews WHERE place_id=target) WHERE id=target;
+  UPDATE public.mt_places SET community_rating=(SELECT round(avg(rating),2) FROM public.mt_reviews WHERE place_id=target AND NOT hidden),
+    community_count=(SELECT count(*) FROM public.mt_reviews WHERE place_id=target AND NOT hidden) WHERE id=target;
   RETURN NULL;
 END; $$;
 REVOKE ALL ON FUNCTION mt_private.update_community_rating() FROM PUBLIC;
@@ -134,7 +136,7 @@ BEGIN
     'reviews',coalesce((SELECT jsonb_agg(r) FROM (
       SELECT r.id,r.user_id,r.rating,r.body,r.created_at,r.updated_at,r.moderated,p.display_name,
       (SELECT count(*) FROM public.mt_checkins c WHERE c.user_id=r.user_id AND c.place_id=r.place_id AND c.visited_on >= date_trunc('year',now() AT TIME ZONE 'America/Martinique')::date) AS visits
-      FROM public.mt_reviews r JOIN public.mt_public_profiles p ON p.user_id=r.user_id WHERE r.place_id=target_place ORDER BY r.created_at DESC,r.id DESC LIMIT 20 OFFSET page_offset) r),'[]'::jsonb),
+      FROM public.mt_reviews r JOIN public.mt_public_profiles p ON p.user_id=r.user_id WHERE r.place_id=target_place AND NOT r.hidden ORDER BY r.created_at DESC,r.id DESC LIMIT 20 OFFSET page_offset) r),'[]'::jsonb),
     'comments',coalesce((SELECT jsonb_agg(c) FROM (
       SELECT c.id,c.user_id,c.body,c.created_at,p.display_name FROM public.mt_comments c JOIN public.mt_public_profiles p ON p.user_id=c.user_id WHERE c.place_id=target_place ORDER BY c.created_at DESC,c.id DESC LIMIT 20 OFFSET page_offset) c),'[]'::jsonb),
     'rating',(SELECT community_rating FROM public.mt_places WHERE id=target_place),

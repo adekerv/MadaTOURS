@@ -12,6 +12,8 @@ type Account = {
   language?: string;
   verify?: string;
   recovery?: string;
+  /** Set while an administrator has suspended the account. */
+  bannedUntil?: string;
 };
 type Row = Record<string, unknown>;
 const authError = (code: string, status = 400) =>
@@ -58,13 +60,18 @@ export function testClients(db: PGlite) {
     return {
       auth: {
         refreshSession: () =>
-          account() ? success(signIn(account()!)) : failure('refresh_token_not_found'),
+          !account()
+            ? failure('refresh_token_not_found')
+            : account()!.bannedUntil
+              ? failure('user_banned')
+              : success(signIn(account()!)),
         getUser: () =>
           account()
             ? success({
                 user: {
                   id: account()!.id,
                   email: account()!.email,
+                  banned_until: account()!.bannedUntil,
                   user_metadata: {
                     display_name: account()!.name,
                     language: account()!.language,
@@ -101,12 +108,16 @@ export function testClients(db: PGlite) {
           accounts.set(user.id, user);
           return success(signIn(user));
         },
-        signInWithPassword: ({ email, password }: { email: string; password: string }) => {
+        signInWithPassword: async ({ email, password }: { email: string; password: string }) => {
           const user = [...accounts.values()].find(
             (a) => a.email === email && a.password === password,
           );
           if (!user) return failure('invalid_credentials');
           if (!user.confirmed) return failure('email_not_confirmed');
+          if (user.bannedUntil) return failure('user_banned');
+          await locked(() =>
+            db.query('UPDATE auth.users SET last_sign_in_at=now() WHERE id=$1', [user.id]),
+          );
           return success(signIn(user));
         },
         verifyOtp: ({ email, token, type }: { email: string; token: string; type: string }) => {
@@ -154,20 +165,38 @@ export function testClients(db: PGlite) {
         },
         signOut: ({ scope }: { scope: string }) => {
           const id = account()?.id;
-          if (scope === 'global')
+          if (scope === 'global' || scope === 'others')
             for (const [token, userId] of sessions) if (userId === id) sessions.delete(token);
-          sessions.delete(session);
+          if (scope === 'others') sessions.set(session, id!);
+          else sessions.delete(session);
           return success();
         },
         admin: {
           updateUserById: async (
             id: string,
-            { email, password }: { email?: string; password?: string },
+            {
+              email,
+              password,
+              ban_duration,
+            }: { email?: string; password?: string; ban_duration?: string },
           ) => {
             if (!admin) return failure('not_admin');
             const user = accounts.get(id);
             if (!user) return failure('user_not_found');
             if (password !== undefined) user.password = password;
+            if (ban_duration !== undefined) {
+              // Like Supabase, "none" lifts a suspension and any other duration sets one.
+              user.bannedUntil =
+                ban_duration === 'none'
+                  ? undefined
+                  : new Date(Date.now() + 100 * 365 * 86400000).toISOString();
+              await locked(() =>
+                db.query('UPDATE auth.users SET banned_until=$2 WHERE id=$1', [
+                  id,
+                  user.bannedUntil ?? null,
+                ]),
+              );
+            }
             if (email) {
               if ([...accounts.values()].some((a) => a.id !== id && a.email === email))
                 return failure('email_exists');
@@ -208,6 +237,56 @@ export function testClients(db: PGlite) {
           mt_claim_google_request: ['daily_limit'],
           mt_queue_google_matches: [],
           mt_refresh_daily_picks: [],
+          mt_my_activity: [],
+          mt_admin_overview: [],
+          mt_admin_users: [
+            'search_text',
+            'role_filter',
+            'status_filter',
+            'sort_key',
+            'page_offset',
+            'page_size',
+          ],
+          mt_admin_user: ['target'],
+          mt_admin_set_role: ['target', 'new_role'],
+          mt_admin_reviews: [
+            'search_text',
+            'rating_filter',
+            'visibility',
+            'sort_key',
+            'page_offset',
+            'page_size',
+          ],
+          mt_admin_review_write: ['action', 'target'],
+          mt_admin_messages: [
+            'search_text',
+            'status_filter',
+            'sort_key',
+            'page_offset',
+            'page_size',
+          ],
+          mt_admin_message_write: ['action', 'target'],
+          mt_admin_meetups: [
+            'search_text',
+            'status_filter',
+            'from_date',
+            'to_date',
+            'place_filter',
+            'sort_key',
+            'page_offset',
+            'page_size',
+          ],
+          mt_admin_meetup: ['target'],
+          mt_admin_meetup_export: [
+            'search_text',
+            'status_filter',
+            'from_date',
+            'to_date',
+            'place_filter',
+          ],
+          mt_admin_meetup_write: ['action', 'target', 'member'],
+          mt_admin_log_write: ['action', 'target_type', 'target_id', 'summary', 'details'],
+          mt_admin_log_list: ['search_text', 'area', 'page_offset', 'page_size'],
         };
         const names = functions[name];
         if (!names) throw new Error('Unexpected RPC');
@@ -216,7 +295,13 @@ export function testClients(db: PGlite) {
             data: (
               await sql<{ result: unknown }>(
                 `SELECT public.${name}(${names.map((_, i) => '$' + (i + 1)).join(',')}) AS result`,
-                names.map((k) => (typeof args[k] === 'object' ? JSON.stringify(args[k]) : args[k])),
+                names.map((k) =>
+                  args[k] === null || args[k] === undefined
+                    ? null
+                    : typeof args[k] === 'object'
+                      ? JSON.stringify(args[k])
+                      : args[k],
+                ),
                 account()?.id,
                 admin,
               )
@@ -249,6 +334,8 @@ export function testClients(db: PGlite) {
             'mt_source_logs',
             'mt_google_matches',
             'mt_daily_picks',
+            'mt_site_settings',
+            'mt_contact_messages',
           ].includes(table)
         )
           throw new Error('Unexpected table');

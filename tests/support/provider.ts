@@ -159,7 +159,9 @@ export function createProvider(fixture: ReturnType<typeof testClients>) {
         else if (path === 'recover') result = await client.auth.resetPasswordForEmail(body.email);
         else if (path === 'logout')
           result = await client.auth.signOut({
-            scope: url.searchParams.get('scope') === 'global' ? 'global' : 'local',
+            scope: ['global', 'others'].includes(url.searchParams.get('scope') ?? '')
+              ? (url.searchParams.get('scope') as 'global' | 'others')
+              : 'local',
           });
         else if (path === 'user')
           result =

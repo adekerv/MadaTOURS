@@ -58,7 +58,7 @@ BEGIN
   RETURN coalesce((
     SELECT jsonb_agg(jsonb_build_object('id',ph.id,'reviewId',ph.review_id,'path',ph.path) ORDER BY ph.created_at,ph.id)
     FROM public.mt_review_photos ph
-    WHERE ph.review_id IN (SELECT r.id FROM public.mt_reviews r WHERE r.place_id=target_place ORDER BY r.created_at DESC,r.id DESC LIMIT 20 OFFSET page_offset)
+    WHERE ph.review_id IN (SELECT r.id FROM public.mt_reviews r WHERE r.place_id=target_place AND NOT r.hidden ORDER BY r.created_at DESC,r.id DESC LIMIT 20 OFFSET page_offset)
   ),'[]'::jsonb);
 END; $$;
 REVOKE ALL ON FUNCTION public.mt_place_review_photos(bigint,integer) FROM PUBLIC, anon;
