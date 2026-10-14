@@ -90,3 +90,7 @@ Production runs on Vercel as one PHP function (`vercel.json`, `api/index.php`), 
 ## Credits
 
 Map data © OpenStreetMap contributors, tiles by OpenFreeMap, road routes © openrouteservice.org by HeiGIT. Venue facts come from the Martinique tourism board and local tourism offices, cited on each listing. Photos are credited in [public/photos/CREDITS.md](public/photos/CREDITS.md) and [public/assets/placeholders/CREDITS.md](public/assets/placeholders/CREDITS.md).
+
+## License
+
+The code is released under the [MIT license](LICENSE). Photos, map data and other third-party material keep their own licenses, listed in the credits above.
