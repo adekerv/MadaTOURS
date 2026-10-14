@@ -1,9 +1,7 @@
 # Accounts without email
 
-MadaTours needs no email provider: no sign-in step depends on mail. Accounts use Supabase Auth with email and
-password (or Google), and a forgotten password is reset with a one-time recovery code instead of an email link. The
-only mail is an optional welcome message, which stays in the Laravel log unless SMTP is configured (see
-[database setup](SUPABASE-SETUP.md#3-accounts-without-email)).
+MadaTours sends no email. Accounts use Supabase Auth with email and password (or Google), and a forgotten password is
+reset with a one-time recovery code instead of an email link.
 
 ## What you must set up in Supabase (once)
 

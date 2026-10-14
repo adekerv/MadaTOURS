@@ -5,14 +5,9 @@ export const french: Record<string, string> = {
   'Community favorites are temporarily unavailable. You can still explore the guide.':
     'Les favoris de la communauté sont temporairement indisponibles. Vous pouvez toujours explorer le guide.',
   'Loading community favorites…': 'Chargement des favoris de la communauté…',
-  'Photo processing is temporarily unavailable. Please try again later.':
-    'Le traitement des photos est temporairement indisponible. Réessayez plus tard.',
-  'The verification could not be completed. Please request a new code.':
-    'La vérification n’a pas abouti. Demandez un nouveau code.',
   'Photo license': 'Licence de la photo',
   'Community: {rating} / 5 ({count})': 'Communauté : {rating} / 5 ({count})',
   'Email verified': 'Adresse e-mail vérifiée',
-  'The verification does not match this account.': 'La vérification ne correspond pas à ce compte.',
   'Only people you accept can see your check-ins, favorites and plans you choose to share. Your device location is never shared.':
     'Seules les personnes que vous acceptez peuvent voir vos visites, favoris et projets que vous choisissez de partager. La position de votre appareil reste privée.',
   'Find an explorer by display name': 'Trouver une personne par son nom affiché',
@@ -94,7 +89,6 @@ export const french: Record<string, string> = {
   'Publish or update review': 'Publier ou modifier l’avis',
   'Your review is live. You can edit it here at any time.':
     'Votre avis est publié. Vous pouvez le modifier ici à tout moment.',
-  'Sign in to review or check in': 'Connectez-vous pour donner un avis ou enregistrer une visite',
   'Loading reviews…': 'Chargement des avis…',
   '{name} rated this {count} stars': '{name} a attribué {count} étoiles',
   'Visited {count} times this year': '{count} visites cette année',
@@ -121,7 +115,6 @@ export const french: Record<string, string> = {
   'Restrict comments': 'Restreindre les commentaires',
   'Blocked commenters': 'Comptes privés de commentaires',
   'Restore commenting': 'Rétablir les commentaires',
-  'Reviews and comment restrictions': 'Avis et restrictions des commentaires',
   'Please check the required fields and try again.':
     'Vérifiez les champs obligatoires et réessayez.',
   Appearance: 'Apparence',
@@ -141,13 +134,7 @@ export const french: Record<string, string> = {
   'Explore all places': 'Explorer tous les lieux',
   'Explore {name}': 'Explorer {name}',
   'Loading map…': 'Chargement de la carte…',
-  'No rating in this guide yet': 'Pas encore de note dans ce guide',
-  'Be the first to rate': 'Donnez le premier avis',
-  'Find this venue on Google Maps to leave a review.':
-    'Retrouvez ce lieu sur Google Maps pour laisser un avis.',
-  'Hours unavailable': 'Horaires indisponibles',
   'Call the venue': 'Appeler l’établissement',
-  'Venue contact and information': 'Contact et informations du lieu',
   'Photo credits': 'Crédits photo',
   'Recent searches': 'Recherches récentes',
   'Clear history': 'Effacer l’historique',
@@ -162,7 +149,6 @@ export const french: Record<string, string> = {
   'Public domain': 'Domaine public',
   'Photo source': 'Source de la photo',
   'Suggest a place': 'Suggérer un lieu',
-  'Open account settings': 'Ouvrir les paramètres du compte',
   'Sign in to manage your account': 'Se connecter pour gérer son compte',
   'Place name': 'Nom du lieu',
   'Source link': 'Lien de la source',
@@ -188,19 +174,14 @@ export const french: Record<string, string> = {
     'Votre ordre actuel est déjà aussi court que cette suggestion.',
   'Stops reordered. Your first stop stays the same.':
     'Étapes réorganisées. Votre première étape reste inchangée.',
-  'Étang des Salines landscape': 'Paysage de l’étang des Salines',
-  'Martinique scenery · illustrative photo': 'Paysage de Martinique · photo d’illustration',
   'Discover freely. An account keeps your favorites with you across devices.':
     'Explorez librement. Un compte conserve vos favoris sur tous vos appareils.',
   Information: 'Informations',
-  'Weather and map data:': 'Données météo et cartographiques :',
   About: 'À propos',
   Contact: 'Contact',
   'Privacy Policy': 'Politique de confidentialité',
   Terms: 'Conditions',
   'Your name': 'Votre nom',
-  'Start exploring right away. No email verification needed.':
-    'Commencez à explorer immédiatement. Aucune vérification par email nécessaire.',
   'Welcome, {name}.': 'Bienvenue, {name}.',
   'Thanks for signing up! Welcome, {name}.': 'Merci pour votre inscription ! Bienvenue, {name}.',
   'Distance and sorting': 'Distance et tri',
@@ -213,7 +194,6 @@ export const french: Record<string, string> = {
   'Add place': 'Ajouter le lieu',
   'Add to revisit list': 'À visiter à nouveau',
   All: 'Tout',
-  'Already have an account? Sign in': 'Déjà un compte ? Se connecter',
   'Back to home': 'Retour à l’accueil',
   'Browse all Martinique': 'Explorer toute la Martinique',
   Cancel: 'Annuler',
@@ -352,8 +332,6 @@ export const french: Record<string, string> = {
   Food: 'Restaurants',
   'Fort-de-France weather': 'Météo à Fort-de-France',
   'Get directions': 'Obtenir l’itinéraire',
-  'Guide details and ratings are supplied with this catalogue, not live visitor reviews. Confirm opening hours, access, and trail conditions before visiting.':
-    'Les informations et notes proviennent du catalogue, pas d’avis de visiteurs en direct. Confirmez les horaires, l’accès et l’état des sentiers avant votre visite.',
   'Guide rating': 'Note du guide',
   'Guide rating (optional)': 'Note du guide (facultative)',
   'Highest guide rating': 'Les mieux notés dans le guide',
@@ -374,7 +352,6 @@ export const french: Record<string, string> = {
   'MadaTours could not open this screen. Reload to return to the app.':
     'MadaTours n’a pas pu ouvrir cet écran. Rechargez pour revenir à l’application.',
   'MadaTours home': 'Accueil MadaTours',
-  'Made for discovering Martinique': 'Pour découvrir la Martinique',
   'Make a day of it': 'Profitez de votre journée',
   'Manage places': 'Gérer les lieux',
   Map: 'Carte',
@@ -386,7 +363,6 @@ export const french: Record<string, string> = {
   'No places found. Try a town name or activity.':
     'Aucun lieu trouvé. Essayez une commune ou une activité.',
   'No places in this area': 'Aucun lieu dans cette zone',
-  'Not rated': 'Sans note',
   'OUT INTO NATURE': 'AU CŒUR DE LA NATURE',
   'On your revisit list': 'Dans votre liste de prochaines visites',
   'Opening MadaTours…': 'Ouverture de MadaTours…',
@@ -396,7 +372,6 @@ export const french: Record<string, string> = {
   'Place added. It is now available in search and on the map.':
     'Lieu ajouté. Il est disponible dans la recherche et sur la carte.',
   'Place category': 'Catégorie de lieu',
-  'Place deleted.': 'Lieu supprimé.',
   'Place tags': 'Caractéristiques du lieu',
   'Places and filters': 'Lieux et filtres',
   'Places to revisit': 'Lieux à visiter à nouveau',
@@ -423,9 +398,7 @@ export const french: Record<string, string> = {
   'Search this area': 'Rechercher dans cette zone',
   Show: 'Afficher',
   'Sign in': 'Se connecter',
-  'Sign in when you want to save a place.': 'Connectez-vous pour enregistrer un lieu.',
   'Sign out': 'Se déconnecter',
-  'Signed in as': 'Connecté en tant que',
   'Skip to content': 'Aller au contenu',
   Snow: 'Neige',
   'Snow showers': 'Averses de neige',
@@ -454,12 +427,9 @@ export const french: Record<string, string> = {
   'Weather is unavailable right now.': 'La météo est momentanément indisponible.',
   'Welcome to MadaTours': 'Bienvenue sur MadaTours',
   'Where will today take you?': 'Où irez-vous aujourd’hui ?',
-  'You are signed in.': 'Vous êtes connecté.',
   'You have signed out.': 'Vous êtes déconnecté.',
   'Your account': 'Votre compte',
   'Your favorites': 'Vos favoris',
-  'Your favorites and revisit list are linked to this account.':
-    'Vos favoris et prochaines visites sont liés à ce compte.',
   'Your island, your adventure': 'Votre île, votre aventure',
   'Your location': 'Votre position',
   'Your saved places': 'Vos lieux enregistrés',
@@ -507,10 +477,7 @@ export const french: Record<string, string> = {
   'No day trips yet': 'Aucune journée prévue',
   'Create your first plan, then add places in the order you want to visit.':
     'Créez votre premier programme, puis ajoutez vos lieux dans l’ordre de visite souhaité.',
-  'Visit time: {minutes} min': 'Temps de visite : {minutes} min',
   'Straight-line distance: {distance} km': 'Distance à vol d’oiseau : {distance} km',
-  'Travel time is not included. Open directions for road routes and current estimates.':
-    'Le temps de trajet n’est pas inclus. Ouvrez l’itinéraire pour les routes et les estimations actuelles.',
   'Directions from previous stop': 'Itinéraire depuis l’étape précédente',
   'A maximum of 20 stops keeps each day manageable.':
     'Une journée peut contenir jusqu’à 20 étapes.',
@@ -518,14 +485,12 @@ export const french: Record<string, string> = {
     'Vous pouvez conserver jusqu’à 20 journées sur cet appareil.',
   'Offline copy': 'Copie hors connexion',
   'Last saved: {date}': 'Dernier enregistrement : {date}',
-  'Read your saved places offline': 'Vos lieux disponibles hors connexion',
   'Open offline places': 'Ouvrir les lieux hors connexion',
   'Remove offline copy': 'Supprimer la copie hors connexion',
   'Offline copies are stored on this device. Photos, maps, directions, and account changes need a connection.':
     'Les copies sont conservées sur cet appareil. Les photos, cartes, itinéraires et modifications du compte nécessitent une connexion.',
   'No offline places yet. Sign in and save a place while connected.':
     'Aucun lieu hors connexion. Connectez-vous et enregistrez un lieu avec Internet.',
-  'Connect to change your saved places.': 'Connectez-vous pour modifier vos lieux enregistrés.',
   'Reset your password': 'Réinitialiser votre mot de passe',
   'New password': 'Nouveau mot de passe',
   'Forgot password?': 'Mot de passe oublié ?',
@@ -539,8 +504,6 @@ export const french: Record<string, string> = {
   'Password updated. Sign in with your new password.':
     'Mot de passe modifié. Connectez-vous avec votre nouveau mot de passe.',
   'The database is not configured yet.': 'La base de données n’est pas encore configurée.',
-  'Account services are not configured yet.':
-    'Les services de compte ne sont pas encore configurés.',
   'You do not have permission to make this change.':
     'Vous n’avez pas l’autorisation d’effectuer cette modification.',
   'This place is no longer available.': 'Ce lieu n’est plus disponible.',
@@ -562,28 +525,19 @@ export const french: Record<string, string> = {
     'Trop de tentatives. Réessayez dans 15 minutes.',
   'Invalid request. Please reload and try again.':
     'Requête invalide. Rechargez la page et réessayez.',
-  'Only administrators can manage places.': 'Seuls les administrateurs peuvent gérer les lieux.',
   'This place could not be found.': 'Ce lieu est introuvable.',
   'The service is temporarily unavailable. Please try again shortly.':
     'Le service est momentanément indisponible. Réessayez dans un instant.',
   'Enter a valid email address.': 'Saisissez une adresse e-mail valide.',
-  'Enter your password.': 'Saisissez votre mot de passe.',
-  'Use a password with at least 12 characters.':
-    'Utilisez un mot de passe d’au moins 12 caractères.',
-  'Enter the code from your email.': 'Saisissez le code reçu par e-mail.',
   'Sources and updates': 'Sources et mises à jour',
   'Source checked: {date}': 'Source consultée le {date}',
   'Venue details still need verification.': 'Les informations de ce lieu restent à vérifier.',
   Photo: 'Photo',
   'Displayed cropped to fit.': 'Affichage recadré.',
-  'No venue photo yet': 'Photo du lieu à venir',
   'Access restrictions': 'Restrictions d’accès',
   'Access is restricted. This place cannot be added to a day trip. Consult the source before planning a visit.':
     'L’accès est restreint. Ce lieu ne peut pas être ajouté à une journée. Consultez la source avant toute visite.',
-  'Check the source for current hours and access. Map points are approximate; confirm the entrance with the venue.':
-    'Consultez la source pour les horaires et l’accès. Les points sur la carte sont approximatifs ; confirmez l’entrée auprès du lieu.',
   'Delete {name}': 'Supprimer {name}',
-  'Places ({count})': 'Lieux ({count})',
   'Delete {name}? This also removes it from everyone’s saved lists.':
     'Supprimer {name} ? Cela le retirera aussi des listes de tous les utilisateurs.',
   'Description in French (optional)': 'Description en français (facultative)',
@@ -856,15 +810,11 @@ export const french: Record<string, string> = {
   Approved: 'Approuvé',
   Rejected: 'Refusé',
   'Source hours': 'Horaires de la source',
-  'Updated: {date}': 'Mis à jour : {date}',
-  'Highest community rating': 'Meilleure note de la communauté',
   'Choose a JPEG, PNG or WebP image under 15 MB.':
     'Choisissez une image JPEG, PNG ou WebP de moins de 15 Mo.',
   'Submission sent. You will see the moderation decision here.':
     'Proposition envoyée. Vous verrez ici la décision de modération.',
   'Account settings': 'Paramètres du compte',
-  'Change your name and email address, or delete your account.':
-    'Modifiez votre nom et votre adresse e-mail, ou supprimez votre compte.',
   Profile: 'Profil',
   'Your name and language are saved with your account.':
     'Votre nom et votre langue sont enregistrés avec votre compte.',
@@ -1057,8 +1007,6 @@ export const french: Record<string, string> = {
   'Places with restricted access cannot be part of a tour.':
     'Les lieux à accès restreint ne peuvent pas faire partie d’un circuit.',
   'Weather, map and route data:': 'Données météo, cartographiques et d’itinéraire :',
-  'Change your name, email address and recovery codes, or delete your account.':
-    'Modifiez votre nom, votre adresse e-mail et vos codes de récupération, ou supprimez votre compte.',
   'Illustrative photo · not this place': 'Photo d’illustration · ne montre pas ce lieu',
   'AI-generated image · not this place': 'Image générée par IA · ne montre pas ce lieu',
   'Places without their own photo show an icon tile or a labelled illustrative photo of the activity: free-licence stock, or one AI-generated trail scene. These never show the listed venue, and each one is credited on its place page.':

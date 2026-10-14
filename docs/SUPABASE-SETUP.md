@@ -35,8 +35,6 @@ Do not use `migrate:fresh`, `db:wipe` or drop the auth schema on an existing pro
 
 The app needs no mail server. Signup signs the person in at once, and a forgotten password is reset with one of eight one-time recovery codes. In the Supabase dashboard, turn off **Confirm email** and **Secure email change** under Authentication → Sign In / Providers → Email, and leave custom SMTP unset. [Accounts without email](ACCOUNTS-WITHOUT-EMAIL.md) explains the whole flow; `npm run auth:signup -- --apply` turns off confirmation through the Management API when a private `SUPABASE_ACCESS_TOKEN` is available.
 
-Laravel can also send an optional welcome email after signup (`resources/views/emails/welcome.blade.php`). With the default `MAIL_MAILER=log` it is only written to the Laravel log. To deliver it, set `MAIL_MAILER=smtp` and the other `MAIL_*` settings in private configuration. A delivery failure is logged without credentials and never undoes a signup.
-
 ## 4. Run and provision administrators
 
 ```sh

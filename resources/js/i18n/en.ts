@@ -20,7 +20,6 @@ export const english: Record<string, string> = {
     'Access is restricted. This place cannot be added to a day trip. Consult the source before planning a visit.',
   'Access restrictions': 'Access restrictions',
   Account: 'Account',
-  'Account services are not configured yet.': 'Account services are not configured yet.',
   Activities: 'Activities',
   Activity: 'Activity',
   'Activity appears here after someone accepts your follow request.':
@@ -37,7 +36,6 @@ export const english: Record<string, string> = {
   All: 'All',
   'All experiences': 'All experiences',
   'All towns': 'All towns',
-  'Already have an account? Sign in': 'Already have an account? Sign in',
   'An exact map location and a photo are required.':
     'An exact map location and a photo are required.',
   'Any rating': 'Any rating',
@@ -56,7 +54,6 @@ export const english: Record<string, string> = {
   'Back to home': 'Back to home',
   'Back to sign in': 'Back to sign in',
   Bar: 'Bar',
-  'Be the first to rate': 'Be the first to rate',
   Beach: 'Beach',
   Beaches: 'Beaches',
   Beachfront: 'Beachfront',
@@ -84,8 +81,6 @@ export const english: Record<string, string> = {
   Category: 'Category',
   Challenge: 'Challenge',
   'Changes saved.': 'Changes saved.',
-  'Check the source for current hours and access. Map points are approximate; confirm the entrance with the venue.':
-    'Check the source for current hours and access. Map points are approximate; confirm the entrance with the venue.',
   'Check with the venue': 'Check with the venue',
   'Check your email, password, or verification code and try again.':
     'Check your email, password, or verification code and try again.',
@@ -126,7 +121,6 @@ export const english: Record<string, string> = {
   'Conditions unavailable': 'Conditions unavailable',
   'Confirm deletion': 'Confirm deletion',
   'Confirm restriction': 'Confirm restriction',
-  'Connect to change your saved places.': 'Connect to change your saved places.',
   'Connecting…': 'Connecting…',
   'Connection unavailable. Showing the last loaded guide.':
     'Connection unavailable. Showing the last loaded guide.',
@@ -206,8 +200,6 @@ export const english: Record<string, string> = {
   'Enable source updates': 'Enable source updates',
   'English description': 'English description',
   'Enter a valid email address.': 'Enter a valid email address.',
-  'Enter the code from your email.': 'Enter the code from your email.',
-  'Enter your password.': 'Enter your password.',
   Entertainment: 'Entertainment',
   'Entertainment and nightlife': 'Entertainment and nightlife',
   'Estimated finish: {time}': 'Estimated finish: {time}',
@@ -315,8 +307,6 @@ export const english: Record<string, string> = {
     'Find cinemas, go-karting, and activities for time with friends and family.',
   'Find restaurants': 'Find restaurants',
   'Find something to do': 'Find something to do',
-  'Find this venue on Google Maps to leave a review.':
-    'Find this venue on Google Maps to leave a review.',
   'Find your next favorite beach, a new trail, or a table by the sea. Explore the island at your own pace.':
     'Find your next favorite beach, a new trail, or a table by the sea. Explore the island at your own pace.',
   'Find your next favorite place': 'Find your next favorite place',
@@ -353,14 +343,11 @@ export const english: Record<string, string> = {
   'Google matching queue': 'Google matching queue',
   'Google photos, ratings and hours': 'Google photos, ratings and hours',
   Grill: 'Grill',
-  'Guide details and ratings are supplied with this catalogue, not live visitor reviews. Confirm opening hours, access, and trail conditions before visiting.':
-    'Guide details and ratings are supplied with this catalogue, not live visitor reviews. Confirm opening hours, access, and trail conditions before visiting.',
   'Guide rating': 'Guide rating',
   'Guide rating (optional)': 'Guide rating (optional)',
   'Guided Tour': 'Guided Tour',
   'Guided tours': 'Guided tours',
   Heritage: 'Heritage',
-  'Highest community rating': 'Highest community rating',
   'Highest guide rating': 'Highest guide rating',
   Hiking: 'Hiking',
   'Hiking and nature trails': 'Hiking and nature trails',
@@ -370,7 +357,6 @@ export const english: Record<string, string> = {
   'Horse Riding': 'Horse Riding',
   Host: 'Host',
   'Hosted by {name}': 'Hosted by {name}',
-  'Hours unavailable': 'Hours unavailable',
   'Hours unknown; confirm with the venue before leaving.':
     'Hours unknown; confirm with the venue before leaving.',
   'Hours updated': 'Hours updated',
@@ -433,7 +419,6 @@ export const english: Record<string, string> = {
     'MadaTours does not collect event payments. Confirm arrangements with the host.',
   'MadaTours home': 'MadaTours home',
   'MadaTours — place suggestion': 'MadaTours — place suggestion',
-  'Made for discovering Martinique': 'Made for discovering Martinique',
   'Make a day of it': 'Make a day of it',
   'Manage places': 'Manage places',
   'Manual review needed': 'Manual review needed',
@@ -442,7 +427,6 @@ export const english: Record<string, string> = {
   'Map point': 'Map point',
   Marina: 'Marina',
   'Market Food': 'Market Food',
-  'Martinique scenery · illustrative photo': 'Martinique scenery · illustrative photo',
   'Martinique time': 'Martinique time',
   'Matching failed; retry scheduled': 'Matching failed; retry scheduled',
   'Matching places': 'Matching places',
@@ -481,12 +465,9 @@ export const english: Record<string, string> = {
     'No offline places yet. Sign in and save a place while connected.',
   'No places found. Try a town name or activity.': 'No places found. Try a town name or activity.',
   'No places in this area': 'No places in this area',
-  'No rating in this guide yet': 'No rating in this guide yet',
   'No stops yet. Add a place to begin.': 'No stops yet. Add a place to begin.',
   'No suitable stops nearby. Try driving or choose another starting time.':
     'No suitable stops nearby. Try driving or choose another starting time.',
-  'No venue photo yet': 'No venue photo yet',
-  'Not rated': 'Not rated',
   'Notes (optional)': 'Notes (optional)',
   'OUT INTO NATURE': 'OUT INTO NATURE',
   'Official source URL': 'Official source URL',
@@ -498,10 +479,8 @@ export const english: Record<string, string> = {
   'On your revisit list': 'On your revisit list',
   'One day': 'One day',
   'One week': 'One week',
-  'Only administrators can manage places.': 'Only administrators can manage places.',
   'Only people you accept can see your check-ins, favorites and plans you choose to share. Your device location is never shared.':
     'Only people you accept can see your check-ins, favorites and plans you choose to share. Your device location is never shared.',
-  'Open account settings': 'Open account settings',
   'Open candidate photo': 'Open candidate photo',
   'Open email draft': 'Open email draft',
   'Open offline places': 'Open offline places',
@@ -521,8 +500,6 @@ export const english: Record<string, string> = {
   'Photo author': 'Photo author',
   'Photo credits': 'Photo credits',
   'Photo license': 'Photo license',
-  'Photo processing is temporarily unavailable. Please try again later.':
-    'Photo processing is temporarily unavailable. Please try again later.',
   'Photo source': 'Photo source',
   'Photo storage is not configured yet.': 'Photo storage is not configured yet.',
   'Photo upload failed. Please try again.': 'Photo upload failed. Please try again.',
@@ -531,11 +508,9 @@ export const english: Record<string, string> = {
     'Place added. It is now available in search and on the map.',
   'Place category': 'Place category',
   'Place comments': 'Place comments',
-  'Place deleted.': 'Place deleted.',
   'Place name': 'Place name',
   'Place submissions': 'Place submissions',
   'Place tags': 'Place tags',
-  'Places ({count})': 'Places ({count})',
   'Places and filters': 'Places and filters',
   'Places near me': 'Places near me',
   'Places to discover': 'Places to discover',
@@ -563,7 +538,6 @@ export const english: Record<string, string> = {
   Rain: 'Rain',
   'Rain showers': 'Rain showers',
   Rating: 'Rating',
-  'Read your saved places offline': 'Read your saved places offline',
   'Reason for rejection': 'Reason for rejection',
   'Reason for restricting comments': 'Reason for restricting comments',
   'Recent ingestion results': 'Recent ingestion results',
@@ -597,7 +571,6 @@ export const english: Record<string, string> = {
   'Review submission': 'Review submission',
   'Review text': 'Review text',
   Reviews: 'Reviews',
-  'Reviews and comment restrictions': 'Reviews and comment restrictions',
   'Reviews are public and linked to your display name. Share your own experience.':
     'Reviews are public and linked to your display name. Share your own experience.',
   Romantic: 'Romantic',
@@ -640,10 +613,7 @@ export const english: Record<string, string> = {
   'Show {name} on map': 'Show {name} on map',
   'Sign in': 'Sign in',
   'Sign in to manage your account': 'Sign in to manage your account',
-  'Sign in to review or check in': 'Sign in to review or check in',
-  'Sign in when you want to save a place.': 'Sign in when you want to save a place.',
   'Sign out': 'Sign out',
-  'Signed in as': 'Signed in as',
   'Skip to content': 'Skip to content',
   Snow: 'Snow',
   'Snow showers': 'Snow showers',
@@ -662,8 +632,6 @@ export const english: Record<string, string> = {
   Spa: 'Spa',
   Speed: 'Speed',
   'Sports and adventure': 'Sports and adventure',
-  'Start exploring right away. No email verification needed.':
-    'Start exploring right away. No email verification needed.',
   'Start time (Martinique)': 'Start time (Martinique)',
   'Start your island list': 'Start your island list',
   Steakhouse: 'Steakhouse',
@@ -706,9 +674,6 @@ export const english: Record<string, string> = {
     'The first community favorites will appear once places receive three reviews. Share a place you enjoyed to help others discover it.',
   'The service is temporarily unavailable. Please try again shortly.':
     'The service is temporarily unavailable. Please try again shortly.',
-  'The verification could not be completed. Please request a new code.':
-    'The verification could not be completed. Please request a new code.',
-  'The verification does not match this account.': 'The verification does not match this account.',
   'This code is invalid or has expired. Request a new code.':
     'This code is invalid or has expired. Request a new code.',
   'This photo could not be read. Choose another photo.':
@@ -729,8 +694,6 @@ export const english: Record<string, string> = {
   Traditional: 'Traditional',
   Train: 'Train',
   'Travel mode': 'Travel mode',
-  'Travel time is not included. Open directions for road routes and current estimates.':
-    'Travel time is not included. Open directions for road routes and current estimates.',
   'Travel times are planning estimates, not live road directions. Confirm opening hours before leaving.':
     'Travel times are planning estimates, not live road directions. Confirm opening hours before leaving.',
   'Trip name': 'Trip name',
@@ -745,11 +708,9 @@ export const english: Record<string, string> = {
   'Under review': 'Under review',
   'Underwater Scooter': 'Underwater Scooter',
   Unfollow: 'Unfollow',
-  'Updated: {date}': 'Updated: {date}',
   'Updating places…': 'Updating places…',
   'Upload a JPEG, PNG or WebP photo under 2 MB.': 'Upload a JPEG, PNG or WebP photo under 2 MB.',
   'Upload your photo': 'Upload your photo',
-  'Use a password with at least 12 characters.': 'Use a password with at least 12 characters.',
   'Use a public HTTPS official source. Google Maps pages cannot be ingested.':
     'Use a public HTTPS official source. Google Maps pages cannot be ingested.',
   'Use at least 12 characters. A few memorable words work well.':
@@ -761,7 +722,6 @@ export const english: Record<string, string> = {
   'Use your location to group nearby stops, allow travel time and fit a meal around lunch. Your device coordinates stay on this device.':
     'Use your location to group nearby stops, allow travel time and fit a meal around lunch. Your device coordinates stay on this device.',
   Vanilla: 'Vanilla',
-  'Venue contact and information': 'Venue contact and information',
   'Venue details still need verification.': 'Venue details still need verification.',
   'Verify your email before signing in.': 'Verify your email before signing in.',
   'View details': 'View details',
@@ -774,7 +734,6 @@ export const english: Record<string, string> = {
   'Visit duration (minutes)': 'Visit duration (minutes)',
   'Visit recorded. Only one check-in per place per day is counted.':
     'Visit recorded. Only one check-in per place per day is counted.',
-  'Visit time: {minutes} min': 'Visit time: {minutes} min',
   'Visited {count} times this year': 'Visited {count} times this year',
   'Visits: {visits} min · Travel allowance: {travel} min':
     'Visits: {visits} min · Travel allowance: {travel} min',
@@ -786,7 +745,6 @@ export const english: Record<string, string> = {
   'Water Sports': 'Water Sports',
   Waterfall: 'Waterfall',
   Waterfront: 'Waterfront',
-  'Weather and map data:': 'Weather and map data:',
   'Weather is unavailable right now.': 'Weather is unavailable right now.',
   'Welcome to MadaTours': 'Welcome to MadaTours',
   'Welcome to your island guide': 'Welcome to your island guide',
@@ -799,7 +757,6 @@ export const english: Record<string, string> = {
   'Withdraw application': 'Withdraw application',
   Yoga: 'Yoga',
   Yole: 'Yole',
-  'You are signed in.': 'You are signed in.',
   'You can keep up to 20 day trips on this device.':
     'You can keep up to 20 day trips on this device.',
   'You can save up to 20 day trips. Remove an old trip first.':
@@ -818,8 +775,6 @@ export const english: Record<string, string> = {
   'Your draft is ready. Send it in your email app to share it with us.':
     'Your draft is ready. Send it in your email app to share it with us.',
   'Your favorites': 'Your favorites',
-  'Your favorites and revisit list are linked to this account.':
-    'Your favorites and revisit list are linked to this account.',
   'Your island guide, no account needed': 'Your island guide, no account needed',
   'Your island, your adventure': 'Your island, your adventure',
   'Your location': 'Your location',
@@ -851,10 +806,7 @@ export const english: Record<string, string> = {
   '{name} rated this {count} stars': '{name} rated this {count} stars',
   '{temp}°C · {conditions} · {humidity}% humidity':
     '{temp}°C · {conditions} · {humidity}% humidity',
-  'Étang des Salines landscape': 'Étang des Salines landscape',
   'Account settings': 'Account settings',
-  'Change your name and email address, or delete your account.':
-    'Change your name and email address, or delete your account.',
   Profile: 'Profile',
   'Your name and language are saved with your account.':
     'Your name and language are saved with your account.',
@@ -1039,8 +991,6 @@ export const english: Record<string, string> = {
   'Places with restricted access cannot be part of a tour.':
     'Places with restricted access cannot be part of a tour.',
   'Weather, map and route data:': 'Weather, map and route data:',
-  'Change your name, email address and recovery codes, or delete your account.':
-    'Change your name, email address and recovery codes, or delete your account.',
   'Illustrative photo · not this place': 'Illustrative photo · not this place',
   'AI-generated image · not this place': 'AI-generated image · not this place',
   'Places without their own photo show an icon tile or a labelled illustrative photo of the activity: free-licence stock, or one AI-generated trail scene. These never show the listed venue, and each one is credited on its place page.':

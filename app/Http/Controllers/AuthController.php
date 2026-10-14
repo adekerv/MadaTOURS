@@ -7,7 +7,6 @@ use App\Http\Requests\AuthRequest;
 use App\Services\RecoveryCodes;
 use App\Services\Supabase\AuthService;
 use App\Services\Supabase\SupabaseClient;
-use App\Services\WelcomeMessage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -106,7 +105,7 @@ class AuthController extends Controller
         return redirect()->away($this->origin().'/?'.($error ? 'auth_error='.$error : 'signed_in=google'));
     }
 
-    public function register(AuthRequest $request, WelcomeMessage $welcome, RecoveryCodes $recovery): JsonResponse
+    public function register(AuthRequest $request, RecoveryCodes $recovery): JsonResponse
     {
         $input = $request->validated();
         $this->auth->limit('auth', $input['email']);
@@ -118,9 +117,6 @@ class AuthController extends Controller
         $user = isset($data['access_token']) ? $this->auth->user() : null;
         $codes = [];
         if ($user) {
-            if ($user['email']) {
-                $welcome->send($user, $input['language'] ?? 'en');
-            }
             // The only way back into a password account without email. If this fails the account still works and
             // the person can issue codes from their settings, so signup is not turned into an error.
             try {
