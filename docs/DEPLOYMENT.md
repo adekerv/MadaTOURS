@@ -1,6 +1,8 @@
 # Deploying Laravel
 
-Build from the repository root. Serve only `public/`, never the project root. The included Dockerfile builds Vite assets, installs PHP dependencies and starts Apache. `render.yaml` is an optional deployment blueprint; no hosting changes happen automatically from these local edits.
+Production runs on Vercel at https://mada-tours.vercel.app (see [Vercel](#vercel) below). The Dockerfile and `render.yaml` remain for PHP/container hosts. Build from the repository root and serve only `public/`, never the project root. The Dockerfile builds Vite assets, installs PHP dependencies and starts Apache.
+
+A deployment never changes the database. When a commit adds a file under `database/schema`, apply it to Supabase as its own release step, after a backup, before or together with the code that needs it. The live project has no Laravel `migrations` table; schema files are applied through the SQL Editor (or `php artisan db:export-setup`).
 
 ## Environment
 
@@ -68,6 +70,6 @@ docker build -t madatours .
 docker run --env-file .env.production -p 10000:10000 madatours
 ```
 
-Use a private production environment file with the settings above. Port defaults to 10000 and follows the host's `PORT` variable. Keep `storage/` and `bootstrap/cache/` writable by the web user. The former Node function configuration has been removed; deploy this version to a PHP/container host before directing live traffic to it.
+Use a private production environment file with the settings above. Port defaults to 10000 and follows the host's `PORT` variable. Keep `storage/` and `bootstrap/cache/` writable by the web user. The former Node function configuration has been removed.
 
 The image uses PHP's production INI defaults. OPcache is built into PHP 8.5 and is not compiled again; see the [PHP 8.5 migration notes](https://www.php.net/manual/en/migration85.incompatible.php#opcache). CI is configured to build the container and check its public entry point separately from the PHP and browser suites.

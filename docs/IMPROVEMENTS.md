@@ -2,7 +2,7 @@
 
 ## Implemented
 
-- Supabase PostgreSQL and managed authentication, verified email codes, password recovery, explicit administrator roles, private saved lists and account deletion.
+- Supabase PostgreSQL and managed authentication, accounts without email (one-time recovery codes reset a password), Google sign-in, explicit administrator roles, private saved lists and account deletion.
 - French/English interface and public place descriptions, persistent language preference and accent-insensitive search.
 - Device-local day plans with ordered stops, visit durations, notes and directions between eligible stops. Distance is straight-line, not driving distance or a travel-time estimate.
 - Offline saved-place text and a cached production app shell. Maps, weather, photos and account changes still require a connection.
@@ -12,7 +12,7 @@
 
 ## Finish the class release first
 
-The Laravel migration is ready for deployment to a PHP/container host; previous live checks describe the retired Node deployment. Follow [deployment](DEPLOYMENT.md) and repeat account/saved-place checks after deploying Laravel. Complete the email templates/SMTP setup in [SUPABASE-SETUP.md](SUPABASE-SETUP.md) if classmates should register themselves; separate confirmed demo accounts are an alternative for class. Rehearse on your own computer and phone. Email inbox delivery remains unverified.
+The Laravel version is live on Vercel (https://mada-tours.vercel.app). Accounts need no email: see [accounts without email](ACCOUNTS-WITHOUT-EMAIL.md). Before the class release, make sure every `database/schema` file is applied to the live Supabase project, get the automated checks passing again, and rehearse on your own computer and phone.
 
 ## Suggested next product work
 

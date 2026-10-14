@@ -70,7 +70,7 @@ Automated tests use an isolated PostgreSQL engine and an Auth contract double; t
 
 ## Deployment and mobile
 
-Deploy Laravel to a PHP host or use the included Dockerfile. The document root is `public/`; the build output is `public/build/`. [Deployment instructions](docs/DEPLOYMENT.md) cover environment variables, migrations, persistent sessions and the optional Render blueprint. The previous Express/Vercel deployment is retired from this source tree; saving these changes does not change a hosted site.
+The live site is this Laravel application on Vercel at **https://mada-tours.vercel.app**, run as one PHP function (`vercel.json`, `api/index.php`) with the Vercel Supabase integration. The Dockerfile and the optional Render blueprint remain for PHP/container hosts. The document root is `public/`; the build output is `public/build/`. [Deployment instructions](docs/DEPLOYMENT.md) cover environment variables, database changes, sessions and recurring tasks. Database changes are not applied by a deployment: apply new `database/schema` files to Supabase separately (see [database setup](docs/SUPABASE-SETUP.md)).
 
 Keep `VITE_API_URL` empty for the website. Native builds use `dist/mobile` and the deployed Laravel HTTPS origin; see [mobile guide](docs/MOBILE.md). Native signing and store submission are separate release steps.
 
