@@ -19,6 +19,8 @@ class TourResource extends JsonResource
             'description' => $row['description'],
             'descriptionFr' => $row['description_fr'] ?? null,
             'published' => (bool) $row['published'],
+            'featured' => (bool) ($row['featured'] ?? false),
+            'image' => $row['image'] ?? null,
             'stops' => $row['stops'],
             'route' => ! empty($row['route_geojson']) ? [
                 'geometry' => $row['route_geojson'],

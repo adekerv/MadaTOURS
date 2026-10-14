@@ -30,5 +30,6 @@ class AppServiceProvider extends ServiceProvider
             return $auth->token() ? new GenericUser($auth->user()) : null;
         });
         Gate::define('manage-places', fn (GenericUser $user) => $user->role === 'admin');
+        Gate::define('administer', fn (GenericUser $user) => $user->role === 'admin');
     }
 }

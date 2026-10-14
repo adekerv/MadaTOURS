@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
+use App\Services\AdminLog;
 use App\Services\PlacePhotos;
 use App\Services\SubmissionPhotos;
 use App\Services\Supabase\AuthService;
@@ -34,7 +35,7 @@ class PlacePhotoController extends Controller
         ]);
     }
 
-    public function store(Request $request, SubmissionPhotos $photos): JsonResponse
+    public function store(Request $request, SubmissionPhotos $photos, AdminLog $log): JsonResponse
     {
         Gate::authorize('manage-places');
         $input = $request->validate([
@@ -60,15 +61,17 @@ class PlacePhotoController extends Controller
             'business' => $input['business'] ?? null, 'licence_version' => $input['licenceVersion'], 'channel' => $input['channel'],
             'granted_on' => $input['grantedOn'], 'expires_on' => $input['expiresOn'] ?? null,
         ], isset($input['evidence']) ? $this->evidence($input['evidence']) : null, $request->user()->id);
+        $log->record('photos.publish', 'Published an owner photo for place #'.$input['placeId'], 'place', $input['placeId'], ['grantor' => $input['grantorName']]);
 
         return response()->json($result, 201);
     }
 
-    public function revoke(Request $request): JsonResponse
+    public function revoke(Request $request, AdminLog $log): JsonResponse
     {
         Gate::authorize('manage-places');
         $input = $request->validate(['id' => 'required|uuid']);
         $this->placePhotos->revoke($input['id']);
+        $log->record('photos.revoke', 'Took down an owner photo', 'photo-permission', $input['id']);
 
         return response()->json(['success' => true]);
     }
@@ -101,12 +104,13 @@ class PlacePhotoController extends Controller
         return response()->json(['success' => true], 201);
     }
 
-    public function resolve(Request $request, string $report): JsonResponse
+    public function resolve(Request $request, AdminLog $log, string $report): JsonResponse
     {
         Gate::authorize('manage-places');
         validator(['report' => $report], ['report' => 'required|integer|min:1'])->validate();
         $input = $request->validate(['status' => ['required', Rule::in(['resolved', 'dismissed'])]]);
         $this->db->request('PATCH', '/rest/v1/mt_photo_reports?id=eq.'.$report, ['status' => $input['status'], 'resolved_at' => now()->toIso8601String(), 'resolved_by' => $request->user()->id], admin: true);
+        $log->record('photos.report', ucfirst($input['status']).' photo report #'.$report, 'photo-report', $report);
 
         return response()->json(['success' => true]);
     }

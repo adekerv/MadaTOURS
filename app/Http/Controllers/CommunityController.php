@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AdminLog;
 use App\Services\Supabase\AuthService;
 use App\Services\Supabase\SupabaseClient;
 use Illuminate\Http\JsonResponse;
@@ -27,7 +28,7 @@ class CommunityController extends Controller
         return response()->json(['review' => $rows[0] ?? null]);
     }
 
-    public function store(Request $request, AuthService $auth, string $action): JsonResponse
+    public function store(Request $request, AuthService $auth, AdminLog $log, string $action): JsonResponse
     {
         $rules = match ($action) {
             'review' => ['placeId' => 'required|integer|min:1', 'rating' => 'required|integer|between:1,5', 'body' => 'required|string|min:10|max:2000'],
@@ -43,8 +44,18 @@ class CommunityController extends Controller
             Gate::authorize('manage-places');
         }
         $data = $request->validate($rules);
+        $result = $this->client->request('POST', '/rest/v1/rpc/mt_community_write', ['action' => $action, 'payload' => $data], $auth->token());
+        if (in_array($action, ['moderate-review', 'block-comments', 'unblock-comments'], true) || (str_starts_with($action, 'delete-') && $request->user()->role === 'admin')) {
+            $log->record('community.'.$action, match ($action) {
+                'moderate-review' => 'Edited review #'.$data['id'],
+                'block-comments' => 'Stopped an account from commenting',
+                'unblock-comments' => 'Let an account comment again',
+                'delete-review' => 'Deleted review #'.$data['id'],
+                default => 'Deleted comment #'.$data['id'],
+            }, isset($data['userId']) ? 'user' : (str_contains($action, 'comment') && isset($data['id']) ? 'comment' : 'review'), $data['userId'] ?? $data['id'] ?? null);
+        }
 
-        return response()->json($this->client->request('POST', '/rest/v1/rpc/mt_community_write', ['action' => $action, 'payload' => $data], $auth->token()));
+        return response()->json($result);
     }
 
     public function moderation(Request $request, AuthService $auth): JsonResponse

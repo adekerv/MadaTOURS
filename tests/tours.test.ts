@@ -45,7 +45,12 @@ test('Tours: admin-only writes, a road route stored once per change, and straigh
       const signup = await call(
         '/auth/register',
         'POST',
-        { name: who, email, password: 'long test password', password_confirmation: 'long test password' },
+        {
+          name: who,
+          email,
+          password: 'long test password',
+          password_confirmation: 'long test password',
+        },
         who,
       );
       assert.equal(signup.status, 201);
@@ -123,6 +128,29 @@ test('Tours: admin-only writes, a road route stored once per change, and straigh
     assert.equal(reordered.status, 200);
     assert.equal(reordered.body.routeSource, 'road');
     assert.equal((await routing()).requests.length, 2);
+
+    // A duplicate is an unpublished draft that keeps the road, so it costs no routing request; featuring a
+    // tour puts it first for visitors.
+    assert.equal((await call(`/tours/${id}/duplicate`, 'POST', {}, 'visitor')).status, 403);
+    const copy = await call(`/tours/${id}/duplicate`, 'POST', {}, 'admin');
+    assert.equal(copy.status, 201);
+    assert.equal(copy.body.name, 'South coast loop (copy)');
+    assert.equal(copy.body.published, false);
+    assert.equal(copy.body.routeSource, 'road');
+    assert.equal((await routing()).requests.length, 2);
+    await call(
+      `/tours/${copy.body.id}`,
+      'POST',
+      { ...tour, name: 'Featured loop', featured: true, image: 'https://example.test/cover.jpg' },
+      'admin',
+    );
+    const featured = (await call('/tours')).body;
+    assert.equal(featured[0].name, 'Featured loop');
+    assert.equal(featured[0].image, 'https://example.test/cover.jpg');
+    // An update that leaves the flags out keeps them.
+    await call(`/tours/${copy.body.id}`, 'POST', { ...tour, name: 'Featured loop' }, 'admin');
+    assert.equal((await call('/tours')).body[0].featured, true);
+    assert.equal((await call(`/tours/${copy.body.id}`, 'DELETE', undefined, 'admin')).status, 200);
 
     // Stops that visitors cannot go to are refused before anything is stored or routed.
     const restricted = (await call('/places?full=1')).body.find(

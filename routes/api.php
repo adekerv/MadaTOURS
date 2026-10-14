@@ -1,8 +1,14 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AdminMeetupController;
+use App\Http\Controllers\AdminMessageController;
+use App\Http\Controllers\AdminOverviewController;
+use App\Http\Controllers\AdminReviewController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EnrichmentController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\PlaceController;
@@ -10,6 +16,7 @@ use App\Http\Controllers\PlacePhotoController;
 use App\Http\Controllers\RecurringTaskController;
 use App\Http\Controllers\ReviewPhotoController;
 use App\Http\Controllers\SavedPlaceController;
+use App\Http\Controllers\SiteSettingsController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\TourController;
@@ -25,6 +32,7 @@ Route::withoutMiddleware([EncryptCookies::class, AddQueuedCookiesToResponse::cla
     Route::get('places/{place}', [PlaceController::class, 'show'])->whereNumber('place');
     Route::get('tours', [TourController::class, 'index']);
     Route::get('tours/{id}', [TourController::class, 'show'])->whereNumber('id');
+    Route::get('site', [SiteSettingsController::class, 'show']);
     Route::get('daily-picks', [EnrichmentController::class, 'picks']);
     Route::get('places/{place}/community', [CommunityController::class, 'show']);
     // Vercel Cron calls with GET; the GitHub workflow uses POST. Both need the secret.
@@ -42,6 +50,8 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
         Route::post(is_int($path) ? $method : $path, $method)->block(90, 15);
     }
 });
+// The session tells a signed-in sender apart; guests may write too.
+Route::post('contact', [ContactController::class, 'store'])->block(90, 15);
 Route::middleware('auth:supabase')->group(function () {
     Route::get('moderation/enrichment', [EnrichmentController::class, 'index'])->block(90, 15);
     Route::get('moderation/place-photos', [PlacePhotoController::class, 'index'])->block(90, 15);
@@ -72,6 +82,7 @@ Route::middleware('auth:supabase')->group(function () {
     Route::post('tours', [TourController::class, 'store'])->block(90, 15);
     Route::post('tours/{id}', [TourController::class, 'update'])->whereNumber('id')->block(90, 15);
     Route::post('tours/{id}/route', [TourController::class, 'recalculate'])->whereNumber('id')->block(90, 15);
+    Route::post('tours/{id}/duplicate', [TourController::class, 'duplicate'])->whereNumber('id')->block(90, 15);
     Route::delete('tours/{id}', [TourController::class, 'destroy'])->whereNumber('id')->block(90, 15);
     Route::post('places', [PlaceController::class, 'store'])->block(90, 15);
     Route::delete('places/{id}', [PlaceController::class, 'destroy'])->block(90, 15);
@@ -79,5 +90,40 @@ Route::middleware('auth:supabase')->group(function () {
         Route::get('{collection}', 'index')->block(90, 15);
         Route::post('{collection}', 'store')->block(90, 15);
         Route::delete('{collection}', 'destroy')->block(90, 15);
+    });
+});
+
+// The admin dashboard. The gate turns away anyone who is not an administrator before any controller runs, and the
+// database functions check again with the administrator's own session.
+Route::middleware(['auth:supabase', 'can:administer'])->prefix('admin')->group(function () {
+    Route::get('overview', [AdminOverviewController::class, 'overview'])->block(90, 15);
+    Route::get('log', [AdminOverviewController::class, 'log'])->block(90, 15);
+    Route::post('images', [AdminOverviewController::class, 'image'])->block(90, 15);
+    Route::post('site-settings', [SiteSettingsController::class, 'update'])->block(90, 15);
+    Route::controller(AdminUserController::class)->prefix('users')->group(function () {
+        Route::get('/', 'index')->block(90, 15);
+        Route::get('{id}', 'show')->block(90, 15);
+        Route::post('{id}/role', 'role')->block(90, 15);
+        Route::post('{id}/suspend', 'suspend')->block(90, 15);
+        Route::post('{id}/reactivate', 'reactivate')->block(90, 15);
+        Route::post('{id}/password', 'password')->block(90, 15);
+        Route::delete('{id}', 'destroy')->block(90, 15);
+    });
+    Route::controller(AdminMeetupController::class)->prefix('meetups')->group(function () {
+        Route::get('/', 'index')->block(90, 15);
+        Route::get('export', 'export')->block(90, 15);
+        Route::get('{id}', 'show')->whereNumber('id')->block(90, 15);
+        Route::post('{id}/status', 'status')->whereNumber('id')->block(90, 15);
+        Route::post('{id}/requests/{user}', 'decide')->whereNumber('id')->block(90, 15);
+    });
+    Route::controller(AdminReviewController::class)->prefix('reviews')->group(function () {
+        Route::get('/', 'index')->block(90, 15);
+        Route::post('{id}/{action}', 'update')->whereNumber('id')->whereIn('action', ['hide', 'show'])->block(90, 15);
+        Route::delete('{id}', 'destroy')->whereNumber('id')->block(90, 15);
+    });
+    Route::controller(AdminMessageController::class)->prefix('messages')->group(function () {
+        Route::get('/', 'index')->block(90, 15);
+        Route::post('{id}', 'status')->whereNumber('id')->block(90, 15);
+        Route::delete('{id}', 'destroy')->whereNumber('id')->block(90, 15);
     });
 });

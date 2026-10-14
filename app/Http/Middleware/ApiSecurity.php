@@ -29,7 +29,7 @@ class ApiSecurity
         if (! $request->isMethodSafe() && $request->header('X-MadaTours-Client') !== '1') {
             return response()->json(['error' => 'Invalid request. Please reload and try again.'], 403, $headers);
         }
-        if (strlen($request->getContent()) > ($request->is('api/submissions') && $request->isMethod('POST') ? 2900000 : 32768)) {
+        if (strlen($request->getContent()) > self::bodyLimit($request)) {
             return response()->json(['error' => 'Request is too large.'], 413, $headers);
         }
         if ($request->getContent() !== '' && $request->isJson()) {
@@ -42,6 +42,22 @@ class ApiSecurity
         $response->headers->add($headers);
 
         return $response;
+    }
+
+    /**
+     * Photos travel as base64 JSON: one photo is up to 2.8 MB encoded, and an owner photo can carry a permission
+     * document of up to 5.6 MB as well. Everything else stays small.
+     */
+    private static function bodyLimit(Request $request): int
+    {
+        if (! $request->isMethod('POST')) {
+            return 32768;
+        }
+        if ($request->is('api/moderation/place-photos')) {
+            return 8500000;
+        }
+
+        return $request->is('api/submissions', 'api/reviews/*/photos', 'api/admin/images') ? 2900000 : 32768;
     }
 
     private static function origin(?string $value): ?string

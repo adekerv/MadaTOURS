@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AdminLog;
 use App\Services\SubmissionPhotos;
 use App\Services\Supabase\AuthService;
 use App\Services\Supabase\SupabaseClient;
@@ -56,13 +57,16 @@ class SubmissionController extends Controller
         return response()->json($result, 201);
     }
 
-    public function decide(Request $request, AuthService $auth, string $action): JsonResponse
+    public function decide(Request $request, AuthService $auth, AdminLog $log, string $action): JsonResponse
     {
         Gate::authorize('manage-places');
         abort_unless(in_array($action, ['approve', 'reject'], true), 404);
         $rules = ['id' => 'required|integer|min:1'];
         $rules += $action === 'approve' ? ['description' => 'required|string|min:40|max:3000', 'descriptionFr' => 'required|string|min:40|max:3000'] : ['reason' => 'required|string|min:10|max:1000'];
+        $input = $request->validate($rules);
+        $result = $this->client->request('POST', '/rest/v1/rpc/mt_submission_write', ['action' => $action, 'payload' => [...$input, 'origin' => rtrim(config('supabase.app_origin'), '/')]], $auth->token());
+        $log->record('submissions.'.$action, ($action === 'approve' ? 'Approved' : 'Rejected').' place submission #'.$input['id'], 'submission', $input['id']);
 
-        return response()->json($this->client->request('POST', '/rest/v1/rpc/mt_submission_write', ['action' => $action, 'payload' => [...$request->validate($rules), 'origin' => rtrim(config('supabase.app_origin'), '/')]], $auth->token()));
+        return response()->json($result);
     }
 }

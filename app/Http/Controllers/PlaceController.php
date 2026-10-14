@@ -8,6 +8,7 @@ use App\Http\Requests\StorePlaceRequest;
 use App\Http\Resources\PlaceResource;
 use App\Http\Resources\PlaceSummaryResource;
 use App\Repositories\PlaceRepository;
+use App\Services\AdminLog;
 use App\Services\PlaceSearch;
 use App\Services\Supabase\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -43,16 +44,20 @@ class PlaceController extends Controller
         return response()->json((new PlaceResource($row))->resolve());
     }
 
-    public function store(StorePlaceRequest $request, AuthService $auth): JsonResponse
+    public function store(StorePlaceRequest $request, AuthService $auth, AdminLog $log): JsonResponse
     {
-        return response()->json((new PlaceResource($this->places->create($request->validated(), $auth->token())))->resolve(), 201);
+        $place = $this->places->create($request->validated(), $auth->token());
+        $log->record('places.create', 'Added the place “'.$request->validated('name').'”', 'place', $place['id'] ?? null);
+
+        return response()->json((new PlaceResource($place))->resolve(), 201);
     }
 
-    public function destroy(Request $request, AuthService $auth, string $id): JsonResponse
+    public function destroy(Request $request, AuthService $auth, AdminLog $log, string $id): JsonResponse
     {
         Gate::authorize('manage-places');
         validator(['id' => $id], ['id' => ['required', 'integer', 'min:1', 'max:9007199254740991']])->validate();
         $this->places->delete((int) $id, $auth->token());
+        $log->record('places.delete', 'Deleted place #'.$id, 'place', $id);
 
         return response()->json(['success' => true]);
     }

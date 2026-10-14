@@ -29,6 +29,8 @@ class TourRequest extends FormRequest
             'description' => ['required', 'string', 'min:10', 'max:2000', 'not_regex:/[<>]/u'],
             'descriptionFr' => ['nullable', 'string', 'min:10', 'max:2000', 'not_regex:/[<>]/u'],
             'published' => ['boolean'],
+            'featured' => ['boolean'],
+            'image' => ['nullable', 'string', 'max:2000', 'regex:/^(https:\/\/[^\s<>"]+|\/photos\/[^\s<>"]+)$/'],
             'stops' => ['required', 'array', 'min:2', 'max:25'],
             'stops.*.placeId' => ['required', 'integer', 'min:1', 'distinct'],
             'stops.*.minutes' => ['required', 'integer', 'between:5,720'],
@@ -43,6 +45,7 @@ class TourRequest extends FormRequest
             'stops.max' => 'A tour can have up to 25 stops.',
             'stops.*.placeId.distinct' => 'A place can appear once in a tour.',
             'stops.*.minutes.between' => 'A visit lasts between 5 and 720 minutes.',
+            'image.regex' => 'The image address must start with https://.',
         ];
     }
 
@@ -51,7 +54,7 @@ class TourRequest extends FormRequest
     {
         $data = $this->validated();
 
-        return [
+        $columns = [
             'name' => $data['name'],
             'name_fr' => $data['nameFr'] ?? null,
             'description' => $data['description'],
@@ -59,5 +62,14 @@ class TourRequest extends FormRequest
             'published' => (bool) ($data['published'] ?? false),
             'stops' => array_map(fn ($stop) => ['placeId' => (int) $stop['placeId'], 'minutes' => (int) $stop['minutes']], $data['stops']),
         ];
+        // Sent only by the admin dashboard; a client that leaves them out keeps what the tour has.
+        if (array_key_exists('featured', $data)) {
+            $columns['featured'] = (bool) $data['featured'];
+        }
+        if (array_key_exists('image', $data)) {
+            $columns['image'] = is_string($data['image']) && trim($data['image']) !== '' ? trim($data['image']) : null;
+        }
+
+        return $columns;
     }
 }

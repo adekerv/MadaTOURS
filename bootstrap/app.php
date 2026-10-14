@@ -61,7 +61,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
             if ($error instanceof AuthenticationException) {
                 return response()->json(['error' => 'Please sign in to continue.'], 401);
             }
-            if ($error instanceof AuthorizationException) {
+            // Laravel wraps a failed authorization in an AccessDeniedHttpException before this callback runs.
+            if ($error instanceof AuthorizationException || $error->getPrevious() instanceof AuthorizationException) {
                 return response()->json(['error' => 'Only administrators can do this.'], 403);
             }
             if ($error instanceof ValidationException) {
