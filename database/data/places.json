@@ -10729,6 +10729,18 @@
         }
       },
       "address": "97227 Sainte-Anne"
+    },
+    "image": "/photos/salines.jpg",
+    "photo_credit": {
+      "basis": "commons",
+      "title": "Etang des Salines (Martinique).jpg",
+      "author": "Hervé NICOLAS",
+      "caption": "Étang des Salines · 2016",
+      "license": "CC BY-SA 4.0",
+      "modified": "resized",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Etang_des_Salines_(Martinique).jpg",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "retrievedAt": "2026-09-23"
     }
   },
   {

@@ -8,12 +8,12 @@
 - Island tours curated by administrators, with road routes from OpenRouteService.
 - Reviews with photos, comments, check-ins, followers and meet-ups (only Google-verified accounts can join), with moderation.
 - A full admin dashboard: places, tours, meet-ups, users, reviews, the contact inbox, submissions, photo permissions, sources and Google matching, site content and an activity log.
-- Source-cited listings with a repeatable audit, forty places with their own credited photo, labelled illustrations for the rest, and photo reports.
+- Source-cited listings with a repeatable audit, forty-one places with their own credited photo, labelled illustrations for the rest, and photo reports.
 - Offline saved-place text and a cached app shell; responsive, accessible layouts; Capacitor iOS and Android projects.
 
 ## Before the class release
 
-The site is live on Vercel (https://mada-tours.vercel.app). Apply every `database/schema` file to the live Supabase project (see [deployment](DEPLOYMENT.md)), get the GitHub `Application checks` workflow passing, and rehearse the [class demonstration](CLASS-DEMO.md) on a computer and a phone.
+The site is live on Vercel (https://mada-tours.vercel.app). Every `database/schema` file is applied to the live Supabase project; apply future ones the same way (see [deployment](DEPLOYMENT.md)). Get the GitHub `Application checks` workflow passing and rehearse the [class demonstration](CLASS-DEMO.md) on a computer and a phone.
 
 ## Suggested next product work
 

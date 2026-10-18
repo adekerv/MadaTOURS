@@ -1,6 +1,6 @@
 # MadaTours UX and release pass — September 28–29, 2026
 
-> Historical record. Since this pass, accounts no longer depend on email (recovery codes replace emailed codes, so SMTP is no longer a release dependency; see [accounts without email](ACCOUNTS-WITHOUT-EMAIL.md)), the welcome email was removed, the app is deployed on Vercel, and forty places have their own photo. Current results are in [verification](VERIFICATION.md).
+> Historical record. Since this pass, accounts no longer depend on email (recovery codes replace emailed codes, so SMTP is no longer a release dependency; see [accounts without email](ACCOUNTS-WITHOUT-EMAIL.md)), the welcome email was removed, the app is deployed on Vercel, and forty-one places have their own photo. Current results are in [verification](VERIFICATION.md).
 
 The Laravel 13 API, React/TypeScript frontend and existing Capacitor iOS/Android projects remain in place. Guest discovery and device-local day planning remain available without an account.
 

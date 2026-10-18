@@ -1,11 +1,11 @@
-# Verification — October 14, 2026
+# Verification — October 18, 2026
 
-These checks ran locally on macOS with PHP 8.5 and Node 26, on `main` after the account and admin work was merged. CI is configured for PHP 8.5, Node 24 and PostgreSQL 17.
+These checks ran locally on macOS with PHP 8.5 and Node 26, on `main` after the end-of-project clean-up. CI is configured for PHP 8.5, Node 24 and PostgreSQL 17.
 
 | Check                                                  | Result                                                                                |
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| PHPUnit (`php artisan test`)                           | 166 passed, 806 assertions; 1 skipped (the real-PostgreSQL migration test, see below) |
-| API, PostgreSQL RLS, content and utility (`npm test`)  | 79 passed                                                                             |
+| PHPUnit (`php artisan test`)                           | 164 passed, 793 assertions; 1 skipped (the real-PostgreSQL migration test, see below) |
+| API, PostgreSQL RLS, content and utility (`npm test`)  | 74 passed                                                                             |
 | Chromium and WebKit browser flows (`npm run test:e2e`) | 132 passed, 2 skipped (Chromium-only: service-worker offline reload, tablet gestures) |
 | ESLint and TypeScript, Laravel Pint, Prettier          | Passed                                                                                |
 | Production web build                                   | Passed                                                                                |
@@ -19,5 +19,3 @@ The migration test runs only when `MADATOURS_TEST_POSTGRES_URL` points at a dedi
 - The live database: schema files are applied by hand in the Supabase SQL Editor (see [deployment](DEPLOYMENT.md)). `php artisan supabase:check` is the read-only live check.
 - Physical devices and native builds. `npm run build:mobile` and Capacitor sync work, but no signed binary, simulator build or store upload has been made ([mobile](MOBILE.md)).
 - The Docker image, which is built only in CI.
-
-[Earlier Node/Vercel verification records](legacy/NODE-VERIFICATION.md) are kept for history.

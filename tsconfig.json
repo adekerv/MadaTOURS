@@ -16,5 +16,5 @@
     "types": ["node", "vite/client"]
   },
   "include": ["resources/js", "scripts", "tests", "*.ts"],
-  "exclude": ["node_modules", "dist", "docs/legacy", "ios", "android", "vendor", "public/build"]
+  "exclude": ["node_modules", "dist", "ios", "android", "vendor", "public/build"]
 }

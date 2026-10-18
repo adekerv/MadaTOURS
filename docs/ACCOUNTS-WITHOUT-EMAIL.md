@@ -46,5 +46,5 @@ reset with a one-time recovery code instead of an email link.
 
 ## Bringing email back later
 
-The old email flows (confirmation codes, reset links) were removed from the app, and `scripts/configure-auth-email.ts`
-(`npm run auth:configure`) still sets up SMTP and templates in Supabase. Restoring them is a code change, not a setting.
+The old email flows (confirmation codes, reset links) and the SMTP set-up script were removed. Restoring them is a code
+change, not a setting; both remain in the Git history.
