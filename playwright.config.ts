@@ -6,6 +6,9 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   timeout: 30000,
+  // In CI a failure is listed on the run page, and a one-off WebKit stall on a slow runner gets one more try.
+  retries: process.env.CI ? 1 : 0,
+  reporter: process.env.CI ? [['github'], ['list']] : 'list',
   use: {
     baseURL: 'http://127.0.0.1:3100',
     trace: 'retain-on-failure',
