@@ -44,11 +44,15 @@ async function seedTrip(page: Page) {
  */
 async function expectDrawnMap(page: Page, map: ReturnType<Page['locator']>, both = true) {
   await expect(map.locator('canvas.maplibregl-canvas')).toBeVisible();
+  // CI runners draw WebGL in software, so a map that zooms to its stops can take well over five seconds.
   await expect
-    .poll(async () => {
-      const [sea, land] = await countColors(page, await map.screenshot(), [seaColor, landColor]);
-      return both ? sea > 200 && land > 200 : sea + land > 5000;
-    })
+    .poll(
+      async () => {
+        const [sea, land] = await countColors(page, await map.screenshot(), [seaColor, landColor]);
+        return both ? sea > 200 && land > 200 : sea + land > 5000;
+      },
+      { timeout: 20000 },
+    )
     .toBe(true);
 }
 
