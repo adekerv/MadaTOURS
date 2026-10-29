@@ -1,6 +1,8 @@
 import L from 'leaflet';
 import { MaplibreGL, maplibreGL } from '@maplibre/maplibre-gl-leaflet';
+import { setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import { translate } from '../i18n/core';
 
 /**
@@ -9,6 +11,8 @@ import { translate } from '../i18n/core';
  * serves both themes: the dark theme darkens it with a CSS filter, as the raster map always did.
  */
 const style = 'https://tiles.openfreemap.org/styles/liberty';
+// MapLibre 6 looks for its worker next to its own file, which the bundle does not keep, so point it at the built copy.
+setWorkerUrl(workerUrl);
 const link = (href: string, text: string) =>
   `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
 export const attribution = `${link('https://openfreemap.org', 'OpenFreeMap')} ${link('https://www.openmaptiles.org/', '&copy; OpenMapTiles')} Data from ${link('https://www.openstreetmap.org/copyright', 'OpenStreetMap')}`;

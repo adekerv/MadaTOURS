@@ -46,6 +46,10 @@ class TourRequest extends FormRequest
             'stops.*.placeId.distinct' => 'A place can appear once in a tour.',
             'stops.*.minutes.between' => 'A visit lasts between 5 and 720 minutes.',
             'image.regex' => 'The image address must start with https://.',
+            'name.not_regex' => 'The tour name cannot contain < or > or control characters.',
+            'nameFr.not_regex' => 'The tour name cannot contain < or > or control characters.',
+            'description.not_regex' => 'The description cannot contain < or >.',
+            'descriptionFr.not_regex' => 'The description cannot contain < or >.',
         ];
     }
 
