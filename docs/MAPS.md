@@ -22,7 +22,7 @@ The app and the host set no `Content-Security-Policy` today (checked in the code
 responses), so nothing blocks the tile domain. If you add one, allow:
 
 - `connect-src https://tiles.openfreemap.org` (style, tile and TileJSON requests) and `img-src data: blob:`
-- `worker-src blob:` (MapLibre runs its tile worker from a blob) and `child-src blob:` for older browsers
+- `worker-src 'self'` (MapLibre 6 runs its tile worker from the bundled `maplibre-gl-worker-*.mjs`, set in `basemap.ts`)
 - `font-src` and `img-src` for `https://tiles.openfreemap.org` if you move to a style with glyphs or sprites hosted there
 
 ## Tests

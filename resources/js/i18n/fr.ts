@@ -953,6 +953,9 @@ export const french: Record<string, string> = {
   'A tour can have up to 25 stops.': 'Un circuit peut avoir jusqu’à 25 étapes.',
   'A place can appear once in a tour.': 'Un lieu ne peut apparaître qu’une fois dans un circuit.',
   'A visit lasts between 5 and 720 minutes.': 'Une visite dure entre 5 et 720 minutes.',
+  'The tour name cannot contain < or > or control characters.':
+    'Le nom du circuit ne peut pas contenir < ou > ni de caractères de contrôle.',
+  'The description cannot contain < or >.': 'La description ne peut pas contenir < ou >.',
   'This tour could not be found.': 'Ce circuit est introuvable.',
   'Road route updated.': 'Itinéraire routier mis à jour.',
   'No road route could be worked out, so the map shows straight lines. Check the OpenRouteService key and try again.':

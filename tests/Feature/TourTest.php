@@ -182,7 +182,9 @@ class TourTest extends TestCase
         $this->admin()->postJson('/api/tours', $this->payload(['stops' => [['placeId' => 1, 'minutes' => 60]]]))->assertStatus(400)->assertJsonPath('error', 'Choose at least two stops.');
         $this->admin()->postJson('/api/tours', $this->payload(['stops' => [['placeId' => 1, 'minutes' => 60], ['placeId' => 1, 'minutes' => 30]]]))->assertStatus(400)->assertJsonPath('error', 'A place can appear once in a tour.');
         $this->admin()->postJson('/api/tours', $this->payload(['stops' => [['placeId' => 1, 'minutes' => 2], ['placeId' => 2, 'minutes' => 30]]]))->assertStatus(400)->assertJsonPath('error', 'A visit lasts between 5 and 720 minutes.');
-        $this->admin()->postJson('/api/tours', $this->payload(['name' => '<b>x</b>']))->assertStatus(400);
+        $this->admin()->postJson('/api/tours', $this->payload(['name' => '<b>x</b>']))->assertStatus(400)->assertJsonPath('error', 'The tour name cannot contain < or > or control characters.');
+        $this->admin()->postJson('/api/tours', $this->payload(['nameFr' => "Nord\u{0007} caraïbe"]))->assertStatus(400)->assertJsonPath('error', 'The tour name cannot contain < or > or control characters.');
+        $this->admin()->postJson('/api/tours', $this->payload(['description' => 'Une plage <script> et une distillerie.']))->assertStatus(400)->assertJsonPath('error', 'The description cannot contain < or >.');
         Http::assertNotSent(fn ($r) => str_contains($r->url(), '/mt_tours'));
     }
 

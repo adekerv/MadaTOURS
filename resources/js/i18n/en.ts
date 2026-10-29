@@ -939,6 +939,9 @@ export const english: Record<string, string> = {
   'A tour can have up to 25 stops.': 'A tour can have up to 25 stops.',
   'A place can appear once in a tour.': 'A place can appear once in a tour.',
   'A visit lasts between 5 and 720 minutes.': 'A visit lasts between 5 and 720 minutes.',
+  'The tour name cannot contain < or > or control characters.':
+    'The tour name cannot contain < or > or control characters.',
+  'The description cannot contain < or >.': 'The description cannot contain < or >.',
   'This tour could not be found.': 'This tour could not be found.',
   'Road route updated.': 'Road route updated.',
   'No road route could be worked out, so the map shows straight lines. Check the OpenRouteService key and try again.':
