@@ -290,14 +290,30 @@ class AccountTest extends TestCase
         Http::assertSent(fn (Request $r) => str_ends_with($r->url(), '/rpc/mt_my_activity') && $r->hasHeader('Authorization', 'Bearer old-access'));
     }
 
-    public function test_a_wrong_login_gets_one_answer_whichever_part_was_wrong(): void
+    public function test_a_wrong_login_says_which_part_was_wrong(): void
     {
-        $this->provider();
+        Http::fake(function (Request $request) {
+            $path = parse_url($request->url(), PHP_URL_PATH);
+
+            return match (true) {
+                str_ends_with($path, '/rpc/mt_check_rate_limit') => Http::response('true'),
+                str_ends_with($path, '/rpc/mt_account_sign_in') => match ($request['account_email']) {
+                    'camille@example.test' => Http::response('"password"'),
+                    'google-only@example.test' => Http::response('"google"'),
+                    'broken@example.test' => Http::response(['code' => 'XX000'], 500),
+                    default => Http::response('null'),
+                },
+                default => Http::response(['code' => 400, 'error_code' => 'invalid_credentials', 'msg' => 'Invalid login credentials'], 400),
+            };
+        });
         $this->flushSession();
-        $this->postJson('/api/auth/login', ['email' => 'camille@example.test', 'password' => 'not my password'])
-            ->assertStatus(400)->assertJsonPath('error', 'Invalid email or password.');
-        $this->postJson('/api/auth/login', ['email' => 'nobody@example.test', 'password' => 'not my password'])
-            ->assertStatus(400)->assertJsonPath('error', 'Invalid email or password.');
+        $login = fn (string $email) => $this->postJson('/api/auth/login', ['email' => $email, 'password' => 'not my password'])->assertStatus(400);
+        $login('camille@example.test')->assertJsonPath('error', 'Incorrect password. Try again or reset it with a recovery code.');
+        $login('nobody@example.test')->assertJsonPath('error', 'No account uses this email address. Check it or create an account.');
+        $login('google-only@example.test')->assertJsonPath('error', 'This account signs in with Google. Use Continue with Google.');
+        // The lookup failing never hides the login failure behind a server error.
+        $login('broken@example.test')->assertJsonPath('error', 'Invalid email or password.');
+        Http::assertSent(fn (Request $r) => str_ends_with($r->url(), '/rpc/mt_account_sign_in') && $r->hasHeader('apikey', 'private-key'));
     }
 
     public function test_a_suspended_account_is_signed_out_and_cannot_sign_in(): void

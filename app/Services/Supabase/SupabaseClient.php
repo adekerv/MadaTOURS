@@ -29,7 +29,9 @@ class SupabaseClient
             throw new ApiException(503, 'Could not reach the database. Please try again shortly.');
         }
         if (! $response->successful()) {
-            $code = $response->json('code') ?? $response->json('error_code');
+            // Auth puts the HTTP status in `code` and the reason in `error_code`; PostgREST only sends `code`.
+            $code = $response->json('error_code') ?? $response->json('code');
+            $code = is_string($code) ? $code : null;
             if ($code === 'P0429' || $response->status() === 429 || str_starts_with($code ?? '', 'over_')) {
                 throw new ApiException(429, 'Too many attempts. Please wait before trying again.');
             }

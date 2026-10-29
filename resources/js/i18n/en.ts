@@ -1374,6 +1374,12 @@ export const english: Record<string, string> = {
   'The account was suspended and signed out.': 'The account was suspended and signed out.',
   'The account was reactivated.': 'The account was reactivated.',
   'Invalid email or password.': 'Invalid email or password.',
+  'No account uses this email address. Check it or create an account.':
+    'No account uses this email address. Check it or create an account.',
+  'This account signs in with Google. Use Continue with Google.':
+    'This account signs in with Google. Use Continue with Google.',
+  'Incorrect password. Try again or reset it with a recovery code.':
+    'Incorrect password. Try again or reset it with a recovery code.',
   'An account already uses this email address.': 'An account already uses this email address.',
   'This account is suspended. Contact us if you think this is a mistake.':
     'This account is suspended. Contact us if you think this is a mistake.',

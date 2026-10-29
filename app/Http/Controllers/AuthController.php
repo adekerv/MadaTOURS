@@ -136,11 +136,29 @@ class AuthController extends Controller
         try {
             $this->auth->authenticate('token?grant_type=password', $input);
         } catch (ApiException $error) {
-            // One answer whichever part was wrong, so nobody can learn which addresses have accounts.
-            throw $error->status === 400 ? new ApiException(400, 'Invalid email or password.') : $error;
+            throw $error->status === 400 ? new ApiException(400, $this->wrongPart($input['email'])) : $error;
         }
 
         return response()->json(['user' => $this->auth->user()]);
+    }
+
+    /**
+     * Says which part of a failed login was wrong. Signup already reveals whether an address has an account,
+     * and both limits in AuthService::limit still apply. If the lookup fails, the general answer is kept.
+     */
+    private function wrongPart(string $email): string
+    {
+        try {
+            $method = $this->client->request('POST', '/rest/v1/rpc/mt_account_sign_in', ['account_email' => $email], admin: true);
+        } catch (ApiException) {
+            return 'Invalid email or password.';
+        }
+
+        return match ($method) {
+            null => 'No account uses this email address. Check it or create an account.',
+            'google' => 'This account signs in with Google. Use Continue with Google.',
+            default => 'Incorrect password. Try again or reset it with a recovery code.',
+        };
     }
 
     /**

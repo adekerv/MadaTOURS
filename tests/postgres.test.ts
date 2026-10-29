@@ -68,3 +68,23 @@ test('Supabase SQL enforces RLS even when requests bypass the application API', 
     await db.close();
   }
 });
+
+test('The sign-in lookup tells password, Google-only and unknown addresses apart, for the server only', async () => {
+  const db = await testDatabase();
+  await db.query(
+    'INSERT INTO auth.users(id,email,encrypted_password) VALUES($1,$2,$3),($4,$5,$6)',
+    [alice, 'Alice@Example.test', '$2a$10$hash', bob, 'bob@example.test', ''],
+  );
+  const lookup = async (email: string) =>
+    (await db.query<{ m: string | null }>('SELECT public.mt_account_sign_in($1) AS m', [email]))
+      .rows[0].m;
+  assert.equal(await lookup('alice@example.TEST'), 'password');
+  assert.equal(await lookup('bob@example.test'), 'google');
+  assert.equal(await lookup('nobody@example.test'), null);
+  for (const role of ['anon', 'authenticated']) {
+    await db.exec(`SET ROLE ${role}`);
+    await assert.rejects(lookup('alice@example.test'), /permission denied/);
+    await db.exec('RESET ROLE');
+  }
+  await db.close();
+});

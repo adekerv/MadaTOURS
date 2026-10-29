@@ -899,8 +899,17 @@ BEGIN
   IF to_regclass('auth.sessions') IS NOT NULL THEN EXECUTE 'DELETE FROM auth.sessions WHERE user_id=$1' USING target; END IF;
 END; $$;
 
-REVOKE ALL ON FUNCTION public.mt_replace_recovery_codes(uuid,jsonb), public.mt_recovery_candidates(text), public.mt_consume_recovery_code(bigint), public.mt_recovery_codes_left(uuid), public.mt_revoke_user_sessions(uuid) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.mt_replace_recovery_codes(uuid,jsonb), public.mt_recovery_candidates(text), public.mt_consume_recovery_code(bigint), public.mt_recovery_codes_left(uuid), public.mt_revoke_user_sessions(uuid) TO service_role;
+-- How the account behind an email signs in, so a failed login can say which part was wrong:
+-- 'password' when it has one, 'google' when it only has Google, NULL when no account uses the address.
+-- A password set with a recovery code adds no email identity, so the stored hash is what counts.
+CREATE OR REPLACE FUNCTION public.mt_account_sign_in(account_email text) RETURNS text
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
+  SELECT CASE WHEN coalesce(u.encrypted_password,'') <> '' THEN 'password' ELSE 'google' END
+  FROM auth.users u WHERE lower(u.email)=lower(account_email) LIMIT 1;
+$$;
+
+REVOKE ALL ON FUNCTION public.mt_replace_recovery_codes(uuid,jsonb), public.mt_recovery_candidates(text), public.mt_consume_recovery_code(bigint), public.mt_recovery_codes_left(uuid), public.mt_revoke_user_sessions(uuid), public.mt_account_sign_in(text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.mt_replace_recovery_codes(uuid,jsonb), public.mt_recovery_candidates(text), public.mt_consume_recovery_code(bigint), public.mt_recovery_codes_left(uuid), public.mt_revoke_user_sessions(uuid), public.mt_account_sign_in(text) TO service_role;
 
 -- An email address nobody has checked can never count as verified. Clearing the flag in the same transaction
 -- that changes the address means a change that fails, for example because the address is taken, costs nothing.

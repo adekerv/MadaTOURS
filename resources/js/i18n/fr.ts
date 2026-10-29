@@ -1393,6 +1393,12 @@ export const french: Record<string, string> = {
   'The account was suspended and signed out.': 'Le compte a été suspendu et déconnecté.',
   'The account was reactivated.': 'Le compte a été réactivé.',
   'Invalid email or password.': 'E-mail ou mot de passe incorrect.',
+  'No account uses this email address. Check it or create an account.':
+    'Aucun compte n’utilise cette adresse e-mail. Vérifiez-la ou créez un compte.',
+  'This account signs in with Google. Use Continue with Google.':
+    'Ce compte se connecte avec Google. Utilisez Continuer avec Google.',
+  'Incorrect password. Try again or reset it with a recovery code.':
+    'Mot de passe incorrect. Réessayez ou réinitialisez-le avec un code de récupération.',
   'An account already uses this email address.': 'Un compte utilise déjà cette adresse e-mail.',
   'This account is suspended. Contact us if you think this is a mistake.':
     'Ce compte est suspendu. Contactez-nous si vous pensez qu’il s’agit d’une erreur.',

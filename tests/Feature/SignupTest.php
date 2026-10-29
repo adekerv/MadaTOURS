@@ -86,9 +86,27 @@ class SignupTest extends TestCase
 
     public function test_provider_rejection_reports_an_existing_account(): void
     {
-        Http::fake(['*/rpc/mt_check_rate_limit' => Http::response('true'), '*/auth/v1/signup' => Http::response(['error_code' => 'user_already_exists'], 422)]);
+        Http::fake(['*/rpc/mt_check_rate_limit' => Http::response('true'), '*/auth/v1/signup' => Http::response(['code' => 422, 'error_code' => 'user_already_exists', 'msg' => 'User already registered'], 422)]);
         $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password', 'password_confirmation' => 'a long test password'])
             ->assertStatus(409)->assertJsonPath('error', 'An account already uses this email address.');
+    }
+
+    public function test_provider_password_rules_are_explained_instead_of_a_generic_error(): void
+    {
+        Http::fake(['*/rpc/mt_check_rate_limit' => Http::response('true'), '*/auth/v1/signup' => Http::response(['code' => 422, 'error_code' => 'weak_password', 'msg' => 'Password should contain at least one character of each'], 422)]);
+        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password', 'password_confirmation' => 'a long test password'])
+            ->assertStatus(400)->assertJsonPath('error', 'This password is too easy to guess. Choose a longer or less common one.');
+    }
+
+    public function test_a_suspended_account_is_told_so_after_signup(): void
+    {
+        Http::fake([
+            '*/rpc/mt_check_rate_limit' => Http::response('true'),
+            '*/auth/v1/signup' => Http::response(['access_token' => 'a', 'refresh_token' => 'r', 'expires_in' => 3600]),
+            '*/auth/v1/user' => Http::response(['code' => 403, 'error_code' => 'user_banned', 'msg' => 'User is banned'], 403),
+        ]);
+        $this->postJson('/api/auth/register', ['name' => 'Camille', 'email' => 'user@example.com', 'password' => 'a long test password', 'password_confirmation' => 'a long test password'])
+            ->assertStatus(403)->assertJsonPath('error', 'This account is suspended. Contact us if you think this is a mistake.');
     }
 
     public function test_signup_needs_the_password_twice_and_checks_nothing_remotely_when_they_differ(): void
